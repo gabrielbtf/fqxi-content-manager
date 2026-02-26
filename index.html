@@ -256,13 +256,39 @@
   .img-comment-existing { font-size: 12px; color: #92400e; margin-top: 4px; padding: 6px 8px; background: #fef3c7; border-radius: 6px; }
   .img-comment-author { font-weight: 600; font-size: 11px; color: #78350f; }
 
-  /* ─── REVIEW PANEL ─── */
-  .review-panel { margin-top: 16px; padding: 16px; background: #fafafa; border: 1px solid #e2e8f0; border-radius: 12px; }
-  .review-panel-header { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 12px; flex-wrap: wrap; }
-  .review-panel-title { font-size: 12px; font-weight: 700; color: #0f172a; text-transform: uppercase; letter-spacing: 0.06em; font-family: 'Cormorant Garamond', Georgia, serif; }
+  /* ─── REVIEW MODAL ─── */
+  @keyframes rmFadeIn { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes rmSlideUp { from { opacity: 0; transform: translateY(24px) scale(0.97); } to { opacity: 1; transform: translateY(0) scale(1); } }
+  .rm-overlay { position: fixed; inset: 0; background: rgba(15,23,42,0.6); backdrop-filter: blur(6px); z-index: 200; display: flex; align-items: center; justify-content: center; padding: 20px; animation: rmFadeIn 0.2s ease; }
+  .rm-modal { background: #fff; border-radius: 16px; width: 100%; max-width: 1100px; max-height: 88vh; box-shadow: 0 25px 80px rgba(0,0,0,0.35); position: relative; display: flex; flex-direction: column; overflow: hidden; animation: rmSlideUp 0.3s ease; }
+  .rm-close { position: absolute; top: 12px; right: 12px; width: 32px; height: 32px; border-radius: 50%; border: none; background: rgba(255,255,255,0.9); cursor: pointer; font-size: 20px; color: #475569; z-index: 201; display: flex; align-items: center; justify-content: center; transition: all 0.15s; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+  .rm-close:hover { background: #fff; transform: scale(1.1); color: #0f172a; }
+  .rm-body { display: flex; flex: 1; overflow: hidden; min-height: 0; }
+  .rm-left { flex: 0 0 58%; background: #0f172a; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 24px; overflow-y: auto; position: relative; }
+  .rm-left .slideshow { max-height: 420px; width: 100%; aspect-ratio: 4/5; }
+  .rm-left .single-media { max-height: 420px; width: 100%; }
+  .rm-left .single-media img { max-height: 420px; }
+  .rm-left .video-player { width: 100%; }
+  .rm-left .video-player video { max-height: 420px; }
+  .rm-right { flex: 0 0 42%; display: flex; flex-direction: column; overflow-y: auto; border-left: 1px solid #e2e8f0; }
+  .rm-right-inner { padding: 24px; display: flex; flex-direction: column; gap: 20px; flex: 1; }
+  .rm-header { display: flex; flex-direction: column; gap: 8px; }
+  .rm-title { font-size: 18px; font-weight: 700; font-family: 'Cormorant Garamond', Georgia, serif; color: #0f172a; margin: 0; }
+  .rm-meta { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .rm-section { display: flex; flex-direction: column; gap: 8px; }
+  .rm-section-title { font-size: 10px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.06em; }
+  .rm-caption-tabs { display: flex; gap: 4px; }
+  .rm-caption-tab { padding: 5px 10px; border-radius: 6px; font-size: 11px; font-weight: 600; cursor: pointer; border: 1px solid #e2e8f0; background: #fff; color: #64748b; transition: all 0.15s; position: relative; }
+  .rm-caption-tab.active { background: #e4d344; color: #1e1b4b; border-color: #e4d344; }
+  .rm-caption-tab .has-dot { position: absolute; top: 3px; right: 3px; width: 5px; height: 5px; border-radius: 50%; background: #22c55e; }
+  .rm-caption-text { padding: 12px; background: #f8fafc; border-radius: 8px; font-size: 13px; line-height: 1.6; color: #334155; max-height: 120px; overflow-y: auto; white-space: pre-wrap; }
+  .rm-caption-empty { color: #cbd5e1; font-style: italic; }
+  .rm-actions { display: flex; flex-direction: column; gap: 8px; }
+  .rm-divider { height: 1px; background: #e2e8f0; margin: 0; }
   .review-actions { display: flex; gap: 8px; flex-wrap: wrap; }
-  .btn-review { padding: 6px 14px; border-radius: 8px; font-size: 12px; font-weight: 600; cursor: pointer; border: none; font-family: inherit; transition: all 0.15s; display: flex; align-items: center; gap: 5px; }
-  .btn-review:hover { transform: translateY(-1px); }
+  .btn-review { padding: 8px 16px; border-radius: 8px; font-size: 12px; font-weight: 600; cursor: pointer; border: none; font-family: inherit; transition: all 0.15s; display: flex; align-items: center; gap: 5px; }
+  .btn-review:hover { transform: translateY(-1px); box-shadow: 0 2px 8px rgba(0,0,0,0.12); }
+  .btn-review:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
   .btn-submit-review { background: #3b82f6; color: #fff; }
   .btn-submit-review:hover { background: #2563eb; }
   .btn-approve { background: #22c55e; color: #fff; }
@@ -271,11 +297,11 @@
   .btn-request-changes:hover { background: #d97706; }
   .btn-resubmit { background: #7c3aed; color: #fff; }
   .btn-resubmit:hover { background: #6d28d9; }
-  .review-note-input { width: 100%; border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px; font-size: 13px; outline: none; font-family: inherit; resize: vertical; min-height: 50px; margin-bottom: 8px; }
+  .review-note-input { width: 100%; border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px; font-size: 13px; outline: none; font-family: inherit; resize: vertical; min-height: 50px; margin-bottom: 8px; box-sizing: border-box; }
   .review-note-input:focus { border-color: #e4d344; box-shadow: 0 0 0 3px rgba(228,211,68,0.25); }
-  .review-history { margin-top: 12px; }
-  .review-history-title { font-size: 10px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 8px; }
-  .review-entry { padding: 10px 12px; border-radius: 8px; margin-bottom: 6px; font-size: 12px; line-height: 1.5; }
+  .review-history { display: flex; flex-direction: column; gap: 6px; }
+  .review-history-title { font-size: 10px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 4px; }
+  .review-entry { padding: 10px 12px; border-radius: 8px; font-size: 12px; line-height: 1.5; }
   .review-entry.re-submit, .review-entry.re-resubmit { background: #eff6ff; border-left: 3px solid #3b82f6; }
   .review-entry.re-changes { background: #fffbeb; border-left: 3px solid #f59e0b; }
   .review-entry.re-approve { background: #f0fdf4; border-left: 3px solid #22c55e; }
@@ -292,6 +318,11 @@
   .review-entry-img-comment { font-size: 11px; color: #64748b; padding: 2px 0; }
   .review-entry-img-comment strong { color: #475569; }
   .stat-review { background: #eff6ff; color: #1d4ed8; }
+  .btn-open-review { display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px; border-radius: 8px; font-size: 12px; font-weight: 600; cursor: pointer; border: 1px solid #e2e8f0; background: #f8fafc; color: #475569; font-family: inherit; transition: all 0.15s; margin-top: 12px; }
+  .btn-open-review:hover { background: #e4d344; color: #1e1b4b; border-color: #e4d344; }
+
+  /* ─── DRAG & DROP ─── */
+  .upload-zone.dragging { border-color: #e4d344; background: #fffbeb; border-style: solid; }
 
   /* ─── KEYBOARD HELP ─── */
   .shortcuts-help { font-size: 10px; color: #cbd5e1; display: flex; gap: 12px; padding: 8px 0 0; flex-wrap: wrap; }
@@ -311,6 +342,12 @@
     .main { padding: 16px; }
     .stat-badges { display: none; }
     .toast-container { bottom: 12px; right: 12px; left: 12px; }
+    .rm-body { flex-direction: column; }
+    .rm-left { flex: 0 0 auto; max-height: 50vh; padding: 16px; }
+    .rm-right { flex: 0 0 auto; border-left: none; border-top: 1px solid #e2e8f0; }
+    .rm-right-inner { padding: 16px; }
+    .rm-overlay { padding: 8px; }
+    .rm-modal { max-height: 95vh; }
   }
 </style>
 </head>
@@ -434,38 +471,60 @@ function SubtaskList({subtasks,onChange,onAdd,onRemove}){
 }
 
 function AssetUploader({imageUrls,taskId,onUpdate,mediaType,onMediaTypeChange}){
-  const fileRef=useRef(null);const[uploading,setUploading]=useState(false);const[lightbox,setLightbox]=useState(null);
+  const fileRef=useRef(null);const[uploading,setUploading]=useState(false);const[lightbox,setLightbox]=useState(null);const[dragging,setDragging]=useState(false);
   const mt=mediaType||'single';
-  const acceptType=mt==='video'?'video/*':'image/*';
-  const isMultiple=mt==='carousel';
-  const handleFiles=async(e)=>{
-    const files=Array.from(e.target.files);if(!files.length)return;setUploading(true);
+
+  const autoDetect=(files)=>{
+    const imgs=files.filter(f=>f.type.startsWith('image/'));const vids=files.filter(f=>f.type.startsWith('video/'));
+    if(vids.length>0)return'video';
+    if(imgs.length>1)return'carousel';
+    if(imgs.length===1&&(imageUrls||[]).length>=1)return'carousel';
+    return'single';
+  };
+
+  const processFiles=async(files)=>{
+    if(!files.length)return;setUploading(true);
+    const detected=autoDetect(files);
+    if(detected!==mt&&onMediaTypeChange)onMediaTypeChange(detected);
     const newUrls=[...(imageUrls||[])];
     for(const file of files){
       const isImg=file.type.startsWith('image/');const isVid=file.type.startsWith('video/');
-      if(mt==='video'&&!isVid)continue;
-      if(mt!=='video'&&!isImg)continue;
+      if(!isImg&&!isVid)continue;
       const path=`tasks/${taskId}/${Date.now()}_${file.name}`;
       const{error}=await supabase.storage.from('assets').upload(path,file);
       if(error){console.error(error);continue;}
       const{data}=supabase.storage.from('assets').getPublicUrl(path);
       newUrls.push({url:data.publicUrl,path,name:file.name,type:isVid?'video':'image'});
     }
-    onUpdate(newUrls);setUploading(false);e.target.value='';
+    onUpdate(newUrls);setUploading(false);
   };
-  const removeAsset=async(asset)=>{await supabase.storage.from('assets').remove([asset.path]);onUpdate((imageUrls||[]).filter(a=>a.path!==asset.path));};
+
+  const handleFiles=async(e)=>{await processFiles(Array.from(e.target.files));e.target.value='';};
+  const handleDrop=async(e)=>{e.preventDefault();e.stopPropagation();setDragging(false);await processFiles(Array.from(e.dataTransfer.files));};
+  const handleDragOver=(e)=>{e.preventDefault();e.stopPropagation();setDragging(true);};
+  const handleDragLeave=(e)=>{e.preventDefault();e.stopPropagation();setDragging(false);};
+
+  const removeAsset=async(asset)=>{
+    await supabase.storage.from('assets').remove([asset.path]);
+    const remaining=(imageUrls||[]).filter(a=>a.path!==asset.path);
+    onUpdate(remaining);
+    if(remaining.length<=1&&mt==='carousel'&&onMediaTypeChange)onMediaTypeChange('single');
+  };
+
   return(<div>
     <span className="field-label">Assets / Media</span>
     <div style={{display:'flex',alignItems:'center',gap:8,marginBottom:8}}>
-      <span style={{fontSize:12,color:'#94a3b8'}}>Media type:</span>
-      {MEDIA_TYPES.map(t=><button key={t} className={`btn-sm ${mt===t?'':'btn-outline'}`} onClick={()=>onMediaTypeChange&&onMediaTypeChange(t)} style={mt===t?{background:'#e4d344',color:'#1e1b4b',border:'1px solid #e4d344'}:{}}>{t==='single'?'Single Image':t==='carousel'?'Carousel':'Video'}</button>)}
+      <span style={{fontSize:12,color:'#94a3b8'}}>Type:</span>
+      {MEDIA_TYPES.map(t=><button key={t} className="btn-sm" onClick={()=>onMediaTypeChange&&onMediaTypeChange(t)} style={mt===t?{background:'#e4d344',color:'#1e1b4b',border:'1px solid #e4d344'}:{}}>{t==='single'?'Single':t==='carousel'?'Carousel':'Video'}</button>)}
     </div>
     {(imageUrls||[]).length>0&&<div className="assets-grid">{imageUrls.map((a,i)=><div key={i} className="asset-thumb">
       {a.type==='video'?<video src={a.url} style={{width:'100%',height:'100%',objectFit:'cover'}}/>:<img src={a.url} alt={a.name} onClick={()=>setLightbox(a)}/>}
       <div className="asset-overlay"><button onClick={()=>setLightbox(a)}>View</button><button className="del-btn" onClick={()=>removeAsset(a)}>Delete</button></div>
     </div>)}</div>}
-    <div className="upload-zone" onClick={()=>fileRef.current?.click()}><p>{uploading?"Uploading...":<>{IC.image} Click to upload {mt==='video'?'video':'images'}</>}</p><input ref={fileRef} type="file" accept={acceptType} multiple={isMultiple} onChange={handleFiles} disabled={uploading}/></div>
-    <p className="storage-note">Media stored in Supabase Storage (1GB free)</p>
+    <div className={`upload-zone ${dragging?'dragging':''}`} onClick={()=>fileRef.current?.click()} onDragOver={handleDragOver} onDragLeave={handleDragLeave} onDrop={handleDrop}>
+      <p>{uploading?"Uploading...":<>{IC.image} {dragging?"Drop files here":"Click or drag files to upload"}</>}</p>
+      <input ref={fileRef} type="file" accept="image/*,video/*" multiple onChange={handleFiles} disabled={uploading}/>
+    </div>
     {lightbox&&<div className="lightbox" onClick={()=>setLightbox(null)}>{lightbox.type==='video'?<video src={lightbox.url} controls autoPlay style={{maxWidth:'90vw',maxHeight:'80vh'}} onClick={e=>e.stopPropagation()}/>:<img src={lightbox.url} alt={lightbox.name} onClick={e=>e.stopPropagation()}/>}</div>}
   </div>);
 }
@@ -512,117 +571,130 @@ function MediaViewer({assets,mediaType,imageComments,onImageComment,reviewMode})
   </div>);
 }
 
-function ReviewPanel({task,onUpdate,userEmail,addToast}){
+function ReviewModal({task,onClose,onUpdate,userEmail,addToast}){
   const rs=task.review_status||"none";
   const notes=task.review_notes||[];
   const[msg,setMsg]=useState("");
   const[showChangesForm,setShowChangesForm]=useState(false);
   const[imgComments,setImgComments]=useState({});
+  const[captionTab,setCaptionTab]=useState(PLATFORMS[0]);
+
+  useEffect(()=>{const h=(e)=>{if(e.key==='Escape')onClose();};document.addEventListener('keydown',h);return()=>document.removeEventListener('keydown',h);},[onClose]);
 
   const addReviewNote=(type,message,image_comments)=>{
     const entry={author:userEmail,date:new Date().toISOString(),type,message};
     if(image_comments&&Object.keys(image_comments).length>0)entry.image_comments=image_comments;
-    const updated=[...notes,entry];
-    return updated;
+    return[...notes,entry];
   };
 
-  const submitForReview=()=>{
-    const rn=addReviewNote("submit",msg||"Ready for review");
-    onUpdate({...task,review_status:"submitted",review_notes:rn});
-    setMsg("");
-    addToast("Submitted for review");
-  };
-
-  const resubmit=()=>{
-    const rn=addReviewNote("resubmit",msg||"Updated and resubmitted");
-    onUpdate({...task,review_status:"resubmitted",review_notes:rn});
-    setMsg("");
-    addToast("Resubmitted for review");
-  };
-
-  const approve=()=>{
-    const rn=addReviewNote("approve",msg||"Approved!");
-    onUpdate({...task,review_status:"approved",review_notes:rn});
-    setMsg("");
-    addToast("Post approved!");
-  };
-
-  const requestChanges=()=>{
-    const rn=addReviewNote("changes",msg,imgComments);
-    onUpdate({...task,review_status:"needs_changes",review_notes:rn});
-    setMsg("");setImgComments({});setShowChangesForm(false);
-    addToast("Changes requested");
-  };
-
-  const handleImgComment=(slideIdx,comment)=>{
-    setImgComments(prev=>({...prev,[slideIdx]:comment}));
-  };
+  const submitForReview=()=>{onUpdate({...task,review_status:"submitted",review_notes:addReviewNote("submit",msg||"Ready for review")});setMsg("");addToast("Submitted for review");};
+  const resubmit=()=>{onUpdate({...task,review_status:"resubmitted",review_notes:addReviewNote("resubmit",msg||"Updated and resubmitted")});setMsg("");addToast("Resubmitted for review");};
+  const approve=()=>{onUpdate({...task,review_status:"approved",review_notes:addReviewNote("approve",msg||"Approved!")});setMsg("");addToast("Post approved!");};
+  const requestChanges=()=>{onUpdate({...task,review_status:"needs_changes",review_notes:addReviewNote("changes",msg,imgComments)});setMsg("");setImgComments({});setShowChangesForm(false);addToast("Changes requested");};
+  const handleImgComment=(slideIdx,comment)=>{setImgComments(prev=>({...prev,[slideIdx]:comment}));};
 
   const isReviewable=rs==="submitted"||rs==="resubmitted";
   const canSubmit=rs==="none";
   const canResubmit=rs==="needs_changes";
-
   const formatDate=(d)=>{try{return new Date(d).toLocaleString('en-GB',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'});}catch{return d;}};
   const typeLabels={submit:"Submitted",resubmit:"Resubmitted",changes:"Changes Requested",approve:"Approved"};
+  const caps=task.captions||{};
 
-  return(<div className="review-panel">
-    <div className="review-panel-header">
-      <span className="review-panel-title">Review</span>
-      {rs!=="none"&&<span className={`review-badge rb-${rs}`}>{REVIEW_LABELS[rs]}</span>}
-    </div>
-
-    {/* Media viewer for review context */}
-    {(task.image_urls||[]).length>0&&<MediaViewer assets={task.image_urls} mediaType={task.media_type||"single"} imageComments={showChangesForm?imgComments:null} onImageComment={handleImgComment} reviewMode={showChangesForm}/>}
-
-    {/* Submit for review */}
-    {canSubmit&&<div style={{marginTop:12}}>
-      <textarea className="review-note-input" value={msg} onChange={e=>setMsg(e.target.value)} placeholder="Optional message for reviewer..." rows={2}/>
-      <button className="btn-review btn-submit-review" onClick={submitForReview}>Submit for Review</button>
-    </div>}
-
-    {/* Resubmit after changes */}
-    {canResubmit&&<div style={{marginTop:12}}>
-      <textarea className="review-note-input" value={msg} onChange={e=>setMsg(e.target.value)} placeholder="What did you change?" rows={2}/>
-      <button className="btn-review btn-resubmit" onClick={resubmit}>Resubmit for Review</button>
-    </div>}
-
-    {/* Reviewer actions */}
-    {isReviewable&&<div style={{marginTop:12}}>
-      {!showChangesForm?<div className="review-actions">
-        <button className="btn-review btn-approve" onClick={()=>{approve();}}>Approve</button>
-        <button className="btn-review btn-request-changes" onClick={()=>setShowChangesForm(true)}>Request Changes</button>
-      </div>:<div>
-        <p style={{fontSize:12,fontWeight:600,color:'#475569',marginBottom:6}}>Describe what needs changing. You can also click slides above to leave per-image comments.</p>
-        <textarea className="review-note-input" value={msg} onChange={e=>setMsg(e.target.value)} placeholder="What needs to change?" rows={3}/>
-        {Object.keys(imgComments).length>0&&<div style={{marginBottom:8}}><p style={{fontSize:11,color:'#94a3b8',fontWeight:600}}>Image comments:</p>{Object.entries(imgComments).map(([k,v])=><p key={k} style={{fontSize:11,color:'#64748b'}}>Slide {parseInt(k)+1}: {v}</p>)}</div>}
-        <div style={{display:'flex',gap:8}}><button className="btn-review btn-request-changes" onClick={requestChanges} disabled={!msg.trim()}>Send Feedback</button><button className="btn-sm" onClick={()=>{setShowChangesForm(false);setImgComments({});}}>Cancel</button></div>
-      </div>}
-    </div>}
-
-    {/* Approved state */}
-    {rs==="approved"&&<p style={{marginTop:8,fontSize:13,color:'#15803d',fontWeight:500}}>This post has been approved and is ready to go live.</p>}
-
-    {/* Review history */}
-    {notes.length>0&&<div className="review-history">
-      <div className="review-history-title">Review History</div>
-      {[...notes].reverse().map((n,i)=>(
-        <div key={i} className={`review-entry re-${n.type}`}>
-          <div className="review-entry-header">
-            <span className="review-entry-author">{n.author}</span>
-            <div style={{display:'flex',alignItems:'center',gap:6}}>
-              <span className={`review-entry-type ret-${n.type}`}>{typeLabels[n.type]||n.type}</span>
-              <span className="review-entry-date">{formatDate(n.date)}</span>
-            </div>
-          </div>
-          {n.message&&<p className="review-entry-msg">{n.message}</p>}
-          {n.image_comments&&Object.keys(n.image_comments).length>0&&<div className="review-entry-img-comments">{Object.entries(n.image_comments).map(([k,v])=><p key={k} className="review-entry-img-comment"><strong>Slide {parseInt(k)+1}:</strong> {v}</p>)}</div>}
+  return(<div className="rm-overlay" onClick={onClose}>
+    <div className="rm-modal" onClick={e=>e.stopPropagation()}>
+      <button className="rm-close" onClick={onClose}>{"\u00d7"}</button>
+      <div className="rm-body">
+        {/* LEFT: Media preview */}
+        <div className="rm-left">
+          {(task.image_urls||[]).length>0?
+            <MediaViewer assets={task.image_urls} mediaType={task.media_type||"single"} imageComments={showChangesForm?imgComments:null} onImageComment={handleImgComment} reviewMode={showChangesForm}/>
+            :<div style={{color:'#64748b',fontSize:14,textAlign:'center',padding:40}}>No media uploaded yet.<br/>Upload images or video from the task card.</div>
+          }
         </div>
-      ))}
-    </div>}
+
+        {/* RIGHT: Review controls */}
+        <div className="rm-right">
+          <div className="rm-right-inner">
+            <div className="rm-header">
+              <h2 className="rm-title">{task.title}</h2>
+              <div className="rm-meta">
+                <span className="task-category">{task.category}</span>
+                {rs!=="none"&&<span className={`review-badge rb-${rs}`}>{REVIEW_LABELS[rs]}</span>}
+                {task.media_type&&task.media_type!=='single'&&<span style={{fontSize:10,color:'#94a3b8',textTransform:'uppercase',fontWeight:600}}>{task.media_type}</span>}
+              </div>
+            </div>
+
+            {task.description&&<div className="rm-section"><div className="rm-section-title">Description</div><p style={{fontSize:13,color:'#475569',lineHeight:1.6,margin:0}}>{task.description}</p></div>}
+
+            <div className="rm-divider"/>
+
+            <div className="rm-section">
+              <div className="rm-section-title">Platform Captions</div>
+              <div className="rm-caption-tabs">{PLATFORMS.map(p=><button key={p} className={`rm-caption-tab ${captionTab===p?'active':''}`} onClick={()=>setCaptionTab(p)}>{p}{caps[p]?<span className="has-dot"/>:""}</button>)}</div>
+              <div className="rm-caption-text">{caps[captionTab]?caps[captionTab]:<span className="rm-caption-empty">No caption for {captionTab}.</span>}</div>
+            </div>
+
+            <div className="rm-divider"/>
+
+            {/* Review Actions */}
+            <div className="rm-section">
+              <div className="rm-section-title">Review</div>
+
+              {canSubmit&&<div className="rm-actions">
+                <textarea className="review-note-input" value={msg} onChange={e=>setMsg(e.target.value)} placeholder="Optional message for reviewer..." rows={2}/>
+                <button className="btn-review btn-submit-review" onClick={submitForReview}>Submit for Review</button>
+              </div>}
+
+              {canResubmit&&<div className="rm-actions">
+                <textarea className="review-note-input" value={msg} onChange={e=>setMsg(e.target.value)} placeholder="What did you change?" rows={2}/>
+                <button className="btn-review btn-resubmit" onClick={resubmit}>Resubmit for Review</button>
+              </div>}
+
+              {isReviewable&&<div className="rm-actions">
+                {!showChangesForm?<div className="review-actions">
+                  <button className="btn-review btn-approve" onClick={approve}>Approve</button>
+                  <button className="btn-review btn-request-changes" onClick={()=>setShowChangesForm(true)}>Request Changes</button>
+                </div>:<div style={{width:'100%'}}>
+                  <p style={{fontSize:12,fontWeight:600,color:'#475569',marginBottom:6}}>Describe what needs changing. Click slides on the left to add per-image comments.</p>
+                  <textarea className="review-note-input" value={msg} onChange={e=>setMsg(e.target.value)} placeholder="What needs to change?" rows={3}/>
+                  {Object.keys(imgComments).length>0&&<div style={{marginBottom:8}}><p style={{fontSize:11,color:'#94a3b8',fontWeight:600}}>Image comments:</p>{Object.entries(imgComments).map(([k,v])=><p key={k} style={{fontSize:11,color:'#64748b'}}>Slide {parseInt(k)+1}: {v}</p>)}</div>}
+                  <div style={{display:'flex',gap:8}}><button className="btn-review btn-request-changes" onClick={requestChanges} disabled={!msg.trim()}>Send Feedback</button><button className="btn-sm" onClick={()=>{setShowChangesForm(false);setImgComments({});}}>Cancel</button></div>
+                </div>}
+              </div>}
+
+              {rs==="approved"&&<p style={{fontSize:13,color:'#15803d',fontWeight:500,margin:0}}>This post has been approved and is ready to go live.</p>}
+            </div>
+
+            {/* Review History */}
+            {notes.length>0&&<>
+              <div className="rm-divider"/>
+              <div className="rm-section" style={{flex:1}}>
+                <div className="rm-section-title">Review History</div>
+                <div className="review-history">
+                  {[...notes].reverse().map((n,i)=>(
+                    <div key={i} className={`review-entry re-${n.type}`}>
+                      <div className="review-entry-header">
+                        <span className="review-entry-author">{n.author}</span>
+                        <div style={{display:'flex',alignItems:'center',gap:6}}>
+                          <span className={`review-entry-type ret-${n.type}`}>{typeLabels[n.type]||n.type}</span>
+                          <span className="review-entry-date">{formatDate(n.date)}</span>
+                        </div>
+                      </div>
+                      {n.message&&<p className="review-entry-msg">{n.message}</p>}
+                      {n.image_comments&&Object.keys(n.image_comments).length>0&&<div className="review-entry-img-comments">{Object.entries(n.image_comments).map(([k,v])=><p key={k} className="review-entry-img-comment"><strong>Slide {parseInt(k)+1}:</strong> {v}</p>)}</div>}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </>}
+          </div>
+        </div>
+      </div>
+    </div>
   </div>);
 }
 
-function TaskCard({task,onUpdate,onDelete,categories,isStarred,onToggleStar,forceExpand,userEmail,addToast}){
+function TaskCard({task,onUpdate,onDelete,categories,isStarred,onToggleStar,forceExpand,userEmail,addToast,onOpenReview}){
   const[expanded,setExpanded]=useState(false);
   const[editingTitle,setEditingTitle]=useState(false);
   const[titleDraft,setTitleDraft]=useState(task.title);
@@ -658,7 +730,7 @@ function TaskCard({task,onUpdate,onDelete,categories,isStarred,onToggleStar,forc
             <span className="task-category">{task.category}</span>
             {task.deadline&&<span className="task-deadline">{"\ud83d\udcc5"} {task.deadline}</span>}
             {(task.image_urls||[]).length>0&&<span style={{fontSize:11,color:'#8a7a10'}}>{"\ud83d\uddbc\ufe0f"} {task.image_urls.length}</span>}
-            {task.review_status&&task.review_status!=='none'&&<span className={`review-badge rb-${task.review_status}`}>{REVIEW_LABELS[task.review_status]}</span>}
+            {task.review_status&&task.review_status!=='none'&&<span className={`review-badge rb-${task.review_status}`} style={{cursor:'pointer'}} onClick={e=>{e.stopPropagation();onOpenReview&&onOpenReview(task.id);}}>{REVIEW_LABELS[task.review_status]}</span>}
           </div>
           {!expanded&&task.description&&<p className="task-preview">{task.description}</p>}
           {total>0&&<div className="progress-bar"><div className="progress-track"><div className="progress-fill" style={{width:pct+'%'}}/></div><span className="progress-label">{done}/{total}</span></div>}
@@ -679,8 +751,13 @@ function TaskCard({task,onUpdate,onDelete,categories,isStarred,onToggleStar,forc
           <SubtaskList subtasks={task.subtasks||[]} onChange={subtasks=>onUpdate({...task,subtasks})} onAdd={()=>onUpdate({...task,subtasks:[...(task.subtasks||[]),{text:"",done:false}]})} onRemove={i=>onUpdate({...task,subtasks:(task.subtasks||[]).filter((_,idx)=>idx!==i)})}/>
           <CaptionEditor captions={task.captions} onChange={captions=>onUpdate({...task,captions})}/>
           <AssetUploader imageUrls={task.image_urls||[]} taskId={task.id} onUpdate={urls=>onUpdate({...task,image_urls:urls})} mediaType={task.media_type||'single'} onMediaTypeChange={mt=>onUpdate({...task,media_type:mt})}/>
-          <ReviewPanel task={task} onUpdate={onUpdate} userEmail={userEmail} addToast={addToast}/>
-          <div style={{paddingTop:8,display:'flex',justifyContent:'flex-end'}}><button className="btn-danger" onClick={()=>{if(confirm("Delete this task?"))onDelete(task.id);}}>{IC.trash} Delete task</button></div>
+          <div style={{paddingTop:8,display:'flex',alignItems:'center',justifyContent:'space-between',flexWrap:'wrap',gap:8}}>
+            <button className="btn-open-review" onClick={()=>onOpenReview&&onOpenReview(task.id)}>
+              {task.review_status&&task.review_status!=='none'?<span className={`review-badge rb-${task.review_status}`}>{REVIEW_LABELS[task.review_status]}</span>:null}
+              Open Review
+            </button>
+            <button className="btn-danger" onClick={()=>{if(confirm("Delete this task?"))onDelete(task.id);}}>{IC.trash} Delete task</button>
+          </div>
         </div>}
       </div>
     </div>
@@ -755,6 +832,7 @@ function App(){
   const[newCatName,setNewCatName]=useState("");
   const[allExpanded,setAllExpanded]=useState(undefined);
   const[sidebarOpen,setSidebarOpen]=useState(true);
+  const[reviewingTaskId,setReviewingTaskId]=useState(null);
   const{starred,toggle:toggleStar}=useStarred();
   const{toasts,add:addToast}=useToast();
   const searchRef=useRef(null);
@@ -938,10 +1016,11 @@ function App(){
             </div>
           </div>
           {filtered.length===0&&<div className="empty-state">{search||statusFilter!=='all'||priorityFilter!=='all'?"No tasks match your filters. Try adjusting them.":"No tasks yet. Click New Task to get started!"}</div>}
-          {filtered.map(task=><TaskCard key={task.id} task={task} onUpdate={updateTask} onDelete={deleteTask} categories={categories} isStarred={starred.has(task.id)} onToggleStar={toggleStar} forceExpand={allExpanded} userEmail={user.email} addToast={addToast}/>)}
+          {filtered.map(task=><TaskCard key={task.id} task={task} onUpdate={updateTask} onDelete={deleteTask} categories={categories} isStarred={starred.has(task.id)} onToggleStar={toggleStar} forceExpand={allExpanded} userEmail={user.email} addToast={addToast} onOpenReview={setReviewingTaskId}/>)}
         </main>
       </div>
       {showNew&&<NewTaskModal onAdd={addTask} onClose={()=>setShowNew(false)} categories={categories}/>}
+      {reviewingTaskId&&tasks.find(t=>t.id===reviewingTaskId)&&<ReviewModal task={tasks.find(t=>t.id===reviewingTaskId)} onClose={()=>setReviewingTaskId(null)} onUpdate={updateTask} userEmail={user.email} addToast={addToast}/>}
       <ToastContainer toasts={toasts}/>
     </div>
   );
