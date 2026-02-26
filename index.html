@@ -275,18 +275,18 @@
   .rm-left .single-media img { max-height: 600px; }
   .rm-left .video-player { width: 100%; }
   .rm-left .video-player video { max-height: 600px; }
-  .rm-right { flex: 0 0 35%; display: flex; flex-direction: column; overflow-y: auto; border-left: 1px solid #e2e8f0; }
+  .rm-right { flex: 0 0 35%; display: flex; flex-direction: column; overflow-y: auto; overflow-x: hidden; border-left: 1px solid #e2e8f0; min-width: 0; }
   .rm-right-inner { padding: 24px; display: flex; flex-direction: column; gap: 20px; flex: 1; }
   .rm-header { display: flex; flex-direction: column; gap: 8px; }
   .rm-title { font-size: 18px; font-weight: 700; font-family: 'Cormorant Garamond', Georgia, serif; color: #0f172a; margin: 0; }
   .rm-meta { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
   .rm-section { display: flex; flex-direction: column; gap: 8px; }
   .rm-section-title { font-size: 10px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.06em; }
-  .rm-caption-tabs { display: flex; gap: 4px; }
+  .rm-caption-tabs { display: flex; gap: 4px; flex-wrap: wrap; }
   .rm-caption-tab { padding: 5px 10px; border-radius: 6px; font-size: 11px; font-weight: 600; cursor: pointer; border: 1px solid #e2e8f0; background: #fff; color: #64748b; transition: all 0.15s; position: relative; }
   .rm-caption-tab.active { background: #e4d344; color: #1e1b4b; border-color: #e4d344; }
   .rm-caption-tab .has-dot { position: absolute; top: 3px; right: 3px; width: 5px; height: 5px; border-radius: 50%; background: #22c55e; }
-  .rm-caption-text { padding: 12px; background: #f8fafc; border-radius: 8px; font-size: 13px; line-height: 1.6; color: #334155; max-height: 120px; overflow-y: auto; white-space: pre-wrap; }
+  .rm-caption-text { padding: 12px; background: #f8fafc; border-radius: 8px; font-size: 13px; line-height: 1.6; color: #334155; max-height: 200px; overflow-y: auto; white-space: pre-wrap; word-break: break-word; overflow-wrap: break-word; }
   .rm-caption-empty { color: #cbd5e1; font-style: italic; }
   .rm-actions { display: flex; flex-direction: column; gap: 8px; }
   .rm-divider { height: 1px; background: #e2e8f0; margin: 0; }
@@ -947,15 +947,20 @@ function TaskCard({task,onUpdate,onDelete,categories,isStarred,onToggleStar,forc
             }
           </div>
           <div className="task-meta">
-            <select className={`status-select status-${task.status}`} value={task.status} onChange={e=>{e.stopPropagation();onUpdate({...task,status:e.target.value})}} onClick={e=>e.stopPropagation()}>{STATUSES.map(s=><option key={s} value={s}>{STATUS_LABELS[s]}</option>)}</select>
+            {(()=>{const inReview=task.review_status==='submitted'||task.review_status==='resubmitted';
+              return inReview?
+                <span className="status-select" style={{background:'#dbeafe',color:'#1d4ed8',borderColor:'#93c5fd',cursor:'default',fontWeight:600}}>Review Needed</span>
+                :<select className={`status-select status-${task.status}`} value={task.status} onChange={e=>{e.stopPropagation();onUpdate({...task,status:e.target.value})}} onClick={e=>e.stopPropagation()}>{STATUSES.map(s=><option key={s} value={s}>{STATUS_LABELS[s]}</option>)}</select>;
+            })()}
             <span className="task-category">{task.category}</span>
             {task.deadline&&<span className="task-deadline">{"\ud83d\udcc5"} {task.deadline}</span>}
             {(task.image_urls||[]).length>0&&<span style={{fontSize:11,color:'#8a7a10'}}>{"\ud83d\uddbc\ufe0f"} {task.image_urls.length}</span>}
+            {task.review_status&&task.review_status!=='none'&&
+              <button onClick={e=>{e.stopPropagation();onOpenReview&&onOpenReview(task.id);}} style={{display:'inline-flex',alignItems:'center',gap:5,padding:'3px 10px',borderRadius:999,fontSize:11,fontWeight:600,cursor:'pointer',border:'none',background:task.review_status==='approved'?'#dcfce7':task.review_status==='needs_changes'?'#fef2f2':'#dbeafe',color:task.review_status==='approved'?'#15803d':task.review_status==='needs_changes'?'#dc2626':'#1d4ed8',transition:'all 0.15s',fontFamily:'inherit'}}>
+                {REVIEW_LABELS[task.review_status]} →
+              </button>
+            }
           </div>
-          {task.review_status&&task.review_status!=='none'&&<div style={{marginTop:6,display:'flex',alignItems:'center',gap:8,flexWrap:'wrap'}}>
-            <span className={`review-badge rb-${task.review_status}`} style={{cursor:'pointer'}}>{REVIEW_LABELS[task.review_status]}</span>
-            <button className="btn-sm" onClick={e=>{e.stopPropagation();onOpenReview&&onOpenReview(task.id);}} style={{fontSize:11,padding:'4px 8px',fontWeight:500}}>Review</button>
-          </div>}
           {!expanded&&task.description&&<p className="task-preview">{task.description}</p>}
           {total>0&&<div className="progress-bar"><div className="progress-track"><div className="progress-fill" style={{width:pct+'%'}}/></div><span className="progress-label">{done}/{total}</span></div>}
         </div>
@@ -989,11 +994,11 @@ function TaskCard({task,onUpdate,onDelete,categories,isStarred,onToggleStar,forc
   );
 }
 
-function CategoryItem({cat,isActive,count,onSelect,onRename,onDelete}){
+function CategoryItem({cat,isActive,count,highCount,onSelect,onRename,onDelete}){
   const[editing,setEditing]=useState(false);const[draft,setDraft]=useState(cat);const ref=useRef(null);
   useEffect(()=>{if(editing&&ref.current)ref.current.focus();},[editing]);
   const save=()=>{const t=draft.trim();if(t&&t!==cat)onRename(cat,t);else setDraft(cat);setEditing(false);};
-  return(<div className="sidebar-cat-row">{editing?<input ref={ref} className="cat-edit-input" value={draft} onChange={e=>setDraft(e.target.value)} onBlur={save} onKeyDown={e=>{if(e.key==='Enter')save();if(e.key==='Escape'){setDraft(cat);setEditing(false);}}}/>:<><button className={`sidebar-btn ${isActive?'active':''}`} onClick={onSelect} style={{flex:1}}><span style={{overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{cat}</span><span className="sidebar-count">{count}</span></button><button className="cat-action-btn" onClick={()=>{setDraft(cat);setEditing(true);}}>{IC.edit}</button><button className="cat-action-btn del" onClick={()=>onDelete(cat)}>{IC.x}</button></>}</div>);
+  return(<div className="sidebar-cat-row">{editing?<input ref={ref} className="cat-edit-input" value={draft} onChange={e=>setDraft(e.target.value)} onBlur={save} onKeyDown={e=>{if(e.key==='Enter')save();if(e.key==='Escape'){setDraft(cat);setEditing(false);}}}/>:<><button className={`sidebar-btn ${isActive?'active':''}`} onClick={onSelect} style={{flex:1}}><span style={{overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{cat}</span><span style={{display:'flex',alignItems:'center',gap:4}}>{highCount>0&&<span style={{fontSize:9,fontWeight:700,color:'#ef4444',background:'#fef2f2',padding:'1px 5px',borderRadius:999}}>{highCount}</span>}<span className="sidebar-count">{count}</span></span></button><button className="cat-action-btn" onClick={()=>{setDraft(cat);setEditing(true);}}>{IC.edit}</button><button className="cat-action-btn del" onClick={()=>onDelete(cat)}>{IC.x}</button></>}</div>);
 }
 
 function NewTaskModal({onAdd,onClose,categories}){
@@ -1181,11 +1186,14 @@ function App(){
       // Done tasks always last
       const aD=a.status==='done'?1:0;const bD=b.status==='done'?1:0;
       if(aD!==bD)return aD-bD;
+      // Review-needed tasks next (submitted/resubmitted float to top)
+      const aR=(a.review_status==='submitted'||a.review_status==='resubmitted')?0:1;
+      const bR=(b.review_status==='submitted'||b.review_status==='resubmitted')?0:1;
+      if(aR!==bR)return aR-bR;
       // Sort by selected criteria
       if(sortBy==="priority"){
         const o={high:0,medium:1,low:2};const ap=o[a.priority]??1;const bp=o[b.priority]??1;
         if(ap!==bp)return ap-bp;
-        // Within same priority: in_progress > todo > waiting
         const so={in_progress:0,todo:1,waiting:2};return(so[a.status]??1)-(so[b.status]??1);
       }
       if(sortBy==="status"){const o={in_progress:0,todo:1,waiting:2,done:3};return(o[a.status]||1)-(o[b.status]||1);}
@@ -1229,7 +1237,7 @@ function App(){
           </div>
           <div className="sidebar-section">
             <div className="sidebar-label">Categories</div>
-            {categories.map(cat=><CategoryItem key={cat} cat={cat} isActive={activeCategory===cat} count={tasks.filter(t=>t.category===cat).length} onSelect={()=>setActiveCategory(cat)} onRename={renameCategory} onDelete={deleteCategory}/>)}
+            {categories.map(cat=>{const catTasks=tasks.filter(t=>t.category===cat);const highCount=catTasks.filter(t=>t.priority==='high'&&t.status!=='done').length;return <CategoryItem key={cat} cat={cat} isActive={activeCategory===cat} count={catTasks.length} highCount={highCount} onSelect={()=>setActiveCategory(cat)} onRename={renameCategory} onDelete={deleteCategory}/>;})}
             <div className="add-cat-row"><input className="add-cat-input" placeholder="New category..." value={newCatName} onChange={e=>setNewCatName(e.target.value)} onKeyDown={e=>{if(e.key==='Enter')addCategory();}}/><button className="add-cat-btn" disabled={!newCatName.trim()} onClick={addCategory}>Add</button></div>
           </div>
           <div className="export-bar">
