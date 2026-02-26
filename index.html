@@ -562,10 +562,18 @@ function App(){
   },[user]);
 
   const seedDefaults=async()=>{
+    if(!confirm("This will delete all current tasks and replace them with the defaults. Are you sure?"))return;
+    // Delete all existing tasks and their assets
+    const existing=tasks;
+    for(const t of existing){
+      if(t.image_urls?.length){for(const img of t.image_urls){await supabase.storage.from('assets').remove([img.path]);}}
+    }
+    await supabase.from('tasks').delete().neq('id','00000000-0000-0000-0000-000000000000');
+    // Insert fresh defaults
     const rows=defaultTasks.map(t=>({...t,user_id:user.id}));
     await supabase.from('tasks').insert(rows);
     await supabase.from('meta').upsert({key:'categories',value:DEFAULT_CATEGORIES});
-    addToast("Default tasks loaded!");
+    addToast("Reset complete — default tasks loaded");
   };
 
   const updateTask=async(updated)=>{
