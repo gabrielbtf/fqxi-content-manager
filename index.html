@@ -462,7 +462,7 @@ function SubtaskList({subtasks,onChange,onAdd,onRemove}){
     {subtasks.map((st,i)=>(
       <div key={i} className="subtask-item">
         <input type="checkbox" className="subtask-check" checked={st.done} onChange={()=>{const u=[...subtasks];u[i]={...u[i],done:!u[i].done};onChange(u);}}/>
-        <input type="text" className={`subtask-text ${st.done?'done':''}`} value={st.text} onChange={e=>{const u=[...subtasks];u[i]={...u[i],text:e.target.value};onChange(u);}} placeholder="Subtask..."/>
+        <input type="text" className={`subtask-text ${st.done?'done':''}`} defaultValue={st.text} onBlur={e=>{const u=[...subtasks];u[i]={...u[i],text:e.target.value};onChange(u);}} placeholder="Subtask..."/>
         <button className="subtask-delete" onClick={()=>onRemove(i)}>{IC.trash}</button>
       </div>
     ))}
