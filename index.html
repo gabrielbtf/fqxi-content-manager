@@ -575,7 +575,8 @@ function DocUploader({docs,taskId,onUpdate}){
       <span className="doc-name" title={d.name}>{d.name}</span>
       {d.size&&<span style={{fontSize:10,color:'#94a3b8',flexShrink:0}}>{fmtSize(d.size)}</span>}
       <div className="doc-actions">
-        <a href={d.url} target="_blank" rel="noopener noreferrer">Open</a>
+        <a href={`https://docs.google.com/gview?url=${encodeURIComponent(d.url)}&embedded=true`} target="_blank" rel="noopener noreferrer">View</a>
+        <a href={d.url} download style={{padding:'4px 8px',borderRadius:5,fontSize:11,fontWeight:500,cursor:'pointer',border:'1px solid #e2e8f0',background:'#fff',color:'#475569',textDecoration:'none'}}>Download</a>
         <button className="del-btn" onClick={()=>removeDoc(d)}>Delete</button>
       </div>
     </div>)}</div>}
