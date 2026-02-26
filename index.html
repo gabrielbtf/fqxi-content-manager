@@ -85,6 +85,10 @@
   .task-card.p-medium { border-left-color: #f59e0b; }
   .task-card.p-low { border-left-color: #d1d5db; }
   .task-card.starred { border-left-color: #e4d344; box-shadow: 0 1px 3px rgba(228,211,68,0.2); }
+  .task-card.review-needed { outline: 2px solid #3b82f6; outline-offset: -1px; background: #fafbff; }
+  .task-card.review-approved { outline: 2px solid #22c55e; outline-offset: -1px; background: #f7fdf9; }
+  .task-card.review-approved .task-title { color: #15803d; }
+  .task-card.review-approved .task-category { color: #16a34a; }
   .task-header { padding: 14px 16px; display: flex; align-items: flex-start; gap: 10px; cursor: pointer; user-select: none; }
   .check-btn { width: 20px; height: 20px; border-radius: 50%; border: 2px solid #d1d5db; background: none; cursor: pointer; flex-shrink: 0; display: flex; align-items: center; justify-content: center; margin-top: 2px; transition: all 0.15s; }
   .check-btn:hover { border-color: #86efac; background: #f0fdf4; }
@@ -926,7 +930,8 @@ function TaskCard({task,onUpdate,onDelete,categories,isStarred,onToggleStar,forc
   const saveTitle=()=>{if(titleDraft.trim())onUpdate({...task,title:titleDraft.trim()});else setTitleDraft(task.title);setEditingTitle(false);};
   const saveDesc=()=>{onUpdate({...task,description:descDraft});setEditingDesc(false);};
 
-  const cardClass=`task-card ${task.status==='done'?'done':''} p-${task.priority} ${isStarred?'starred':''}`;
+  const reviewClass=(task.review_status==='submitted'||task.review_status==='resubmitted')?'review-needed':task.review_status==='approved'?'review-approved':'';
+  const cardClass=`task-card ${task.status==='done'?'done':''} p-${task.priority} ${isStarred?'starred':''} ${reviewClass}`;
 
   const handleHeaderClick=(e)=>{
     const target=e.target;
@@ -957,7 +962,7 @@ function TaskCard({task,onUpdate,onDelete,categories,isStarred,onToggleStar,forc
             {(task.image_urls||[]).length>0&&<span style={{fontSize:11,color:'#8a7a10'}}>{"\ud83d\uddbc\ufe0f"} {task.image_urls.length}</span>}
             {task.review_status&&task.review_status!=='none'&&
               <button onClick={e=>{e.stopPropagation();onOpenReview&&onOpenReview(task.id);}} style={{display:'inline-flex',alignItems:'center',gap:5,padding:'3px 10px',borderRadius:999,fontSize:11,fontWeight:600,cursor:'pointer',border:'none',background:task.review_status==='approved'?'#dcfce7':task.review_status==='needs_changes'?'#fef2f2':'#dbeafe',color:task.review_status==='approved'?'#15803d':task.review_status==='needs_changes'?'#dc2626':'#1d4ed8',transition:'all 0.15s',fontFamily:'inherit'}}>
-                {REVIEW_LABELS[task.review_status]} →
+                {task.review_status==='approved'?'Approved — View':'Open Review'} →
               </button>
             }
           </div>
