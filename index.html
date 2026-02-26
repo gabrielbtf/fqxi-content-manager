@@ -85,10 +85,12 @@
   .task-card.p-medium { border-left-color: #f59e0b; }
   .task-card.p-low { border-left-color: #d1d5db; }
   .task-card.starred { border-left-color: #e4d344; box-shadow: 0 1px 3px rgba(228,211,68,0.2); }
-  .task-card.review-needed { outline: 2px solid #3b82f6; outline-offset: -1px; background: #fafbff; }
-  .task-card.review-approved { outline: 2px solid #22c55e; outline-offset: -1px; background: #f7fdf9; }
+  .task-card.review-needed { background: #f8faff; border-top: 3px solid #3b82f6; }
+  .task-card.review-needed .task-title { color: #1e40af; }
+  .task-card.review-approved { background: #f0fdf4; border-top: 3px solid #22c55e; }
   .task-card.review-approved .task-title { color: #15803d; }
-  .task-card.review-approved .task-category { color: #16a34a; }
+  .task-card.review-changes { background: #fffbf0; border-top: 3px solid #f59e0b; }
+  .task-card.review-changes .task-title { color: #92400e; }
   .task-header { padding: 14px 16px; display: flex; align-items: flex-start; gap: 10px; cursor: pointer; user-select: none; }
   .check-btn { width: 20px; height: 20px; border-radius: 50%; border: 2px solid #d1d5db; background: none; cursor: pointer; flex-shrink: 0; display: flex; align-items: center; justify-content: center; margin-top: 2px; transition: all 0.15s; }
   .check-btn:hover { border-color: #86efac; background: #f0fdf4; }
@@ -810,6 +812,7 @@ function ReviewModal({task,onClose,onUpdate,userEmail,addToast}){
   const resubmit=()=>{onUpdate({...task,review_status:"resubmitted",review_notes:addReviewNote("resubmit",msg||"Updated and resubmitted")});setMsg("");addToast("Resubmitted for review");};
   const approve=()=>{onUpdate({...task,review_status:"approved",review_notes:addReviewNote("approve",msg||"Approved!")});setMsg("");addToast("Post approved!");};
   const requestChanges=()=>{onUpdate({...task,review_status:"needs_changes",review_notes:addReviewNote("changes",msg,imgComments)});setMsg("");setImgComments({});setShowChangesForm(false);addToast("Changes requested");};
+  const undoReview=()=>{if(!confirm("Return this task to editing? Review status will be reset."))return;onUpdate({...task,review_status:"none",review_notes:addReviewNote("undo","Returned to editing")});addToast("Returned to editing");};
   const handleImgComment=(slideIdx,comment)=>{setImgComments(prev=>({...prev,[slideIdx]:comment}));};
 
   const isReviewable=rs==="submitted"||rs==="resubmitted";
@@ -866,13 +869,14 @@ function ReviewModal({task,onClose,onUpdate,userEmail,addToast}){
 
               {canResubmit&&<div className="rm-actions">
                 <textarea className="review-note-input" value={msg} onChange={e=>setMsg(e.target.value)} placeholder="What did you change?" rows={2}/>
-                <button className="btn-review btn-resubmit" onClick={resubmit}>Resubmit for Review</button>
+                <div style={{display:'flex',gap:8,alignItems:'center'}}><button className="btn-review btn-resubmit" onClick={resubmit}>Resubmit for Review</button></div>
               </div>}
 
               {isReviewable&&<div className="rm-actions">
                 {!showChangesForm?<div className="review-actions">
                   <button className="btn-review btn-approve" onClick={approve}>Approve</button>
                   <button className="btn-review btn-request-changes" onClick={()=>setShowChangesForm(true)}>Request Changes</button>
+                  <button className="btn-sm" onClick={undoReview} style={{color:'#94a3b8',fontSize:11}}>Undo — return to editing</button>
                 </div>:<div style={{width:'100%'}}>
                   <p style={{fontSize:12,fontWeight:600,color:'#475569',marginBottom:6}}>Describe what needs changing. Click slides on the left to add per-image comments.</p>
                   <textarea className="review-note-input" value={msg} onChange={e=>setMsg(e.target.value)} placeholder="What needs to change?" rows={3}/>
@@ -881,7 +885,10 @@ function ReviewModal({task,onClose,onUpdate,userEmail,addToast}){
                 </div>}
               </div>}
 
-              {rs==="approved"&&<p style={{fontSize:13,color:'#15803d',fontWeight:500,margin:0}}>This post has been approved and is ready to go live.</p>}
+              {rs==="approved"&&<div className="rm-actions">
+                <p style={{fontSize:13,color:'#15803d',fontWeight:500,margin:0}}>This post has been approved and is ready to go live.</p>
+                <button className="btn-sm" onClick={undoReview} style={{color:'#94a3b8',fontSize:11,marginTop:4}}>Undo approval — return to editing</button>
+              </div>}
             </div>
 
             {/* Review History */}
@@ -930,7 +937,7 @@ function TaskCard({task,onUpdate,onDelete,categories,isStarred,onToggleStar,forc
   const saveTitle=()=>{if(titleDraft.trim())onUpdate({...task,title:titleDraft.trim()});else setTitleDraft(task.title);setEditingTitle(false);};
   const saveDesc=()=>{onUpdate({...task,description:descDraft});setEditingDesc(false);};
 
-  const reviewClass=(task.review_status==='submitted'||task.review_status==='resubmitted')?'review-needed':task.review_status==='approved'?'review-approved':'';
+  const reviewClass=(task.review_status==='submitted'||task.review_status==='resubmitted')?'review-needed':task.review_status==='approved'?'review-approved':task.review_status==='needs_changes'?'review-changes':'';
   const cardClass=`task-card ${task.status==='done'?'done':''} p-${task.priority} ${isStarred?'starred':''} ${reviewClass}`;
 
   const handleHeaderClick=(e)=>{
@@ -1191,9 +1198,9 @@ function App(){
       // Done tasks always last
       const aD=a.status==='done'?1:0;const bD=b.status==='done'?1:0;
       if(aD!==bD)return aD-bD;
-      // Review-needed tasks next (submitted/resubmitted float to top)
-      const aR=(a.review_status==='submitted'||a.review_status==='resubmitted')?0:1;
-      const bR=(b.review_status==='submitted'||b.review_status==='resubmitted')?0:1;
+      // Review tasks float to top: approved first (ready to post), then review-needed
+      const reviewOrder=(t)=>{if(t.review_status==='approved')return 0;if(t.review_status==='submitted'||t.review_status==='resubmitted')return 1;return 2;};
+      const aR=reviewOrder(a);const bR=reviewOrder(b);
       if(aR!==bR)return aR-bR;
       // Sort by selected criteria
       if(sortBy==="priority"){
