@@ -888,7 +888,11 @@ function App(){
     await supabase.from('tasks').delete().neq('id','00000000-0000-0000-0000-000000000000');
     // Insert fresh defaults
     const rows=defaultTasks.map(t=>({...t,user_id:user.id}));
-    await supabase.from('tasks').insert(rows);
+    const{error}=await supabase.from('tasks').insert(rows);
+    if(error){console.error('Seed error:',error);addToast("Error resetting tasks");return;}
+    // Re-fetch to ensure state is correct (realtime may miss bulk inserts)
+    const{data}=await supabase.from('tasks').select('*').order('created_at',{ascending:true});
+    if(data)setTasks(data);
     await supabase.from('meta').upsert({key:'categories',value:DEFAULT_CATEGORIES});
     addToast("Reset complete — default tasks loaded");
   };
