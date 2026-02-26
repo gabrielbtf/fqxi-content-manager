@@ -257,6 +257,7 @@
   .img-comment-author { font-weight: 600; font-size: 11px; color: #78350f; }
 
   /* ─── REVIEW MODAL ─── */
+  @keyframes spin { to { transform: rotate(360deg); } }
   @keyframes rmFadeIn { from { opacity: 0; } to { opacity: 1; } }
   @keyframes rmSlideUp { from { opacity: 0; transform: translateY(24px) scale(0.97); } to { opacity: 1; transform: translateY(0) scale(1); } }
   .rm-overlay { position: fixed; inset: 0; background: rgba(15,23,42,0.6); backdrop-filter: blur(6px); z-index: 200; display: flex; align-items: center; justify-content: center; padding: 20px; animation: rmFadeIn 0.2s ease; }
@@ -486,9 +487,58 @@ function SubtaskList({subtasks,onChange,onAdd,onRemove}){
   </div>);
 }
 
-function AssetUploader({imageUrls,taskId,onUpdate,mediaType,onMediaTypeChange}){
+function AssetUploader({imageUrls,taskId,onUpdate,mediaType,onMediaTypeChange,addToast}){
   const fileRef=useRef(null);const[uploading,setUploading]=useState(false);const[lightbox,setLightbox]=useState(null);const[dragging,setDragging]=useState(false);
+  const[compressProgress,setCompressProgress]=useState(null); // null or "Compressing... 34%"
   const mt=mediaType||'single';
+  const MAX_FILE_MB=50;const MAX_FILE_SIZE=MAX_FILE_MB*1024*1024;
+
+  const compressVideo=(file)=>new Promise((resolve,reject)=>{
+    const video=document.createElement('video');
+    video.muted=true;video.playsInline=true;
+    video.src=URL.createObjectURL(file);
+    video.onloadedmetadata=()=>{
+      video.currentTime=0;
+      video.oncanplay=()=>{
+        const origW=video.videoWidth;const origH=video.videoHeight;
+        // Scale down: target 720p max height, keep aspect ratio
+        const maxH=720;const scale=origH>maxH?maxH/origH:1;
+        const w=Math.round(origW*scale/2)*2;const h=Math.round(origH*scale/2)*2;
+        const canvas=document.createElement('canvas');canvas.width=w;canvas.height=h;
+        const ctx=canvas.getContext('2d');
+        const stream=canvas.captureStream(30);
+        // Add audio track if present
+        try{const ac=new AudioContext();const src=ac.createMediaElementSource(video);const dest=ac.createMediaStreamDestination();src.connect(dest);src.connect(ac.destination);dest.stream.getAudioTracks().forEach(t=>stream.addTrack(t));}catch(e){}
+        // Target bitrate: aim for ~45MB for the video duration
+        const durSec=video.duration||60;
+        const targetBits=Math.min(2500000,Math.floor((40*8*1024*1024)/durSec));
+        let recorder;
+        try{recorder=new MediaRecorder(stream,{mimeType:'video/webm;codecs=vp8',videoBitsPerSecond:targetBits});}
+        catch(e){try{recorder=new MediaRecorder(stream,{mimeType:'video/webm',videoBitsPerSecond:targetBits});}
+        catch(e2){reject(new Error('Browser does not support video compression'));return;}}
+        const chunks=[];
+        recorder.ondataavailable=(e)=>{if(e.data.size>0)chunks.push(e.data);};
+        recorder.onstop=()=>{URL.revokeObjectURL(video.src);
+          const blob=new Blob(chunks,{type:'video/webm'});
+          const name=file.name.replace(/\.[^.]+$/,'.webm');
+          resolve(new File([blob],name,{type:'video/webm'}));
+        };
+        recorder.onerror=(e)=>{reject(e);};
+        recorder.start(1000);
+        video.play();
+        const drawFrame=()=>{
+          if(video.ended||video.paused){recorder.stop();return;}
+          ctx.drawImage(video,0,0,w,h);
+          const pct=Math.round((video.currentTime/video.duration)*100);
+          setCompressProgress(`Compressing video... ${pct}%`);
+          requestAnimationFrame(drawFrame);
+        };
+        drawFrame();
+        video.onended=()=>{recorder.stop();};
+      };
+    };
+    video.onerror=()=>{reject(new Error('Could not load video'));};
+  });
 
   const autoDetect=(files)=>{
     const imgs=files.filter(f=>f.type.startsWith('image/'));const vids=files.filter(f=>f.type.startsWith('video/'));
@@ -499,16 +549,35 @@ function AssetUploader({imageUrls,taskId,onUpdate,mediaType,onMediaTypeChange}){
   };
 
   const processFiles=async(files)=>{
-    if(!files.length)return;setUploading(true);
-    const detected=autoDetect(files);
+    if(!files.length)return;
+    // Auto-compress oversized videos
+    const processed=[];
+    for(const file of files){
+      if(file.type.startsWith('video/')&&file.size>MAX_FILE_SIZE){
+        addToast&&addToast(`Compressing ${file.name} (${(file.size/1048576).toFixed(0)}MB)...`);
+        setCompressProgress('Compressing video... 0%');
+        try{
+          const compressed=await compressVideo(file);
+          setCompressProgress(null);
+          if(compressed.size>MAX_FILE_SIZE){addToast&&addToast(`Still too large after compression (${(compressed.size/1048576).toFixed(0)}MB). Try a shorter clip or use HandBrake.`);continue;}
+          addToast&&addToast(`Compressed to ${(compressed.size/1048576).toFixed(1)}MB`);
+          processed.push(compressed);
+        }catch(e){console.error(e);setCompressProgress(null);addToast&&addToast('Compression failed — try compressing with HandBrake instead.');continue;}
+      } else if(file.size>MAX_FILE_SIZE){
+        addToast&&addToast(`${file.name} is ${(file.size/1048576).toFixed(0)}MB — max is ${MAX_FILE_MB}MB.`);continue;
+      } else {processed.push(file);}
+    }
+    if(!processed.length)return;
+    setUploading(true);
+    const detected=autoDetect(processed);
     if(detected!==mt&&onMediaTypeChange)onMediaTypeChange(detected);
     const newUrls=[...(imageUrls||[])];
-    for(const file of files){
+    for(const file of processed){
       const isImg=file.type.startsWith('image/');const isVid=file.type.startsWith('video/');
       if(!isImg&&!isVid)continue;
       const path=`tasks/${taskId}/${Date.now()}_${file.name}`;
       const{error}=await supabase.storage.from('assets').upload(path,file);
-      if(error){console.error(error);continue;}
+      if(error){console.error(error);addToast&&addToast('Upload failed: '+error.message);continue;}
       const{data}=supabase.storage.from('assets').getPublicUrl(path);
       newUrls.push({url:data.publicUrl,path,name:file.name,type:isVid?'video':'image'});
     }
@@ -537,9 +606,10 @@ function AssetUploader({imageUrls,taskId,onUpdate,mediaType,onMediaTypeChange}){
       {a.type==='video'?<video src={a.url} style={{width:'100%',height:'100%',objectFit:'cover'}}/>:<img src={a.url} alt={a.name} onClick={()=>setLightbox(a)}/>}
       <div className="asset-overlay"><button onClick={()=>setLightbox(a)}>View</button><button className="del-btn" onClick={()=>removeAsset(a)}>Delete</button></div>
     </div>)}</div>}
+    {compressProgress&&<div style={{padding:'12px 16px',background:'#fffbeb',border:'1px solid #fcd34d',borderRadius:8,marginTop:8,fontSize:12,fontWeight:600,color:'#92400e',display:'flex',alignItems:'center',gap:8}}><span className="spinner" style={{width:14,height:14,border:'2px solid #fcd34d',borderTopColor:'#92400e',borderRadius:'50%',animation:'spin 0.8s linear infinite',flexShrink:0}}/>{compressProgress}</div>}
     <div className={`upload-zone ${dragging?'dragging':''}`} onClick={()=>fileRef.current?.click()} onDragOver={handleDragOver} onDragLeave={handleDragLeave} onDrop={handleDrop}>
-      <p>{uploading?"Uploading...":<>{IC.image} {dragging?"Drop files here":"Click or drag files to upload"}</>}</p>
-      <input ref={fileRef} type="file" accept="image/*,video/*" multiple onChange={handleFiles} disabled={uploading}/>
+      <p>{uploading?"Uploading...":<>{IC.image} {dragging?"Drop files here":<>Click or drag to upload <span style={{fontSize:10,color:'#94a3b8'}}>(videos over 50MB auto-compressed)</span></>}</>}</p>
+      <input ref={fileRef} type="file" accept="image/*,video/*" multiple onChange={handleFiles} disabled={uploading||!!compressProgress}/>
     </div>
     {lightbox&&<div className="lightbox" onClick={()=>setLightbox(null)}>{lightbox.type==='video'?<video src={lightbox.url} controls autoPlay style={{maxWidth:'90vw',maxHeight:'80vh'}} onClick={e=>e.stopPropagation()}/>:<img src={lightbox.url} alt={lightbox.name} onClick={e=>e.stopPropagation()}/>}</div>}
   </div>);
@@ -809,7 +879,7 @@ function TaskCard({task,onUpdate,onDelete,categories,isStarred,onToggleStar,forc
           <SubtaskList subtasks={task.subtasks||[]} onChange={subtasks=>onUpdate({...task,subtasks})} onAdd={()=>onUpdate({...task,subtasks:[...(task.subtasks||[]),{text:"",done:false}]})} onRemove={i=>onUpdate({...task,subtasks:(task.subtasks||[]).filter((_,idx)=>idx!==i)})}/>
           <CaptionEditor captions={task.captions} onChange={captions=>onUpdate({...task,captions})}/>
           <DocUploader docs={task.doc_urls||[]} taskId={task.id} onUpdate={urls=>onUpdate({...task,doc_urls:urls})}/>
-          <AssetUploader imageUrls={task.image_urls||[]} taskId={task.id} onUpdate={urls=>onUpdate({...task,image_urls:urls})} mediaType={task.media_type||'single'} onMediaTypeChange={mt=>onUpdate({...task,media_type:mt})}/>
+          <AssetUploader imageUrls={task.image_urls||[]} taskId={task.id} onUpdate={urls=>onUpdate({...task,image_urls:urls})} mediaType={task.media_type||'single'} onMediaTypeChange={mt=>onUpdate({...task,media_type:mt})} addToast={addToast}/>
           <div style={{paddingTop:8,display:'flex',alignItems:'center',justifyContent:'space-between',flexWrap:'wrap',gap:8}}>
             <button className="btn-open-review" onClick={()=>onOpenReview&&onOpenReview(task.id)}>
               {task.review_status&&task.review_status!=='none'?<span className={`review-badge rb-${task.review_status}`}>{REVIEW_LABELS[task.review_status]}</span>:null}
