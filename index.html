@@ -495,37 +495,44 @@ function AssetUploader({imageUrls,taskId,onUpdate,mediaType,onMediaTypeChange,ad
 
   const compressVideo=(file)=>new Promise((resolve,reject)=>{
     const video=document.createElement('video');
-    video.muted=true;video.playsInline=true;
+    video.playsInline=true;
     video.src=URL.createObjectURL(file);
     video.onloadedmetadata=()=>{
       video.currentTime=0;
       video.oncanplay=()=>{
         const origW=video.videoWidth;const origH=video.videoHeight;
-        // Scale down: target 720p max height, keep aspect ratio
         const maxH=720;const scale=origH>maxH?maxH/origH:1;
         const w=Math.round(origW*scale/2)*2;const h=Math.round(origH*scale/2)*2;
         const canvas=document.createElement('canvas');canvas.width=w;canvas.height=h;
         const ctx=canvas.getContext('2d');
-        const stream=canvas.captureStream(30);
-        // Add audio track if present
-        try{const ac=new AudioContext();const src=ac.createMediaElementSource(video);const dest=ac.createMediaStreamDestination();src.connect(dest);src.connect(ac.destination);dest.stream.getAudioTracks().forEach(t=>stream.addTrack(t));}catch(e){}
-        // Target bitrate: aim for ~45MB for the video duration
+        const canvasStream=canvas.captureStream(30);
+        // Capture audio: unmute video and use captureStream on a hidden video element
+        video.muted=false;video.volume=1;
+        let audioVideo=null;
+        try{
+          // Create a second video element to capture audio via captureStream
+          audioVideo=document.createElement('video');
+          audioVideo.src=video.src;audioVideo.muted=false;audioVideo.volume=0;
+          const audioStream=audioVideo.captureStream?audioVideo.captureStream():audioVideo.mozCaptureStream();
+          const audioTracks=audioStream.getAudioTracks();
+          audioTracks.forEach(t=>canvasStream.addTrack(t));
+        }catch(e){console.log('Audio capture fallback:',e);}
         const durSec=video.duration||60;
         const targetBits=Math.min(2500000,Math.floor((40*8*1024*1024)/durSec));
         let recorder;
-        try{recorder=new MediaRecorder(stream,{mimeType:'video/webm;codecs=vp8',videoBitsPerSecond:targetBits});}
-        catch(e){try{recorder=new MediaRecorder(stream,{mimeType:'video/webm',videoBitsPerSecond:targetBits});}
-        catch(e2){reject(new Error('Browser does not support video compression'));return;}}
+        const mimeTypes=['video/webm;codecs=vp8,opus','video/webm;codecs=vp9,opus','video/webm;codecs=vp8','video/webm'];
+        for(const mime of mimeTypes){try{recorder=new MediaRecorder(canvasStream,{mimeType:mime,videoBitsPerSecond:targetBits});break;}catch(e){}}
+        if(!recorder){reject(new Error('Browser does not support video compression'));return;}
         const chunks=[];
         recorder.ondataavailable=(e)=>{if(e.data.size>0)chunks.push(e.data);};
-        recorder.onstop=()=>{URL.revokeObjectURL(video.src);
-          const blob=new Blob(chunks,{type:'video/webm'});
+        recorder.onstop=()=>{URL.revokeObjectURL(video.src);if(audioVideo)audioVideo.pause();
+          const blob=new Blob(chunks,{type:recorder.mimeType||'video/webm'});
           const name=file.name.replace(/\.[^.]+$/,'.webm');
           resolve(new File([blob],name,{type:'video/webm'}));
         };
         recorder.onerror=(e)=>{reject(e);};
         recorder.start(1000);
-        video.play();
+        video.play();if(audioVideo){audioVideo.currentTime=0;audioVideo.play().catch(()=>{});}
         const drawFrame=()=>{
           if(video.ended||video.paused){recorder.stop();return;}
           ctx.drawImage(video,0,0,w,h);
