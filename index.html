@@ -13,125 +13,186 @@
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
   body { font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif; background: #f8fafc; color: #1e293b; line-height: 1.5; }
   .app { min-height: 100vh; display: flex; flex-direction: column; }
+
+  /* ─── HEADER ─── */
   .header { background: #fff; border-bottom: 1px solid #e2e8f0; position: sticky; top: 0; z-index: 40; }
-  .header-inner { max-width: 1280px; margin: 0 auto; padding: 16px 24px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
+  .header-inner { max-width: 1280px; margin: 0 auto; padding: 14px 24px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
   .header h1 { font-size: 22px; font-weight: 700; color: #0f172a; font-family: 'Cormorant Garamond', Georgia, serif; }
   .header-sub { font-size: 11px; color: #94a3b8; margin-top: 2px; display: flex; align-items: center; gap: 8px; }
-  .header-right { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+  .header-right { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+  .stat-badges { display: flex; gap: 5px; flex-wrap: wrap; }
+  .stat-badge { display: inline-flex; align-items: center; padding: 3px 9px; border-radius: 999px; font-size: 11px; font-weight: 500; cursor: pointer; transition: all 0.15s; border: 1.5px solid transparent; }
+  .stat-badge:hover { transform: scale(1.05); }
+  .stat-badge.filter-active { border-color: currentColor; }
+  .stat-active { background: #eff6ff; color: #1d4ed8; }
+  .stat-waiting { background: #fffbeb; color: #b45309; }
+  .stat-todo { background: #f8fafc; color: #475569; border-color: #e2e8f0; }
+  .stat-done { background: #f0fdf4; color: #15803d; }
+
+  /* ─── LAYOUT ─── */
   .layout { max-width: 1280px; margin: 0 auto; width: 100%; flex: 1; display: flex; }
-  .sidebar { width: 240px; flex-shrink: 0; border-right: 1px solid #e2e8f0; padding: 24px 16px 24px 24px; overflow-y: auto; }
-  .sidebar-label { font-size: 11px; font-weight: 600; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px; }
+  .sidebar { width: 250px; flex-shrink: 0; border-right: 1px solid #e2e8f0; padding: 20px 16px 24px 24px; overflow-y: auto; position: sticky; top: 52px; height: calc(100vh - 52px); }
+  .sidebar-section { margin-bottom: 20px; }
+  .sidebar-label { font-size: 10px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 6px; }
   .sidebar-btn { display: flex; align-items: center; justify-content: space-between; width: 100%; text-align: left; font-size: 13px; padding: 6px 10px; border-radius: 8px; border: none; background: none; cursor: pointer; color: #475569; transition: all 0.15s; gap: 4px; }
   .sidebar-btn:hover { background: #f1f5f9; }
   .sidebar-btn.active { background: #fdf9e2; color: #8a7a10; font-weight: 500; }
-  .sidebar-count { font-size: 11px; color: #94a3b8; flex-shrink: 0; }
+  .sidebar-count { font-size: 11px; color: #94a3b8; flex-shrink: 0; min-width: 18px; text-align: right; }
   .sidebar-cat-row { display: flex; align-items: center; gap: 2px; }
   .sidebar-cat-row:hover .cat-action-btn { opacity: 1; }
   .cat-action-btn { opacity: 0; background: none; border: none; cursor: pointer; color: #94a3b8; padding: 2px; display: flex; transition: opacity 0.15s; flex-shrink: 0; }
   .cat-action-btn:hover { color: #8a7a10; }
   .cat-action-btn.del:hover { color: #ef4444; }
   .cat-edit-input { font-size: 13px; border: 1px solid #e4d344; border-radius: 6px; padding: 4px 8px; outline: none; font-family: inherit; width: 100%; box-shadow: 0 0 0 3px rgba(228,211,68,0.25); }
-  .main { flex: 1; padding: 24px; min-width: 0; }
-  .stat-badge { display: inline-flex; align-items: center; padding: 4px 10px; border-radius: 999px; font-size: 11px; font-weight: 500; }
-  .stat-active { background: #eff6ff; color: #1d4ed8; }
-  .stat-waiting { background: #fffbeb; color: #b45309; }
-  .stat-todo { background: #f8fafc; color: #475569; }
-  .stat-done { background: #f0fdf4; color: #15803d; }
-  .btn-primary { background: #e4d344; color: #1e293b; border: none; padding: 8px 14px; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 6px; transition: background 0.15s; font-family: inherit; }
-  .btn-primary:hover { background: #d4c334; }
+  .add-cat-row { display: flex; gap: 4px; margin-top: 8px; }
+  .add-cat-input { flex: 1; border: 1px solid #e2e8f0; border-radius: 6px; padding: 4px 8px; font-size: 12px; outline: none; font-family: inherit; min-width: 0; }
+  .add-cat-btn { background: #e4d344; color: #1e293b; border: none; border-radius: 6px; padding: 4px 8px; font-size: 11px; cursor: pointer; font-family: inherit; font-weight: 600; }
+  .add-cat-btn:disabled { opacity: 0.4; }
+
+  /* ─── MAIN ─── */
+  .main { flex: 1; padding: 20px 24px; min-width: 0; }
+  .filters { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-bottom: 16px; }
+  .search-wrap { position: relative; flex: 1; min-width: 180px; max-width: 320px; }
+  .search-wrap svg { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: #94a3b8; }
+  .search-input { width: 100%; padding: 7px 12px 7px 32px; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 13px; outline: none; font-family: inherit; }
+  .search-input:focus { border-color: #e4d344; box-shadow: 0 0 0 3px rgba(228,211,68,0.25); }
+  .filter-select { padding: 7px 10px; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 12px; outline: none; font-family: inherit; cursor: pointer; background: #fff; }
+  .filter-select:focus { border-color: #e4d344; box-shadow: 0 0 0 3px rgba(228,211,68,0.25); }
+  .results-count { font-size: 11px; color: #94a3b8; margin-left: auto; white-space: nowrap; }
+
+  /* ─── TOOLBAR ─── */
+  .toolbar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; gap: 8px; flex-wrap: wrap; }
+  .toolbar-left { display: flex; align-items: center; gap: 8px; }
+  .toolbar-btn { background: none; border: 1px solid #e2e8f0; color: #64748b; padding: 4px 10px; border-radius: 6px; font-size: 11px; cursor: pointer; display: flex; align-items: center; gap: 4px; font-family: inherit; transition: all 0.15s; }
+  .toolbar-btn:hover { background: #f1f5f9; color: #475569; }
+  .toolbar-btn.active { background: #fdf9e2; border-color: #e4d344; color: #8a7a10; }
+  .kbd { display: inline-flex; align-items: center; justify-content: center; min-width: 18px; height: 18px; padding: 0 4px; border-radius: 4px; background: #f1f5f9; border: 1px solid #e2e8f0; font-size: 10px; font-family: monospace; color: #94a3b8; margin-left: 4px; }
+
+  /* ─── BUTTONS ─── */
+  .btn-primary { background: #e4d344; color: #1e293b; border: none; padding: 7px 14px; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 6px; transition: all 0.15s; font-family: inherit; }
+  .btn-primary:hover { background: #d4c334; transform: translateY(-1px); }
   .btn-sm { background: none; border: 1px solid #e2e8f0; color: #475569; padding: 4px 8px; border-radius: 6px; font-size: 11px; cursor: pointer; display: flex; align-items: center; gap: 4px; font-family: inherit; transition: all 0.15s; }
   .btn-sm:hover { background: #f1f5f9; }
   .btn-danger { background: none; border: none; color: #ef4444; cursor: pointer; font-size: 12px; display: flex; align-items: center; gap: 4px; padding: 4px 8px; border-radius: 6px; font-family: inherit; }
   .btn-danger:hover { background: #fef2f2; }
-  .filters { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin-bottom: 20px; }
-  .search-wrap { position: relative; flex: 1; min-width: 200px; max-width: 360px; }
-  .search-wrap svg { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: #94a3b8; }
-  .search-input { width: 100%; padding: 8px 12px 8px 32px; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 13px; outline: none; font-family: inherit; }
-  .search-input:focus { border-color: #e4d344; box-shadow: 0 0 0 3px rgba(228,211,68,0.25); }
-  .filter-select { padding: 8px 12px; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 13px; outline: none; font-family: inherit; cursor: pointer; background: #fff; }
-  .filter-select:focus { border-color: #e4d344; box-shadow: 0 0 0 3px rgba(228,211,68,0.25); }
-  .task-card { background: #fff; border-radius: 12px; border: 1px solid #e2e8f0; box-shadow: 0 1px 2px rgba(0,0,0,0.04); transition: box-shadow 0.15s; margin-bottom: 12px; }
-  .task-card:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
-  .task-card.done { opacity: 0.55; }
-  .task-header { padding: 16px; display: flex; align-items: flex-start; gap: 12px; }
+
+  /* ─── TASK CARDS ─── */
+  .task-card { background: #fff; border-radius: 12px; border: 1px solid #e2e8f0; box-shadow: 0 1px 2px rgba(0,0,0,0.04); transition: all 0.2s; margin-bottom: 10px; border-left: 4px solid transparent; }
+  .task-card:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.07); }
+  .task-card.done { opacity: 0.5; }
+  .task-card.p-high { border-left-color: #ef4444; }
+  .task-card.p-medium { border-left-color: #f59e0b; }
+  .task-card.p-low { border-left-color: #d1d5db; }
+  .task-card.starred { border-left-color: #e4d344; box-shadow: 0 1px 3px rgba(228,211,68,0.2); }
+  .task-header { padding: 14px 16px; display: flex; align-items: flex-start; gap: 10px; }
   .check-btn { width: 20px; height: 20px; border-radius: 50%; border: 2px solid #d1d5db; background: none; cursor: pointer; flex-shrink: 0; display: flex; align-items: center; justify-content: center; margin-top: 2px; transition: all 0.15s; }
-  .check-btn:hover { border-color: #86efac; }
+  .check-btn:hover { border-color: #86efac; background: #f0fdf4; }
   .check-btn.checked { background: #22c55e; border-color: #22c55e; }
   .task-content { flex: 1; min-width: 0; }
-  .task-title-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .task-title-row { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
   .task-title { font-size: 15px; font-weight: 600; color: #0f172a; font-family: 'Cormorant Garamond', Georgia, serif; }
   .task-title.struck { text-decoration: line-through; color: #94a3b8; }
   .task-title-input { font-size: 15px; font-weight: 600; color: #0f172a; border: 1px solid #e4d344; border-radius: 6px; padding: 2px 6px; outline: none; font-family: 'Cormorant Garamond', Georgia, serif; width: 100%; box-shadow: 0 0 0 3px rgba(228,211,68,0.25); }
-  .edit-title-btn { background: none; border: none; cursor: pointer; color: #94a3b8; padding: 2px; display: flex; transition: color 0.15s; }
+  .star-btn { background: none; border: none; cursor: pointer; padding: 2px; display: flex; font-size: 14px; transition: transform 0.2s; flex-shrink: 0; }
+  .star-btn:hover { transform: scale(1.3); }
+  .star-btn.active { animation: starPop 0.3s ease; }
+  @keyframes starPop { 0%{transform:scale(1)}50%{transform:scale(1.4)}100%{transform:scale(1)} }
+  .edit-title-btn { background: none; border: none; cursor: pointer; color: #cbd5e1; padding: 2px; display: flex; transition: color 0.15s; }
   .edit-title-btn:hover { color: #8a7a10; }
   .priority-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
   .priority-high { background: #ef4444; }
   .priority-medium { background: #f59e0b; }
   .priority-low { background: #d1d5db; }
-  .task-meta { display: flex; align-items: center; gap: 8px; margin-top: 4px; flex-wrap: wrap; }
-  .status-select { font-size: 11px; font-weight: 500; padding: 2px 8px; border-radius: 999px; border: 1px solid; cursor: pointer; outline: none; font-family: inherit; appearance: none; -webkit-appearance: none; }
+  .task-meta { display: flex; align-items: center; gap: 6px; margin-top: 4px; flex-wrap: wrap; }
+  .status-select { font-size: 11px; font-weight: 500; padding: 2px 8px; border-radius: 999px; border: 1px solid; cursor: pointer; outline: none; font-family: inherit; appearance: none; -webkit-appearance: none; transition: all 0.15s; }
+  .status-select:hover { opacity: 0.8; }
   .status-todo { background: #f1f5f9; color: #475569; border-color: #cbd5e1; }
   .status-in_progress { background: #dbeafe; color: #1d4ed8; border-color: #93c5fd; }
   .status-waiting { background: #fef3c7; color: #b45309; border-color: #fcd34d; }
   .status-done { background: #dcfce7; color: #15803d; border-color: #86efac; }
   .task-category { font-size: 11px; color: #94a3b8; }
   .task-deadline { font-size: 11px; color: #ea580c; font-weight: 500; }
-  .progress-bar { display: flex; align-items: center; gap: 8px; margin-top: 8px; }
-  .progress-track { flex: 1; height: 6px; background: #f1f5f9; border-radius: 999px; overflow: hidden; }
+  .task-preview { font-size: 12px; color: #94a3b8; margin-top: 4px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 500px; font-style: italic; }
+  .progress-bar { display: flex; align-items: center; gap: 8px; margin-top: 6px; }
+  .progress-track { flex: 1; height: 5px; background: #f1f5f9; border-radius: 999px; overflow: hidden; }
   .progress-fill { height: 100%; background: #e4d344; border-radius: 999px; transition: width 0.3s; }
   .progress-label { font-size: 11px; color: #94a3b8; }
-  .expand-btn { color: #94a3b8; cursor: pointer; padding: 4px; flex-shrink: 0; background: none; border: none; display: flex; }
+  .expand-btn { color: #cbd5e1; cursor: pointer; padding: 4px; flex-shrink: 0; background: none; border: none; display: flex; transition: all 0.2s; }
   .expand-btn:hover { color: #475569; }
+  .task-card:hover .expand-btn { color: #94a3b8; }
+
+  /* ─── EXPANDED TASK ─── */
+  .task-expanded-wrap { overflow: hidden; transition: max-height 0.3s ease, opacity 0.2s ease; }
+  .task-expanded-wrap.open { max-height: 2000px; opacity: 1; }
+  .task-expanded-wrap.closed { max-height: 0; opacity: 0; }
   .task-expanded { padding: 0 16px 16px; border-top: 1px solid #f1f5f9; }
-  .field-label { display: block; font-size: 11px; font-weight: 600; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px; margin-top: 12px; }
-  .field-desc { font-size: 13px; color: #475569; }
-  .field-textarea { width: 100%; border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px; font-size: 13px; outline: none; font-family: inherit; resize: vertical; min-height: 60px; }
+  .field-label { display: block; font-size: 10px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 4px; margin-top: 14px; }
+  .field-desc { font-size: 13px; color: #475569; line-height: 1.6; }
+  .field-textarea { width: 100%; border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px; font-size: 13px; outline: none; font-family: inherit; resize: vertical; min-height: 60px; transition: border-color 0.15s; }
   .field-textarea:focus { border-color: #e4d344; box-shadow: 0 0 0 3px rgba(228,211,68,0.25); }
-  .field-input { width: 100%; border: 1px solid #e2e8f0; border-radius: 8px; padding: 8px 10px; font-size: 13px; outline: none; font-family: inherit; }
+  .field-input { width: 100%; border: 1px solid #e2e8f0; border-radius: 8px; padding: 8px 10px; font-size: 13px; outline: none; font-family: inherit; transition: border-color 0.15s; }
   .field-input:focus { border-color: #e4d344; box-shadow: 0 0 0 3px rgba(228,211,68,0.25); }
   .field-select { width: 100%; border: 1px solid #e2e8f0; border-radius: 8px; padding: 8px 10px; font-size: 13px; outline: none; font-family: inherit; cursor: pointer; background: #fff; }
   .field-row { display: flex; gap: 12px; flex-wrap: wrap; }
   .field-col { flex: 1; min-width: 140px; }
-  .subtask-item { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; }
+
+  /* ─── SUBTASKS ─── */
+  .subtask-item { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; padding: 2px 0; }
   .subtask-item:hover .subtask-delete { opacity: 1; }
-  .subtask-check { border-radius: 4px; cursor: pointer; width: 16px; height: 16px; accent-color: #4f46e5; }
+  .subtask-check { border-radius: 4px; cursor: pointer; width: 16px; height: 16px; accent-color: #e4d344; }
   .subtask-text { flex: 1; font-size: 13px; background: none; border: none; outline: none; font-family: inherit; color: #334155; padding: 0; }
   .subtask-text.done { text-decoration: line-through; color: #94a3b8; }
   .subtask-delete { opacity: 0; background: none; border: none; cursor: pointer; color: #94a3b8; padding: 2px; transition: opacity 0.15s; display: flex; }
   .subtask-delete:hover { color: #ef4444; }
   .add-subtask-btn { background: none; border: none; color: #8a7a10; font-size: 12px; cursor: pointer; display: flex; align-items: center; gap: 4px; margin-top: 4px; font-family: inherit; }
+
+  /* ─── CAPTIONS ─── */
   .caption-tabs { display: flex; gap: 4px; margin-bottom: 8px; flex-wrap: wrap; }
   .caption-tab { padding: 4px 10px; border-radius: 6px; font-size: 11px; font-weight: 500; border: none; cursor: pointer; transition: all 0.15s; font-family: inherit; }
   .caption-tab.active { background: #e4d344; color: #1e293b; font-weight: 600; }
   .caption-tab.inactive { background: #f1f5f9; color: #475569; }
   .caption-tab.inactive:hover { background: #e2e8f0; }
-  .assets-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 8px; margin-top: 8px; }
+  .caption-tab .has-content { display: inline-block; width: 5px; height: 5px; border-radius: 50%; background: #22c55e; margin-left: 4px; vertical-align: middle; }
+
+  /* ─── ASSETS ─── */
+  .assets-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 8px; margin-top: 8px; }
   .asset-thumb { position: relative; border-radius: 8px; overflow: hidden; border: 1px solid #e2e8f0; background: #f8fafc; aspect-ratio: 1; cursor: pointer; }
   .asset-thumb img { width: 100%; height: 100%; object-fit: cover; }
   .asset-thumb:hover .asset-overlay { opacity: 1; }
   .asset-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; gap: 8px; opacity: 0; transition: opacity 0.15s; }
   .asset-overlay button { background: rgba(255,255,255,0.9); border: none; border-radius: 6px; padding: 4px 8px; font-size: 11px; cursor: pointer; font-family: inherit; font-weight: 500; }
   .asset-overlay .del-btn { color: #ef4444; }
-  .upload-zone { border: 2px dashed #d1d5db; border-radius: 8px; padding: 16px; text-align: center; cursor: pointer; transition: all 0.15s; margin-top: 8px; }
+  .upload-zone { border: 2px dashed #d1d5db; border-radius: 8px; padding: 14px; text-align: center; cursor: pointer; transition: all 0.15s; margin-top: 8px; }
   .upload-zone:hover { border-color: #e4d344; background: #fdfbe8; }
   .upload-zone p { font-size: 12px; color: #94a3b8; }
   .upload-zone input { display: none; }
   .storage-note { font-size: 10px; color: #94a3b8; margin-top: 4px; }
   .lightbox { position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 60; display: flex; align-items: center; justify-content: center; cursor: pointer; }
   .lightbox img { max-width: 90vw; max-height: 90vh; border-radius: 8px; }
-  .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.4); display: flex; align-items: center; justify-content: center; z-index: 50; padding: 16px; }
-  .modal { background: #fff; border-radius: 16px; padding: 24px; width: 100%; max-width: 420px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25); }
+
+  /* ─── MODALS ─── */
+  .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.4); display: flex; align-items: center; justify-content: center; z-index: 50; padding: 16px; animation: fadeIn 0.15s ease; }
+  @keyframes fadeIn { from{opacity:0}to{opacity:1} }
+  .modal { background: #fff; border-radius: 16px; padding: 24px; width: 100%; max-width: 440px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25); animation: slideUp 0.2s ease; }
+  @keyframes slideUp { from{transform:translateY(10px);opacity:0}to{transform:translateY(0);opacity:1} }
   .modal h2 { font-size: 20px; font-weight: 700; color: #0f172a; margin-bottom: 16px; font-family: 'Cormorant Garamond', Georgia, serif; }
   .modal-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 20px; }
-  .modal-cancel { background: none; border: none; color: #475569; padding: 8px 16px; cursor: pointer; font-size: 13px; font-family: inherit; }
-  .modal-confirm { background: #e4d344; color: #1e293b; border: none; padding: 8px 16px; border-radius: 8px; cursor: pointer; font-size: 13px; font-weight: 600; font-family: inherit; }
+  .modal-cancel { background: none; border: none; color: #475569; padding: 8px 16px; cursor: pointer; font-size: 13px; font-family: inherit; border-radius: 8px; }
+  .modal-cancel:hover { background: #f1f5f9; }
+  .modal-confirm { background: #e4d344; color: #1e293b; border: none; padding: 8px 16px; border-radius: 8px; cursor: pointer; font-size: 13px; font-weight: 600; font-family: inherit; transition: background 0.15s; }
+  .modal-confirm:hover { background: #d4c334; }
   .modal-confirm:disabled { opacity: 0.4; }
   .modal-field { width: 100%; border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px; font-size: 13px; outline: none; font-family: inherit; margin-bottom: 12px; }
   .modal-field:focus { border-color: #e4d344; box-shadow: 0 0 0 3px rgba(228,211,68,0.25); }
-  .add-cat-row { display: flex; gap: 4px; margin-top: 8px; }
-  .add-cat-input { flex: 1; border: 1px solid #e2e8f0; border-radius: 6px; padding: 4px 8px; font-size: 12px; outline: none; font-family: inherit; min-width: 0; }
-  .add-cat-btn { background: #e4d344; color: #1e293b; border: none; border-radius: 6px; padding: 4px 8px; font-size: 11px; cursor: pointer; font-family: inherit; font-weight: 600; }
-  .add-cat-btn:disabled { opacity: 0.4; }
+
+  /* ─── TOAST ─── */
+  .toast-container { position: fixed; bottom: 24px; right: 24px; z-index: 70; display: flex; flex-direction: column; gap: 8px; }
+  .toast { background: #1e293b; color: #fff; padding: 10px 16px; border-radius: 10px; font-size: 13px; box-shadow: 0 8px 24px rgba(0,0,0,0.15); display: flex; align-items: center; gap: 8px; animation: toastIn 0.3s ease; }
+  .toast.leaving { animation: toastOut 0.3s ease forwards; }
+  @keyframes toastIn { from{transform:translateY(10px);opacity:0}to{transform:translateY(0);opacity:1} }
+  @keyframes toastOut { from{transform:translateY(0);opacity:1}to{transform:translateY(10px);opacity:0} }
+
+  /* ─── MISC ─── */
   .sync-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
   .sync-live { background: #22c55e; animation: pulse 2s infinite; }
   .sync-off { background: #ef4444; }
@@ -139,11 +200,18 @@
   .empty-state { text-align: center; padding: 48px; color: #94a3b8; font-size: 13px; }
   .desc-edit-area { width: 100%; border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px; font-size: 13px; outline: none; font-family: inherit; resize: vertical; min-height: 60px; }
   .desc-edit-area:focus { border-color: #e4d344; box-shadow: 0 0 0 3px rgba(228,211,68,0.25); }
-  .auth-screen { display: flex; align-items: center; justify-content: center; min-height: 100vh; }
+  .user-pill { display: flex; align-items: center; gap: 6px; background: #f1f5f9; padding: 4px 10px; border-radius: 999px; font-size: 11px; color: #475569; }
+  .signout-btn { background: none; border: none; color: #94a3b8; cursor: pointer; font-size: 11px; text-decoration: underline; margin-left: 4px; font-family: inherit; }
+  .export-bar { display: flex; flex-direction: column; gap: 6px; margin-top: 20px; padding-top: 16px; border-top: 1px solid #e2e8f0; }
+  .btn-export { background: #f1f5f9; color: #475569; border: none; padding: 8px 14px; border-radius: 8px; font-size: 12px; font-weight: 500; cursor: pointer; font-family: inherit; text-align: left; transition: background 0.15s; }
+  .btn-export:hover { background: #e2e8f0; }
+
+  /* ─── AUTH ─── */
+  .auth-screen { display: flex; align-items: center; justify-content: center; min-height: 100vh; background: linear-gradient(135deg, #f8fafc 0%, #fdfbe8 100%); }
   .auth-card { background: #fff; border-radius: 16px; padding: 40px; width: 100%; max-width: 380px; box-shadow: 0 4px 24px rgba(0,0,0,0.08); text-align: center; }
-  .auth-card h1 { font-size: 24px; font-weight: 700; margin-bottom: 4px; font-family: 'Cormorant Garamond', Georgia, serif; }
+  .auth-card h1 { font-size: 26px; font-weight: 700; margin-bottom: 4px; font-family: 'Cormorant Garamond', Georgia, serif; }
   .auth-card p { font-size: 13px; color: #94a3b8; margin-bottom: 24px; }
-  .auth-input { width: 100%; padding: 10px 14px; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 14px; outline: none; font-family: inherit; margin-bottom: 12px; }
+  .auth-input { width: 100%; padding: 10px 14px; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 14px; outline: none; font-family: inherit; margin-bottom: 12px; transition: border-color 0.15s; }
   .auth-input:focus { border-color: #e4d344; box-shadow: 0 0 0 3px rgba(228,211,68,0.25); }
   .auth-btn { width: 100%; padding: 12px; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; font-family: inherit; border: none; background: #e4d344; color: #1e293b; transition: all 0.15s; margin-bottom: 8px; }
   .auth-btn:hover { background: #d4c334; }
@@ -153,28 +221,40 @@
   .auth-toggle { font-size: 13px; color: #64748b; margin-top: 12px; }
   .auth-toggle button { background: none; border: none; color: #8a7a10; cursor: pointer; font-family: inherit; font-size: 13px; text-decoration: underline; }
   .auth-error { color: #ef4444; font-size: 12px; margin-bottom: 8px; }
-  .user-pill { display: flex; align-items: center; gap: 6px; background: #f1f5f9; padding: 4px 10px; border-radius: 999px; font-size: 11px; color: #475569; }
-  .signout-btn { background: none; border: none; color: #94a3b8; cursor: pointer; font-size: 11px; text-decoration: underline; margin-left: 4px; font-family: inherit; }
   .loading-screen { display: flex; align-items: center; justify-content: center; min-height: 100vh; color: #94a3b8; }
-  .export-bar { display: flex; flex-direction: column; gap: 6px; margin-top: 20px; padding-top: 16px; border-top: 1px solid #e2e8f0; }
-  .btn-export { background: #f1f5f9; color: #475569; border: none; padding: 8px 14px; border-radius: 8px; font-size: 12px; font-weight: 500; cursor: pointer; font-family: inherit; text-align: left; }
-  .btn-export:hover { background: #e2e8f0; }
-  @media (max-width: 768px) { .layout { flex-direction: column; } .sidebar { width: 100%; border-right: none; border-bottom: 1px solid #e2e8f0; padding: 12px; } .field-row { flex-direction: column; } }
+
+  /* ─── KEYBOARD HELP ─── */
+  .shortcuts-help { font-size: 10px; color: #cbd5e1; display: flex; gap: 12px; padding: 8px 0 0; flex-wrap: wrap; }
+  .shortcuts-help span { display: flex; align-items: center; gap: 3px; }
+
+  /* ─── MOBILE ─── */
+  .mobile-sidebar-toggle { display: none; background: none; border: 1px solid #e2e8f0; border-radius: 8px; padding: 6px 10px; cursor: pointer; font-size: 12px; font-family: inherit; color: #475569; }
+  @media (max-width: 768px) {
+    .layout { flex-direction: column; }
+    .sidebar { width: 100%; border-right: none; border-bottom: 1px solid #e2e8f0; padding: 12px; position: static; height: auto; max-height: none; }
+    .sidebar.collapsed { display: none; }
+    .mobile-sidebar-toggle { display: flex; align-items: center; gap: 4px; }
+    .field-row { flex-direction: column; }
+    .search-wrap { max-width: 100%; }
+    .task-preview { max-width: 280px; }
+    .header-inner { padding: 12px 16px; }
+    .main { padding: 16px; }
+    .stat-badges { display: none; }
+    .toast-container { bottom: 12px; right: 12px; left: 12px; }
+  }
 </style>
 </head>
 <body>
 <div id="root"></div>
 
 <script type="text/babel">
-const { useState, useEffect, useRef, useCallback } = React;
+const { useState, useEffect, useRef, useCallback, useMemo } = React;
 
 /* ╔════════════════════════════════════════════════════════════╗
-   ║  SUPABASE CONFIG — Replace with your project values       ║
-   ║  See SETUP.md for instructions                            ║
+   ║  SUPABASE CONFIG                                          ║
    ╚════════════════════════════════════════════════════════════╝ */
 const SUPABASE_URL = "https://zlnmhrxcszyqoxdwzwiq.supabase.co";
 const SUPABASE_ANON_KEY = "sb_publishable_X_gtNEHE0TMkFUbeIhmxsw_O7VfiQWf";
-
 const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 /* ============================================================ */
@@ -183,29 +263,30 @@ const PLATFORM_LIMITS = { "Threads": 500, "Bluesky": 300 };
 const STATUSES = ["todo", "in_progress", "waiting", "done"];
 const STATUS_LABELS = { todo: "To Do", in_progress: "In Progress", waiting: "Waiting", done: "Done" };
 const DEFAULT_CATEGORIES = ["Metascience / Articles","Pending / Waiting","Active / Daily","Paradox Reels","FQxI 20th Anniversary","Perimeter / Video","Lower Priority","Strategic / Ongoing"];
+const EMPTY_CAPTIONS = {"Instagram/TikTok":"","Twitter/X":"",Facebook:"",LinkedIn:"",YouTube:"",Threads:"",Bluesky:""};
 
 const defaultTasks = [
-  { title: "David Wallace Q&A Post", category: "Metascience / Articles", status: "todo", priority: "high", deadline: "", description: "Post the David Wallace Q&A. This is FLI/Metascience work \u2014 tag accordingly.", notes: "", captions: { "Instagram/TikTok": "", "Twitter/X": "", Facebook: "", LinkedIn: "", YouTube: "", Threads: "", Bluesky: "" }, subtasks: [{ text: "Draft caption for each platform", done: false }, { text: "Tag under FLI/Metascience", done: false }, { text: "Schedule post", done: false }], image_urls: [] },
-  { title: "Catalina Press Release Post", category: "Metascience / Articles", status: "todo", priority: "high", deadline: "", description: "Press release is up. Use the photo from the press release for the social post.", notes: "Photo available in the press release.", captions: { "Instagram/TikTok": "", "Twitter/X": "", Facebook: "", LinkedIn: "", YouTube: "", Threads: "", Bluesky: "" }, subtasks: [{ text: "Pull photo from press release", done: false }, { text: "Write captions", done: false }, { text: "Post", done: false }], image_urls: [] },
-  { title: "Risk Aversion in Science Research Article", category: "Metascience / Articles", status: "waiting", priority: "high", deadline: "Before March (tentative)", description: "Zeeya edited article on risk aversion. Title like \"Risk GM\u2026\". Waiting for writer approval. Draft available \u2014 DO NOT publish yet.", notes: "Can draft post now. DO NOT publish until writer approves.", captions: { "Instagram/TikTok": "", "Twitter/X": "", Facebook: "", LinkedIn: "", YouTube: "", Threads: "", Bluesky: "" }, subtasks: [{ text: "Review draft article", done: false }, { text: "Draft social post (hold for approval)", done: false }, { text: "Get confirmation from Zeeya", done: false }, { text: "Publish", done: false }], image_urls: [] },
-  { title: "FQxI Member Survey Report (Peer Review)", category: "Metascience / Articles", status: "waiting", priority: "high", deadline: "Before March (likely)", description: "Zeeya's long report on member survey about peer review. Likely before March.", notes: "On radar. Zeeya putting together.", captions: { "Instagram/TikTok": "", "Twitter/X": "", Facebook: "", LinkedIn: "", YouTube: "", Threads: "", Bluesky: "" }, subtasks: [{ text: "Receive report from Zeeya", done: false }, { text: "Pull key points", done: false }, { text: "Draft promotion posts", done: false }, { text: "Post", done: false }], image_urls: [] },
-  { title: "Fred Adams Q&A (Miriam Frankel)", category: "Pending / Waiting", status: "waiting", priority: "medium", deadline: "TBD", description: "Pinned \u2014 needs research to decide if priority now.", notes: "\u26a0\ufe0f Question mark. Do more research.", captions: { "Instagram/TikTok": "", "Twitter/X": "", Facebook: "", LinkedIn: "", YouTube: "", Threads: "", Bluesky: "" }, subtasks: [{ text: "Research priority", done: false }, { text: "Decide timeline", done: false }], image_urls: [] },
-  { title: "Brandon Ogbunu Article", category: "Pending / Waiting", status: "waiting", priority: "medium", deadline: "March/April", description: "Zeeya hasn't sent it yet.", notes: "Waiting on Zeeya.", captions: { "Instagram/TikTok": "", "Twitter/X": "", Facebook: "", LinkedIn: "", YouTube: "", Threads: "", Bluesky: "" }, subtasks: [{ text: "Receive article", done: false }, { text: "Review and draft post", done: false }, { text: "Post", done: false }], image_urls: [] },
-  { title: "Archive Story: Reducing AI Slop", category: "Pending / Waiting", status: "waiting", priority: "medium", deadline: "Could come in Feb", description: "Nicola Jones's pitch. May or may not run. Zeeya will send draft if greenlit.", notes: "Could arrive imminently.", captions: { "Instagram/TikTok": "", "Twitter/X": "", Facebook: "", LinkedIn: "", YouTube: "", Threads: "", Bluesky: "" }, subtasks: [{ text: "Wait for draft", done: false }, { text: "Draft social post", done: false }, { text: "Post", done: false }], image_urls: [] },
-  { title: "Cambridge-Related Post", category: "Pending / Waiting", status: "todo", priority: "medium", deadline: "", description: "FQxI person in Cambridge social media video. Promote it.", notes: "Check Zeeya's text for details.", captions: { "Instagram/TikTok": "", "Twitter/X": "", Facebook: "", LinkedIn: "", YouTube: "", Threads: "", Bluesky: "" }, subtasks: [{ text: "Get video link from Zeeya", done: false }, { text: "Draft post", done: false }, { text: "Post", done: false }], image_urls: [] },
-  { title: "RSA Competition Winner Profiles (Daily Posts)", category: "Active / Daily", status: "in_progress", priority: "high", deadline: "Next ~7 days", description: "One post per day. Headshot + quote per winner.", notes: "ACTIVE daily schedule. Rishabh Ghosh done.", captions: { "Instagram/TikTok": "", "Twitter/X": "", Facebook: "", LinkedIn: "", YouTube: "", Threads: "", Bluesky: "" }, subtasks: [{ text: "Rishabh Ghosh profile", done: true }, { text: "Winner 2", done: false }, { text: "Winner 3", done: false }, { text: "Winner 4", done: false }, { text: "Winner 5", done: false }, { text: "Winner 6", done: false }, { text: "Winner 7", done: false }, { text: "Winner 8", done: false }], image_urls: [] },
-  { title: "Paradox Reels \u2014 Edit & Post Winner Interviews", category: "Paradox Reels", status: "waiting", priority: "high", deadline: "After Saturday's interview", description: "5 done, 3 declined. Clip per winner (<90s) + possible 10-min narrative.", notes: "Can't edit until Saturday.", captions: { "Instagram/TikTok": "", "Twitter/X": "", Facebook: "", LinkedIn: "", YouTube: "", Threads: "", Bluesky: "" }, subtasks: [{ text: "Final interview (Saturday)", done: false }, { text: "Edit short clips", done: false }, { text: "Consider 10-min video", done: false }, { text: "Posting strategy", done: false }, { text: "Post", done: false }], image_urls: [] },
-  { title: "Fulcrum Grant Outreach (20th Anniversary)", category: "FQxI 20th Anniversary", status: "in_progress", priority: "medium", deadline: "Ongoing", description: "Outreach to past 10 years of Fulcrum grant winners.", notes: "Some replied. Keep emailing.", captions: { "Instagram/TikTok": "", "Twitter/X": "", Facebook: "", LinkedIn: "", YouTube: "", Threads: "", Bluesky: "" }, subtasks: [{ text: "Send more emails", done: false }, { text: "Follow up", done: false }, { text: "Collect videos", done: false }], image_urls: [] },
-  { title: "Edit Anniversary Videos", category: "FQxI 20th Anniversary", status: "in_progress", priority: "medium", deadline: "Ongoing", description: "Editing videos from grant winners.", notes: "", captions: { "Instagram/TikTok": "", "Twitter/X": "", Facebook: "", LinkedIn: "", YouTube: "", Threads: "", Bluesky: "" }, subtasks: [{ text: "Edit received videos", done: false }, { text: "Format for social", done: false }], image_urls: [] },
-  { title: "Brainstorm FQxI at 20 Celebration Ideas", category: "FQxI 20th Anniversary", status: "todo", priority: "medium", deadline: "", description: "What else can we do for the 20th?", notes: "Open brainstorm.", captions: { "Instagram/TikTok": "", "Twitter/X": "", Facebook: "", LinkedIn: "", YouTube: "", Threads: "", Bluesky: "" }, subtasks: [{ text: "Brainstorm ideas", done: false }, { text: "Pick top 2\u20133", done: false }, { text: "Plan execution", done: false }], image_urls: [] },
-  { title: "Elise Crull Video Edit (Perimeter)", category: "Perimeter / Video", status: "todo", priority: "medium", deadline: "", description: "Video needs editing.", notes: "", captions: { "Instagram/TikTok": "", "Twitter/X": "", Facebook: "", LinkedIn: "", YouTube: "", Threads: "", Bluesky: "" }, subtasks: [{ text: "Edit video", done: false }, { text: "Draft post", done: false }, { text: "Post", done: false }], image_urls: [] },
-  { title: "Katie's Videos (\u00d72)", category: "Perimeter / Video", status: "waiting", priority: "low", deadline: "TBD", description: "Book video (hold until published) + SciComm video.", notes: "SciComm may be ready sooner.", captions: { "Instagram/TikTok": "", "Twitter/X": "", Facebook: "", LinkedIn: "", YouTube: "", Threads: "", Bluesky: "" }, subtasks: [{ text: "Check SciComm video", done: false }, { text: "Book video \u2014 wait", done: false }], image_urls: [] },
-  { title: "Bernard Carr \u2014 Podcast Promo Post", category: "Perimeter / Video", status: "in_progress", priority: "medium", deadline: "", description: "Hook: \"Hawking's student studying poltergeists.\" Instagram carousel + Twitter.", notes: "Slides 1\u20132 have quotes.", captions: { "Instagram/TikTok": "", "Twitter/X": "", Facebook: "", LinkedIn: "", YouTube: "", Threads: "", Bluesky: "" }, subtasks: [{ text: "Finalise hook", done: false }, { text: "Pull quotes", done: false }, { text: "Design carousel", done: false }, { text: "Twitter/X format", done: false }, { text: "Post", done: false }], image_urls: [] },
-  { title: "XPANSE Video Clips", category: "Lower Priority", status: "todo", priority: "low", deadline: "", description: "Repurpose into something engaging.", notes: "Raw clips are boring.", captions: { "Instagram/TikTok": "", "Twitter/X": "", Facebook: "", LinkedIn: "", YouTube: "", Threads: "", Bluesky: "" }, subtasks: [{ text: "Brainstorm repurposing", done: false }, { text: "Edit", done: false }, { text: "Post", done: false }], image_urls: [] },
-  { title: "Upload Old Posts to New Cloud Storage", category: "Lower Priority", status: "todo", priority: "low", deadline: "", description: "Migrate to new FQxI admin cloud.", notes: "", captions: { "Instagram/TikTok": "", "Twitter/X": "", Facebook: "", LinkedIn: "", YouTube: "", Threads: "", Bluesky: "" }, subtasks: [{ text: "Identify what to migrate", done: false }, { text: "Upload", done: false }, { text: "Verify", done: false }], image_urls: [] },
-  { title: "Build a Content Plan / Calendar", category: "Strategic / Ongoing", status: "todo", priority: "medium", deadline: "", description: "Proper content plan + engagement ideas.", notes: "", captions: { "Instagram/TikTok": "", "Twitter/X": "", Facebook: "", LinkedIn: "", YouTube: "", Threads: "", Bluesky: "" }, subtasks: [{ text: "Outline cadence", done: false }, { text: "Brainstorm engagement", done: false }, { text: "Build calendar", done: false }], image_urls: [] },
-  { title: "Study Quanta Magazine's Instagram", category: "Strategic / Ongoing", status: "todo", priority: "medium", deadline: "", description: "Study @quantamag for inspiration.", notes: "What makes their posts work?", captions: { "Instagram/TikTok": "", "Twitter/X": "", Facebook: "", LinkedIn: "", YouTube: "", Threads: "", Bluesky: "" }, subtasks: [{ text: "Review posts", done: false }, { text: "Note what works", done: false }, { text: "Adapt ideas", done: false }], image_urls: [] },
-  { title: "QSpace Forums \u2014 Backup Content", category: "Strategic / Ongoing", status: "todo", priority: "low", deadline: "Ongoing", description: "Fallback: physics announcement board for shareable content.", notes: "Jobs, conferences, courses.", captions: { "Instagram/TikTok": "", "Twitter/X": "", Facebook: "", LinkedIn: "", YouTube: "", Threads: "", Bluesky: "" }, subtasks: [{ text: "Bookmark board", done: false }, { text: "Check periodically", done: false }], image_urls: [] },
+  { title: "David Wallace Q&A Post", category: "Metascience / Articles", status: "todo", priority: "high", deadline: "", description: "Post the David Wallace Q&A. This is FLI/Metascience work \u2014 tag accordingly.", notes: "", captions: {...EMPTY_CAPTIONS}, subtasks: [{ text: "Draft caption for each platform", done: false }, { text: "Tag under FLI/Metascience", done: false }, { text: "Schedule post", done: false }], image_urls: [] },
+  { title: "Catalina Press Release Post", category: "Metascience / Articles", status: "todo", priority: "high", deadline: "", description: "Press release is up. Use the photo from the press release for the social post.", notes: "Photo available in the press release.", captions: {...EMPTY_CAPTIONS}, subtasks: [{ text: "Pull photo from press release", done: false }, { text: "Write captions", done: false }, { text: "Post", done: false }], image_urls: [] },
+  { title: "Risk Aversion in Science Research Article", category: "Metascience / Articles", status: "waiting", priority: "high", deadline: "Before March (tentative)", description: "Zeeya edited article on risk aversion. Title like \"Risk GM\u2026\". Waiting for writer approval. Draft available \u2014 DO NOT publish yet.", notes: "Can draft post now. DO NOT publish until writer approves.", captions: {...EMPTY_CAPTIONS}, subtasks: [{ text: "Review draft article", done: false }, { text: "Draft social post (hold for approval)", done: false }, { text: "Get confirmation from Zeeya", done: false }, { text: "Publish", done: false }], image_urls: [] },
+  { title: "FQxI Member Survey Report (Peer Review)", category: "Metascience / Articles", status: "waiting", priority: "high", deadline: "Before March (likely)", description: "Zeeya's long report on member survey about peer review. Likely before March.", notes: "On radar. Zeeya putting together.", captions: {...EMPTY_CAPTIONS}, subtasks: [{ text: "Receive report from Zeeya", done: false }, { text: "Pull key points", done: false }, { text: "Draft promotion posts", done: false }, { text: "Post", done: false }], image_urls: [] },
+  { title: "Fred Adams Q&A (Miriam Frankel)", category: "Pending / Waiting", status: "waiting", priority: "medium", deadline: "TBD", description: "Pinned \u2014 needs research to decide if priority now.", notes: "\u26a0\ufe0f Question mark. Do more research.", captions: {...EMPTY_CAPTIONS}, subtasks: [{ text: "Research priority", done: false }, { text: "Decide timeline", done: false }], image_urls: [] },
+  { title: "Brandon Ogbunu Article", category: "Pending / Waiting", status: "waiting", priority: "medium", deadline: "March/April", description: "Zeeya hasn't sent it yet.", notes: "Waiting on Zeeya.", captions: {...EMPTY_CAPTIONS}, subtasks: [{ text: "Receive article", done: false }, { text: "Review and draft post", done: false }, { text: "Post", done: false }], image_urls: [] },
+  { title: "Archive Story: Reducing AI Slop", category: "Pending / Waiting", status: "waiting", priority: "medium", deadline: "Could come in Feb", description: "Nicola Jones's pitch. May or may not run. Zeeya will send draft if greenlit.", notes: "Could arrive imminently.", captions: {...EMPTY_CAPTIONS}, subtasks: [{ text: "Wait for draft", done: false }, { text: "Draft social post", done: false }, { text: "Post", done: false }], image_urls: [] },
+  { title: "Cambridge-Related Post", category: "Pending / Waiting", status: "todo", priority: "medium", deadline: "", description: "FQxI person in Cambridge social media video. Promote it.", notes: "Check Zeeya's text for details.", captions: {...EMPTY_CAPTIONS}, subtasks: [{ text: "Get video link from Zeeya", done: false }, { text: "Draft post", done: false }, { text: "Post", done: false }], image_urls: [] },
+  { title: "RSA Competition Winner Profiles (Daily Posts)", category: "Active / Daily", status: "in_progress", priority: "high", deadline: "Next ~7 days", description: "One post per day. Headshot + quote per winner.", notes: "ACTIVE daily schedule. Rishabh Ghosh done.", captions: {...EMPTY_CAPTIONS}, subtasks: [{ text: "Rishabh Ghosh profile", done: true }, { text: "Winner 2", done: false }, { text: "Winner 3", done: false }, { text: "Winner 4", done: false }, { text: "Winner 5", done: false }, { text: "Winner 6", done: false }, { text: "Winner 7", done: false }, { text: "Winner 8", done: false }], image_urls: [] },
+  { title: "Paradox Reels \u2014 Edit & Post Winner Interviews", category: "Paradox Reels", status: "waiting", priority: "high", deadline: "After Saturday's interview", description: "5 done, 3 declined. Clip per winner (<90s) + possible 10-min narrative.", notes: "Can't edit until Saturday.", captions: {...EMPTY_CAPTIONS}, subtasks: [{ text: "Final interview (Saturday)", done: false }, { text: "Edit short clips", done: false }, { text: "Consider 10-min video", done: false }, { text: "Posting strategy", done: false }, { text: "Post", done: false }], image_urls: [] },
+  { title: "Fulcrum Grant Outreach (20th Anniversary)", category: "FQxI 20th Anniversary", status: "in_progress", priority: "medium", deadline: "Ongoing", description: "Outreach to past 10 years of Fulcrum grant winners.", notes: "Some replied. Keep emailing.", captions: {...EMPTY_CAPTIONS}, subtasks: [{ text: "Send more emails", done: false }, { text: "Follow up", done: false }, { text: "Collect videos", done: false }], image_urls: [] },
+  { title: "Edit Anniversary Videos", category: "FQxI 20th Anniversary", status: "in_progress", priority: "medium", deadline: "Ongoing", description: "Editing videos from grant winners.", notes: "", captions: {...EMPTY_CAPTIONS}, subtasks: [{ text: "Edit received videos", done: false }, { text: "Format for social", done: false }], image_urls: [] },
+  { title: "Brainstorm FQxI at 20 Celebration Ideas", category: "FQxI 20th Anniversary", status: "todo", priority: "medium", deadline: "", description: "What else can we do for the 20th?", notes: "Open brainstorm.", captions: {...EMPTY_CAPTIONS}, subtasks: [{ text: "Brainstorm ideas", done: false }, { text: "Pick top 2\u20133", done: false }, { text: "Plan execution", done: false }], image_urls: [] },
+  { title: "Elise Crull Video Edit (Perimeter)", category: "Perimeter / Video", status: "todo", priority: "medium", deadline: "", description: "Video needs editing.", notes: "", captions: {...EMPTY_CAPTIONS}, subtasks: [{ text: "Edit video", done: false }, { text: "Draft post", done: false }, { text: "Post", done: false }], image_urls: [] },
+  { title: "Katie's Videos (\u00d72)", category: "Perimeter / Video", status: "waiting", priority: "low", deadline: "TBD", description: "Book video (hold until published) + SciComm video.", notes: "SciComm may be ready sooner.", captions: {...EMPTY_CAPTIONS}, subtasks: [{ text: "Check SciComm video", done: false }, { text: "Book video \u2014 wait", done: false }], image_urls: [] },
+  { title: "Bernard Carr \u2014 Podcast Promo Post", category: "Perimeter / Video", status: "in_progress", priority: "medium", deadline: "", description: "Hook: \"Hawking's student studying poltergeists.\" Instagram carousel + Twitter.", notes: "Slides 1\u20132 have quotes.", captions: {...EMPTY_CAPTIONS}, subtasks: [{ text: "Finalise hook", done: false }, { text: "Pull quotes", done: false }, { text: "Design carousel", done: false }, { text: "Twitter/X format", done: false }, { text: "Post", done: false }], image_urls: [] },
+  { title: "XPANSE Video Clips", category: "Lower Priority", status: "todo", priority: "low", deadline: "", description: "Repurpose into something engaging.", notes: "Raw clips are boring.", captions: {...EMPTY_CAPTIONS}, subtasks: [{ text: "Brainstorm repurposing", done: false }, { text: "Edit", done: false }, { text: "Post", done: false }], image_urls: [] },
+  { title: "Upload Old Posts to New Cloud Storage", category: "Lower Priority", status: "todo", priority: "low", deadline: "", description: "Migrate to new FQxI admin cloud.", notes: "", captions: {...EMPTY_CAPTIONS}, subtasks: [{ text: "Identify what to migrate", done: false }, { text: "Upload", done: false }, { text: "Verify", done: false }], image_urls: [] },
+  { title: "Build a Content Plan / Calendar", category: "Strategic / Ongoing", status: "todo", priority: "medium", deadline: "", description: "Proper content plan + engagement ideas.", notes: "", captions: {...EMPTY_CAPTIONS}, subtasks: [{ text: "Outline cadence", done: false }, { text: "Brainstorm engagement", done: false }, { text: "Build calendar", done: false }], image_urls: [] },
+  { title: "Study Quanta Magazine's Instagram", category: "Strategic / Ongoing", status: "todo", priority: "medium", deadline: "", description: "Study @quantamag for inspiration.", notes: "What makes their posts work?", captions: {...EMPTY_CAPTIONS}, subtasks: [{ text: "Review posts", done: false }, { text: "Note what works", done: false }, { text: "Adapt ideas", done: false }], image_urls: [] },
+  { title: "QSpace Forums \u2014 Backup Content", category: "Strategic / Ongoing", status: "todo", priority: "low", deadline: "Ongoing", description: "Fallback: physics announcement board for shareable content.", notes: "Jobs, conferences, courses.", captions: {...EMPTY_CAPTIONS}, subtasks: [{ text: "Bookmark board", done: false }, { text: "Check periodically", done: false }], image_urls: [] },
 ];
 
 /* ============================================================
@@ -222,14 +303,62 @@ const IC = {
   edit: <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>,
   image: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>,
   x: <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>,
+  collapse: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="4 14 10 14 10 20"/><polyline points="20 10 14 10 14 4"/><line x1="14" y1="10" x2="21" y2="3"/><line x1="3" y1="21" x2="10" y2="14"/></svg>,
+  expand: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/><line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/></svg>,
+  menu: <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>,
 };
 
-/* ============================================================ */
+/* ============================================================
+   HOOKS
+   ============================================================ */
 function useDebounce(fn, ms) { const t=useRef(null); return useCallback((...a)=>{clearTimeout(t.current);t.current=setTimeout(()=>fn(...a),ms);},[fn,ms]); }
 
-function CaptionEditor({captions,onChange}){const[tab,setTab]=useState("Instagram/TikTok");const limit=PLATFORM_LIMITS[tab];const charCount=(captions[tab]||"").length;const overLimit=limit&&charCount>limit;return(<div><span className="field-label">Platform Captions</span><div className="caption-tabs">{PLATFORMS.map(p=><button key={p} className={`caption-tab ${tab===p?'active':'inactive'}`} onClick={()=>setTab(p)}>{p}{captions[p]?" \u2713":""}</button>)}</div><textarea className="field-textarea" placeholder={`${tab} caption...`} value={captions[tab]||""} onChange={e=>onChange({...captions,[tab]:e.target.value})} rows={3} style={overLimit?{borderColor:'#ef4444',boxShadow:'0 0 0 3px rgba(239,68,68,0.2)'}:{}}/>{limit&&<p style={{fontSize:11,marginTop:4,color:overLimit?'#ef4444':'#94a3b8',fontWeight:overLimit?600:400}}>{charCount} / {limit} characters{overLimit?" — over limit!":""}</p>}</div>);}
+function useStarred() {
+  const[starred,setStarred]=useState(()=>{try{return new Set(JSON.parse(localStorage.getItem('fqxi_starred')||'[]'));}catch{return new Set();}});
+  const toggle=useCallback((id)=>{setStarred(prev=>{const n=new Set(prev);if(n.has(id))n.delete(id);else n.add(id);localStorage.setItem('fqxi_starred',JSON.stringify([...n]));return n;});},[]);
+  return{starred,toggle};
+}
 
-function SubtaskList({subtasks,onChange,onAdd,onRemove}){return(<div><span className="field-label">Subtasks</span>{subtasks.map((st,i)=>(<div key={i} className="subtask-item"><input type="checkbox" className="subtask-check" checked={st.done} onChange={()=>{const u=[...subtasks];u[i]={...u[i],done:!u[i].done};onChange(u);}}/><input type="text" className={`subtask-text ${st.done?'done':''}`} value={st.text} onChange={e=>{const u=[...subtasks];u[i]={...u[i],text:e.target.value};onChange(u);}}/><button className="subtask-delete" onClick={()=>onRemove(i)}>{IC.trash}</button></div>))}<button className="add-subtask-btn" onClick={onAdd}>{IC.plusSm} Add subtask</button></div>);}
+function useToast(){
+  const[toasts,setToasts]=useState([]);
+  const add=useCallback((msg)=>{const id=Date.now();setToasts(p=>[...p,{id,msg}]);setTimeout(()=>setToasts(p=>p.map(t=>t.id===id?{...t,leaving:true}:t)),2500);setTimeout(()=>setToasts(p=>p.filter(t=>t.id!==id)),2800);},[]);
+  return{toasts,add};
+}
+
+/* ============================================================
+   COMPONENTS
+   ============================================================ */
+function CaptionEditor({captions={},onChange}){
+  const caps=captions||EMPTY_CAPTIONS;
+  const[tab,setTab]=useState("Instagram/TikTok");
+  const limit=PLATFORM_LIMITS[tab];
+  const charCount=(caps[tab]||"").length;
+  const overLimit=limit&&charCount>limit;
+  return(<div>
+    <span className="field-label">Platform Captions</span>
+    <div className="caption-tabs">{PLATFORMS.map(p=>
+      <button key={p} className={`caption-tab ${tab===p?'active':'inactive'}`} onClick={()=>setTab(p)}>
+        {p}{caps[p]?<span className="has-content"/>:""}
+      </button>
+    )}</div>
+    <textarea className="field-textarea" placeholder={`${tab} caption...`} value={caps[tab]||""} onChange={e=>onChange({...caps,[tab]:e.target.value})} rows={3} style={overLimit?{borderColor:'#ef4444',boxShadow:'0 0 0 3px rgba(239,68,68,0.2)'}:{}}/>
+    {limit&&<p style={{fontSize:11,marginTop:4,color:overLimit?'#ef4444':'#94a3b8',fontWeight:overLimit?600:400}}>{charCount} / {limit} characters{overLimit?" — over limit!":""}</p>}
+  </div>);
+}
+
+function SubtaskList({subtasks,onChange,onAdd,onRemove}){
+  return(<div>
+    <span className="field-label">Subtasks ({subtasks.filter(s=>s.done).length}/{subtasks.length})</span>
+    {subtasks.map((st,i)=>(
+      <div key={i} className="subtask-item">
+        <input type="checkbox" className="subtask-check" checked={st.done} onChange={()=>{const u=[...subtasks];u[i]={...u[i],done:!u[i].done};onChange(u);}}/>
+        <input type="text" className={`subtask-text ${st.done?'done':''}`} value={st.text} onChange={e=>{const u=[...subtasks];u[i]={...u[i],text:e.target.value};onChange(u);}} placeholder="Subtask..."/>
+        <button className="subtask-delete" onClick={()=>onRemove(i)}>{IC.trash}</button>
+      </div>
+    ))}
+    <button className="add-subtask-btn" onClick={onAdd}>{IC.plusSm} Add subtask</button>
+  </div>);
+}
 
 function AssetUploader({imageUrls,taskId,onUpdate}){
   const fileRef=useRef(null);const[uploading,setUploading]=useState(false);const[lightbox,setLightbox]=useState(null);
@@ -247,25 +376,45 @@ function AssetUploader({imageUrls,taskId,onUpdate}){
     onUpdate(newUrls);setUploading(false);e.target.value='';
   };
   const removeAsset=async(asset)=>{await supabase.storage.from('assets').remove([asset.path]);onUpdate((imageUrls||[]).filter(a=>a.path!==asset.path));};
-  return(<div><span className="field-label">Assets / Images</span>{(imageUrls||[]).length>0&&<div className="assets-grid">{imageUrls.map((a,i)=><div key={i} className="asset-thumb"><img src={a.url} alt={a.name} onClick={()=>setLightbox(a)}/><div className="asset-overlay"><button onClick={()=>setLightbox(a)}>View</button><button className="del-btn" onClick={()=>removeAsset(a)}>Delete</button></div></div>)}</div>}<div className="upload-zone" onClick={()=>fileRef.current?.click()}><p>{uploading?"Uploading...":<>{IC.image} Click to upload images</>}</p><input ref={fileRef} type="file" accept="image/*" multiple onChange={handleFiles} disabled={uploading}/></div><p className="storage-note">Images stored in Supabase Storage (1GB free tier)</p>{lightbox&&<div className="lightbox" onClick={()=>setLightbox(null)}><img src={lightbox.url} alt={lightbox.name} onClick={e=>e.stopPropagation()}/></div>}</div>);
+  return(<div>
+    <span className="field-label">Assets / Images</span>
+    {(imageUrls||[]).length>0&&<div className="assets-grid">{imageUrls.map((a,i)=><div key={i} className="asset-thumb"><img src={a.url} alt={a.name} onClick={()=>setLightbox(a)}/><div className="asset-overlay"><button onClick={()=>setLightbox(a)}>View</button><button className="del-btn" onClick={()=>removeAsset(a)}>Delete</button></div></div>)}</div>}
+    <div className="upload-zone" onClick={()=>fileRef.current?.click()}><p>{uploading?"Uploading...":<>{IC.image} Click to upload images</>}</p><input ref={fileRef} type="file" accept="image/*" multiple onChange={handleFiles} disabled={uploading}/></div>
+    <p className="storage-note">Images stored in Supabase Storage (1GB free)</p>
+    {lightbox&&<div className="lightbox" onClick={()=>setLightbox(null)}><img src={lightbox.url} alt={lightbox.name} onClick={e=>e.stopPropagation()}/></div>}
+  </div>);
 }
 
-function TaskCard({task,onUpdate,onDelete,categories}){
-  const[expanded,setExpanded]=useState(false);const[editingTitle,setEditingTitle]=useState(false);const[titleDraft,setTitleDraft]=useState(task.title);
-  const[editingDesc,setEditingDesc]=useState(false);const[descDraft,setDescDraft]=useState(task.description);const titleRef=useRef(null);
+function TaskCard({task,onUpdate,onDelete,categories,isStarred,onToggleStar,forceExpand}){
+  const[expanded,setExpanded]=useState(false);
+  const[editingTitle,setEditingTitle]=useState(false);
+  const[titleDraft,setTitleDraft]=useState(task.title);
+  const[editingDesc,setEditingDesc]=useState(false);
+  const[descDraft,setDescDraft]=useState(task.description);
+  const titleRef=useRef(null);
+
   useEffect(()=>{if(editingTitle&&titleRef.current)titleRef.current.focus();},[editingTitle]);
-  const done=task.subtasks.filter(s=>s.done).length;const total=task.subtasks.length;const pct=total>0?Math.round((done/total)*100):0;
+  useEffect(()=>{if(forceExpand!==undefined)setExpanded(forceExpand);},[forceExpand]);
+
+  const done=task.subtasks?.filter(s=>s.done).length||0;
+  const total=task.subtasks?.length||0;
+  const pct=total>0?Math.round((done/total)*100):0;
   const saveTitle=()=>{if(titleDraft.trim())onUpdate({...task,title:titleDraft.trim()});else setTitleDraft(task.title);setEditingTitle(false);};
   const saveDesc=()=>{onUpdate({...task,description:descDraft});setEditingDesc(false);};
-  const debouncedUpdate=useDebounce((u)=>onUpdate(u),600);
+
+  const cardClass=`task-card ${task.status==='done'?'done':''} p-${task.priority} ${isStarred?'starred':''}`;
+
   return(
-    <div className={`task-card ${task.status==='done'?'done':''}`}>
+    <div className={cardClass}>
       <div className="task-header">
         <button className={`check-btn ${task.status==='done'?'checked':''}`} onClick={()=>onUpdate({...task,status:task.status==='done'?'todo':'done'})}>{task.status==='done'&&IC.check}</button>
         <div className="task-content">
           <div className="task-title-row">
-            {editingTitle?<input ref={titleRef} className="task-title-input" value={titleDraft} onChange={e=>setTitleDraft(e.target.value)} onBlur={saveTitle} onKeyDown={e=>{if(e.key==='Enter')saveTitle();if(e.key==='Escape'){setTitleDraft(task.title);setEditingTitle(false);}}}/>:<><span className={`task-title ${task.status==='done'?'struck':''}`}>{task.title}</span><button className="edit-title-btn" onClick={()=>{setTitleDraft(task.title);setEditingTitle(true);}}>{IC.edit}</button></>}
-            <span className={`priority-dot priority-${task.priority}`}/>
+            <button className={`star-btn ${isStarred?'active':''}`} onClick={()=>onToggleStar(task.id)} title="Star this task">{isStarred?"\u2605":"\u2606"}</button>
+            {editingTitle?
+              <input ref={titleRef} className="task-title-input" value={titleDraft} onChange={e=>setTitleDraft(e.target.value)} onBlur={saveTitle} onKeyDown={e=>{if(e.key==='Enter')saveTitle();if(e.key==='Escape'){setTitleDraft(task.title);setEditingTitle(false);}}}/>
+              :<><span className={`task-title ${task.status==='done'?'struck':''}`}>{task.title}</span><button className="edit-title-btn" onClick={()=>{setTitleDraft(task.title);setEditingTitle(true);}}>{IC.edit}</button></>
+            }
           </div>
           <div className="task-meta">
             <select className={`status-select status-${task.status}`} value={task.status} onChange={e=>onUpdate({...task,status:e.target.value})}>{STATUSES.map(s=><option key={s} value={s}>{STATUS_LABELS[s]}</option>)}</select>
@@ -273,25 +422,28 @@ function TaskCard({task,onUpdate,onDelete,categories}){
             {task.deadline&&<span className="task-deadline">{"\ud83d\udcc5"} {task.deadline}</span>}
             {(task.image_urls||[]).length>0&&<span style={{fontSize:11,color:'#8a7a10'}}>{"\ud83d\uddbc\ufe0f"} {task.image_urls.length}</span>}
           </div>
+          {!expanded&&task.description&&<p className="task-preview">{task.description}</p>}
           {total>0&&<div className="progress-bar"><div className="progress-track"><div className="progress-fill" style={{width:pct+'%'}}/></div><span className="progress-label">{done}/{total}</span></div>}
         </div>
-        <button className="expand-btn" onClick={()=>setExpanded(!expanded)}>{expanded?IC.chevronDown:IC.chevronRight}</button>
+        <button className="expand-btn" onClick={()=>setExpanded(!expanded)} title={expanded?"Collapse":"Expand"}>{expanded?IC.chevronDown:IC.chevronRight}</button>
       </div>
-      {expanded&&<div className="task-expanded">
-        <span className="field-label" style={{display:'flex',alignItems:'center',gap:6}}>Description <button className="edit-title-btn" onClick={()=>{setDescDraft(task.description);setEditingDesc(!editingDesc);}}>{IC.edit}</button></span>
-        {editingDesc?<div><textarea className="desc-edit-area" value={descDraft} onChange={e=>setDescDraft(e.target.value)} rows={3}/><div style={{display:'flex',gap:6,marginTop:4}}><button className="btn-sm" onClick={saveDesc}>Save</button><button className="btn-sm" onClick={()=>setEditingDesc(false)}>Cancel</button></div></div>:<p className="field-desc">{task.description||<span style={{color:'#cbd5e1',fontStyle:'italic'}}>No description.</span>}</p>}
-        <span className="field-label">Notes</span>
-        <textarea className="field-textarea" placeholder="Notes..." defaultValue={task.notes} onBlur={e=>onUpdate({...task,notes:e.target.value})} rows={2}/>
-        <div className="field-row" style={{marginTop:12}}>
-          <div className="field-col"><span className="field-label">Priority</span><select className="field-select" value={task.priority} onChange={e=>onUpdate({...task,priority:e.target.value})}><option value="high">High</option><option value="medium">Medium</option><option value="low">Low</option></select></div>
-          <div className="field-col"><span className="field-label">Deadline</span><input className="field-input" type="text" placeholder="e.g. March 1st" defaultValue={task.deadline} onBlur={e=>onUpdate({...task,deadline:e.target.value})}/></div>
-          <div className="field-col"><span className="field-label">Category</span><select className="field-select" value={task.category} onChange={e=>onUpdate({...task,category:e.target.value})}>{categories.map(c=><option key={c}>{c}</option>)}</select></div>
-        </div>
-        <SubtaskList subtasks={task.subtasks} onChange={subtasks=>onUpdate({...task,subtasks})} onAdd={()=>onUpdate({...task,subtasks:[...task.subtasks,{text:"",done:false}]})} onRemove={i=>onUpdate({...task,subtasks:task.subtasks.filter((_,idx)=>idx!==i)})}/>
-        <CaptionEditor captions={task.captions} onChange={captions=>onUpdate({...task,captions})}/>
-        <AssetUploader imageUrls={task.image_urls||[]} taskId={task.id} onUpdate={urls=>onUpdate({...task,image_urls:urls})}/>
-        <div style={{paddingTop:8,display:'flex',justifyContent:'flex-end'}}><button className="btn-danger" onClick={()=>{if(confirm("Delete?"))onDelete(task.id);}}>{IC.trash} Delete</button></div>
-      </div>}
+      <div className={`task-expanded-wrap ${expanded?'open':'closed'}`}>
+        {expanded&&<div className="task-expanded">
+          <span className="field-label" style={{display:'flex',alignItems:'center',gap:6}}>Description <button className="edit-title-btn" onClick={()=>{setDescDraft(task.description);setEditingDesc(!editingDesc);}}>{IC.edit}</button></span>
+          {editingDesc?<div><textarea className="desc-edit-area" value={descDraft} onChange={e=>setDescDraft(e.target.value)} rows={3}/><div style={{display:'flex',gap:6,marginTop:4}}><button className="btn-sm" onClick={saveDesc}>Save</button><button className="btn-sm" onClick={()=>setEditingDesc(false)}>Cancel</button></div></div>:<p className="field-desc">{task.description||<span style={{color:'#cbd5e1',fontStyle:'italic'}}>No description yet.</span>}</p>}
+          <span className="field-label">Notes</span>
+          <textarea className="field-textarea" placeholder="Notes..." defaultValue={task.notes} onBlur={e=>onUpdate({...task,notes:e.target.value})} rows={2}/>
+          <div className="field-row" style={{marginTop:12}}>
+            <div className="field-col"><span className="field-label">Priority</span><select className="field-select" value={task.priority} onChange={e=>onUpdate({...task,priority:e.target.value})}><option value="high">High</option><option value="medium">Medium</option><option value="low">Low</option></select></div>
+            <div className="field-col"><span className="field-label">Deadline</span><input className="field-input" type="text" placeholder="e.g. March 1st" defaultValue={task.deadline} onBlur={e=>onUpdate({...task,deadline:e.target.value})}/></div>
+            <div className="field-col"><span className="field-label">Category</span><select className="field-select" value={task.category} onChange={e=>onUpdate({...task,category:e.target.value})}>{categories.map(c=><option key={c}>{c}</option>)}</select></div>
+          </div>
+          <SubtaskList subtasks={task.subtasks||[]} onChange={subtasks=>onUpdate({...task,subtasks})} onAdd={()=>onUpdate({...task,subtasks:[...(task.subtasks||[]),{text:"",done:false}]})} onRemove={i=>onUpdate({...task,subtasks:(task.subtasks||[]).filter((_,idx)=>idx!==i)})}/>
+          <CaptionEditor captions={task.captions} onChange={captions=>onUpdate({...task,captions})}/>
+          <AssetUploader imageUrls={task.image_urls||[]} taskId={task.id} onUpdate={urls=>onUpdate({...task,image_urls:urls})}/>
+          <div style={{paddingTop:8,display:'flex',justifyContent:'flex-end'}}><button className="btn-danger" onClick={()=>{if(confirm("Delete this task?"))onDelete(task.id);}}>{IC.trash} Delete task</button></div>
+        </div>}
+      </div>
     </div>
   );
 }
@@ -306,7 +458,18 @@ function CategoryItem({cat,isActive,count,onSelect,onRename,onDelete}){
 function NewTaskModal({onAdd,onClose,categories}){
   const[title,setTitle]=useState("");const[category,setCategory]=useState(categories[0]||"");const[priority,setPriority]=useState("medium");const ref=useRef(null);
   useEffect(()=>{ref.current?.focus();},[]);
-  return(<div className="modal-overlay" onClick={onClose}><div className="modal" onClick={e=>e.stopPropagation()}><h2>New Task</h2><input ref={ref} className="modal-field" placeholder="Task title..." value={title} onChange={e=>setTitle(e.target.value)} onKeyDown={e=>{if(e.key==='Enter'&&title.trim())onAdd({title:title.trim(),category,priority});}}/><select className="modal-field" value={category} onChange={e=>setCategory(e.target.value)}>{categories.map(c=><option key={c}>{c}</option>)}</select><select className="modal-field" value={priority} onChange={e=>setPriority(e.target.value)}><option value="high">High</option><option value="medium">Medium</option><option value="low">Low</option></select><div className="modal-actions"><button className="modal-cancel" onClick={onClose}>Cancel</button><button className="modal-confirm" disabled={!title.trim()} onClick={()=>{if(title.trim())onAdd({title:title.trim(),category,priority});}}>Add Task</button></div></div></div>);
+  useEffect(()=>{const h=e=>{if(e.key==='Escape')onClose();};window.addEventListener('keydown',h);return()=>window.removeEventListener('keydown',h);},[onClose]);
+  return(<div className="modal-overlay" onClick={onClose}><div className="modal" onClick={e=>e.stopPropagation()}>
+    <h2>New Task</h2>
+    <input ref={ref} className="modal-field" placeholder="Task title..." value={title} onChange={e=>setTitle(e.target.value)} onKeyDown={e=>{if(e.key==='Enter'&&title.trim())onAdd({title:title.trim(),category,priority});}}/>
+    <select className="modal-field" value={category} onChange={e=>setCategory(e.target.value)}>{categories.map(c=><option key={c}>{c}</option>)}</select>
+    <select className="modal-field" value={priority} onChange={e=>setPriority(e.target.value)}><option value="high">High</option><option value="medium">Medium</option><option value="low">Low</option></select>
+    <div className="modal-actions"><button className="modal-cancel" onClick={onClose}>Cancel</button><button className="modal-confirm" disabled={!title.trim()} onClick={()=>{if(title.trim())onAdd({title:title.trim(),category,priority});}}>Add Task</button></div>
+  </div></div>);
+}
+
+function ToastContainer({toasts}){
+  return(<div className="toast-container">{toasts.map(t=><div key={t.id} className={`toast ${t.leaving?'leaving':''}`}>{t.msg}</div>)}</div>);
 }
 
 /* ============================================================
@@ -321,7 +484,6 @@ function AuthScreen(){
     if(error)setError(error.message);
     setLoading(false);
   };
-  const handleGoogle=async()=>{setLoading(true);const{error}=await supabase.auth.signInWithOAuth({provider:'google'});if(error)setError(error.message);setLoading(false);};
   return(
     <div className="auth-screen"><div className="auth-card">
       <h1>FQxI Content Manager</h1>
@@ -332,10 +494,6 @@ function AuthScreen(){
         <input className="auth-input" type="password" placeholder="Password (min 6 chars)" value={password} onChange={e=>setPassword(e.target.value)} required minLength={6}/>
         <button className="auth-btn" type="submit" disabled={loading}>{loading?"...":(mode==="signup"?"Create Account":"Sign In")}</button>
       </form>
-      <button className="auth-btn auth-btn-google" onClick={handleGoogle} disabled={loading}>
-        <svg width="18" height="18" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
-        Sign in with Google
-      </button>
       <p className="auth-toggle">{mode==="signup"?"Already have an account? ":"Don't have an account? "}<button onClick={()=>{setMode(mode==="signup"?"login":"signup");setError("");}}>{mode==="signup"?"Sign in":"Sign up"}</button></p>
     </div></div>
   );
@@ -351,10 +509,27 @@ function App(){
   const[activeCategory,setActiveCategory]=useState("All");
   const[search,setSearch]=useState("");
   const[statusFilter,setStatusFilter]=useState("all");
+  const[priorityFilter,setPriorityFilter]=useState("all");
   const[showNew,setShowNew]=useState(false);
   const[sortBy,setSortBy]=useState("priority");
   const[synced,setSynced]=useState(false);
   const[newCatName,setNewCatName]=useState("");
+  const[allExpanded,setAllExpanded]=useState(undefined);
+  const[sidebarOpen,setSidebarOpen]=useState(true);
+  const{starred,toggle:toggleStar}=useStarred();
+  const{toasts,add:addToast}=useToast();
+  const searchRef=useRef(null);
+
+  // Keyboard shortcuts
+  useEffect(()=>{
+    const h=(e)=>{
+      if(e.target.tagName==='INPUT'||e.target.tagName==='TEXTAREA'||e.target.tagName==='SELECT')return;
+      if(e.key==='n'&&!e.metaKey&&!e.ctrlKey){e.preventDefault();setShowNew(true);}
+      if(e.key==='/'&&!e.metaKey&&!e.ctrlKey){e.preventDefault();searchRef.current?.focus();}
+    };
+    window.addEventListener('keydown',h);
+    return()=>window.removeEventListener('keydown',h);
+  },[]);
 
   // Auth
   useEffect(()=>{
@@ -363,25 +538,22 @@ function App(){
     return()=>subscription.unsubscribe();
   },[]);
 
-  // Load tasks + real-time subscription
+  // Load tasks + real-time
   useEffect(()=>{
     if(!user)return;
     const loadTasks=async()=>{
       const{data,error}=await supabase.from('tasks').select('*').order('created_at',{ascending:true});
       if(!error&&data){
-        setTasks(data);
-        setSynced(true);
+        setTasks(data);setSynced(true);
         if(data.length===0)seedDefaults();
       }
     };
     loadTasks();
-    // Real-time
     const channel=supabase.channel('tasks-changes').on('postgres_changes',{event:'*',schema:'public',table:'tasks'},(payload)=>{
       if(payload.eventType==='INSERT')setTasks(prev=>[...prev.filter(t=>t.id!==payload.new.id),payload.new]);
       if(payload.eventType==='UPDATE')setTasks(prev=>prev.map(t=>t.id===payload.new.id?payload.new:t));
       if(payload.eventType==='DELETE')setTasks(prev=>prev.filter(t=>t.id!==payload.old.id));
     }).subscribe();
-    // Categories
     supabase.from('meta').select('*').eq('key','categories').single().then(({data})=>{if(data?.value)setCategories(data.value);});
     const catChannel=supabase.channel('meta-changes').on('postgres_changes',{event:'*',schema:'public',table:'meta',filter:'key=eq.categories'},(payload)=>{
       if(payload.new?.value)setCategories(payload.new.value);
@@ -393,11 +565,11 @@ function App(){
     const rows=defaultTasks.map(t=>({...t,user_id:user.id}));
     await supabase.from('tasks').insert(rows);
     await supabase.from('meta').upsert({key:'categories',value:DEFAULT_CATEGORIES});
+    addToast("Default tasks loaded!");
   };
 
   const updateTask=async(updated)=>{
     const{id,...data}=updated;
-    // Optimistic update
     setTasks(prev=>prev.map(t=>t.id===id?updated:t));
     await supabase.from('tasks').update(data).eq('id',id);
   };
@@ -407,19 +579,20 @@ function App(){
     if(task?.image_urls){for(const img of task.image_urls){await supabase.storage.from('assets').remove([img.path]);}}
     setTasks(prev=>prev.filter(t=>t.id!==id));
     await supabase.from('tasks').delete().eq('id',id);
+    addToast("Task deleted");
   };
 
   const addTask=async({title,category,priority})=>{
-    await supabase.from('tasks').insert({title,category,status:'todo',priority,deadline:'',description:'',notes:'',captions:{"Instagram/TikTok":'',"Twitter/X":'',Facebook:'',LinkedIn:'',YouTube:'',Threads:'',Bluesky:''},subtasks:[],image_urls:[],user_id:user.id});
+    await supabase.from('tasks').insert({title,category,status:'todo',priority,deadline:'',description:'',notes:'',captions:{...EMPTY_CAPTIONS},subtasks:[],image_urls:[],user_id:user.id});
     setShowNew(false);
+    addToast(`"${title}" added`);
   };
 
   const saveCategories=async(cats)=>{setCategories(cats);await supabase.from('meta').upsert({key:'categories',value:cats});};
-  const addCategory=()=>{const n=newCatName.trim();if(!n||categories.includes(n))return;saveCategories([...categories,n]);setNewCatName("");};
+  const addCategory=()=>{const n=newCatName.trim();if(!n||categories.includes(n))return;saveCategories([...categories,n]);setNewCatName("");addToast(`Category "${n}" added`);};
   const renameCategory=async(oldName,newName)=>{
     if(categories.includes(newName)){alert(`"${newName}" exists.`);return;}
     const newCats=categories.map(c=>c===oldName?newName:c);
-    // Update tasks
     const toUpdate=tasks.filter(t=>t.category===oldName);
     for(const t of toUpdate){await supabase.from('tasks').update({category:newName}).eq('id',t.id);}
     await saveCategories(newCats);
@@ -439,38 +612,88 @@ function App(){
   if(user===undefined)return<div className="loading-screen">Loading...</div>;
   if(user===null)return<AuthScreen/>;
 
-  const filtered=tasks.filter(t=>activeCategory==="All"||t.category===activeCategory).filter(t=>statusFilter==="all"||t.status===statusFilter).filter(t=>{if(!search)return true;const q=search.toLowerCase();return t.title?.toLowerCase().includes(q)||t.description?.toLowerCase().includes(q)||t.notes?.toLowerCase().includes(q);}).sort((a,b)=>{if(sortBy==="priority"){const o={high:0,medium:1,low:2};return(o[a.priority]||1)-(o[b.priority]||1);}if(sortBy==="status"){const o={in_progress:0,todo:1,waiting:2,done:3};return(o[a.status]||1)-(o[b.status]||1);}return(a.title||"").localeCompare(b.title||"");});
+  // Filter + sort
+  const filtered=tasks
+    .filter(t=>activeCategory==="All"||(activeCategory==="Starred"?starred.has(t.id):t.category===activeCategory))
+    .filter(t=>statusFilter==="all"||t.status===statusFilter)
+    .filter(t=>priorityFilter==="all"||t.priority===priorityFilter)
+    .filter(t=>{if(!search)return true;const q=search.toLowerCase();return t.title?.toLowerCase().includes(q)||t.description?.toLowerCase().includes(q)||t.notes?.toLowerCase().includes(q);})
+    .sort((a,b)=>{
+      // Starred always first
+      const aS=starred.has(a.id)?0:1;const bS=starred.has(b.id)?0:1;
+      if(aS!==bS)return aS-bS;
+      if(sortBy==="priority"){const o={high:0,medium:1,low:2};return(o[a.priority]||1)-(o[b.priority]||1);}
+      if(sortBy==="status"){const o={in_progress:0,todo:1,waiting:2,done:3};return(o[a.status]||1)-(o[b.status]||1);}
+      if(sortBy==="deadline"){const aD=a.deadline||"zzz";const bD=b.deadline||"zzz";return aD.localeCompare(bD);}
+      return(a.title||"").localeCompare(b.title||"");
+    });
+
   const stats={done:tasks.filter(t=>t.status==="done").length,inProgress:tasks.filter(t=>t.status==="in_progress").length,waiting:tasks.filter(t=>t.status==="waiting").length,todo:tasks.filter(t=>t.status==="todo").length};
+
+  const toggleStatusFilter=(status)=>{
+    const mapped={inProgress:"in_progress",waiting:"waiting",todo:"todo",done:"done"}[status];
+    setStatusFilter(prev=>prev===mapped?"all":mapped);
+  };
 
   return(
     <div className="app">
       <header className="header"><div className="header-inner">
-        <div><h1>FQxI Content Manager</h1><div className="header-sub"><span className={`sync-dot ${synced?'sync-live':'sync-off'}`}/>{synced?"Live \u2014 syncing in real time":"Connecting..."}</div></div>
+        <div style={{display:'flex',alignItems:'center',gap:12}}>
+          <button className="mobile-sidebar-toggle" onClick={()=>setSidebarOpen(!sidebarOpen)}>{IC.menu}</button>
+          <div><h1>FQxI Content Manager</h1><div className="header-sub"><span className={`sync-dot ${synced?'sync-live':'sync-off'}`}/>{synced?"Live \u2014 syncing in real time":"Connecting..."}</div></div>
+        </div>
         <div className="header-right">
-          <div style={{display:'flex',gap:6,flexWrap:'wrap'}}><span className="stat-badge stat-active">{stats.inProgress} active</span><span className="stat-badge stat-waiting">{stats.waiting} waiting</span><span className="stat-badge stat-todo">{stats.todo} to do</span><span className="stat-badge stat-done">{stats.done} done</span></div>
+          <div className="stat-badges">
+            <span className={`stat-badge stat-active ${statusFilter==='in_progress'?'filter-active':''}`} onClick={()=>toggleStatusFilter('inProgress')}>{stats.inProgress} active</span>
+            <span className={`stat-badge stat-waiting ${statusFilter==='waiting'?'filter-active':''}`} onClick={()=>toggleStatusFilter('waiting')}>{stats.waiting} waiting</span>
+            <span className={`stat-badge stat-todo ${statusFilter==='todo'?'filter-active':''}`} onClick={()=>toggleStatusFilter('todo')}>{stats.todo} to do</span>
+            <span className={`stat-badge stat-done ${statusFilter==='done'?'filter-active':''}`} onClick={()=>toggleStatusFilter('done')}>{stats.done} done</span>
+          </div>
           <button className="btn-primary" onClick={()=>setShowNew(true)}>{IC.plus} New Task</button>
           <div className="user-pill"><span>{user.email||"User"}</span><button className="signout-btn" onClick={signOut}>Sign out</button></div>
         </div>
       </div></header>
       <div className="layout">
-        <aside className="sidebar">
-          <div className="sidebar-label">Categories</div>
-          <button className={`sidebar-btn ${activeCategory==="All"?'active':''}`} onClick={()=>setActiveCategory("All")}><span>All</span><span className="sidebar-count">{tasks.length}</span></button>
-          {categories.map(cat=><CategoryItem key={cat} cat={cat} isActive={activeCategory===cat} count={tasks.filter(t=>t.category===cat).length} onSelect={()=>setActiveCategory(cat)} onRename={renameCategory} onDelete={deleteCategory}/>)}
-          <div className="add-cat-row"><input className="add-cat-input" placeholder="New category..." value={newCatName} onChange={e=>setNewCatName(e.target.value)} onKeyDown={e=>{if(e.key==='Enter')addCategory();}}/><button className="add-cat-btn" disabled={!newCatName.trim()} onClick={addCategory}>Add</button></div>
-          <div className="export-bar"><button className="btn-export" onClick={seedDefaults}>Reset to default tasks</button></div>
+        <aside className={`sidebar ${sidebarOpen?'':'collapsed'}`}>
+          <div className="sidebar-section">
+            <div className="sidebar-label">Views</div>
+            <button className={`sidebar-btn ${activeCategory==="All"?'active':''}`} onClick={()=>setActiveCategory("All")}><span>All Tasks</span><span className="sidebar-count">{tasks.length}</span></button>
+            <button className={`sidebar-btn ${activeCategory==="Starred"?'active':''}`} onClick={()=>setActiveCategory("Starred")}><span>{"\u2605"} Starred</span><span className="sidebar-count">{starred.size}</span></button>
+          </div>
+          <div className="sidebar-section">
+            <div className="sidebar-label">Categories</div>
+            {categories.map(cat=><CategoryItem key={cat} cat={cat} isActive={activeCategory===cat} count={tasks.filter(t=>t.category===cat).length} onSelect={()=>setActiveCategory(cat)} onRename={renameCategory} onDelete={deleteCategory}/>)}
+            <div className="add-cat-row"><input className="add-cat-input" placeholder="New category..." value={newCatName} onChange={e=>setNewCatName(e.target.value)} onKeyDown={e=>{if(e.key==='Enter')addCategory();}}/><button className="add-cat-btn" disabled={!newCatName.trim()} onClick={addCategory}>Add</button></div>
+          </div>
+          <div className="export-bar">
+            <button className="btn-export" onClick={seedDefaults}>Reset to default tasks</button>
+          </div>
+          <div className="shortcuts-help">
+            <span><span className="kbd">N</span> New task</span>
+            <span><span className="kbd">/</span> Search</span>
+            <span><span className="kbd">Esc</span> Close</span>
+          </div>
         </aside>
         <main className="main">
           <div className="filters">
-            <div className="search-wrap">{IC.search}<input className="search-input" placeholder="Search..." value={search} onChange={e=>setSearch(e.target.value)}/></div>
+            <div className="search-wrap">{IC.search}<input ref={searchRef} className="search-input" placeholder="Search tasks..." value={search} onChange={e=>setSearch(e.target.value)}/></div>
             <select className="filter-select" value={statusFilter} onChange={e=>setStatusFilter(e.target.value)}><option value="all">All Statuses</option>{STATUSES.map(s=><option key={s} value={s}>{STATUS_LABELS[s]}</option>)}</select>
-            <select className="filter-select" value={sortBy} onChange={e=>setSortBy(e.target.value)}><option value="priority">Sort: Priority</option><option value="status">Sort: Status</option><option value="title">Sort: Title</option></select>
+            <select className="filter-select" value={priorityFilter} onChange={e=>setPriorityFilter(e.target.value)}><option value="all">All Priorities</option><option value="high">High</option><option value="medium">Medium</option><option value="low">Low</option></select>
+            <select className="filter-select" value={sortBy} onChange={e=>setSortBy(e.target.value)}><option value="priority">Sort: Priority</option><option value="status">Sort: Status</option><option value="title">Sort: Title</option><option value="deadline">Sort: Deadline</option></select>
+            <span className="results-count">{filtered.length} of {tasks.length} tasks</span>
           </div>
-          {filtered.length===0&&<div className="empty-state">No tasks match your filters.</div>}
-          {filtered.map(task=><TaskCard key={task.id} task={task} onUpdate={updateTask} onDelete={deleteTask} categories={categories}/>)}
+          <div className="toolbar">
+            <div className="toolbar-left">
+              <button className="toolbar-btn" onClick={()=>setAllExpanded(true)} title="Expand all tasks">{IC.expand} Expand all</button>
+              <button className="toolbar-btn" onClick={()=>{setAllExpanded(false);setTimeout(()=>setAllExpanded(undefined),100);}} title="Collapse all tasks">{IC.collapse} Collapse all</button>
+            </div>
+          </div>
+          {filtered.length===0&&<div className="empty-state">{search||statusFilter!=='all'||priorityFilter!=='all'?"No tasks match your filters. Try adjusting them.":"No tasks yet. Click New Task to get started!"}</div>}
+          {filtered.map(task=><TaskCard key={task.id} task={task} onUpdate={updateTask} onDelete={deleteTask} categories={categories} isStarred={starred.has(task.id)} onToggleStar={toggleStar} forceExpand={allExpanded}/>)}
         </main>
       </div>
       {showNew&&<NewTaskModal onAdd={addTask} onClose={()=>setShowNew(false)} categories={categories}/>}
+      <ToastContainer toasts={toasts}/>
     </div>
   );
 }
