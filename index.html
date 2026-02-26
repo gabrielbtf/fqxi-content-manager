@@ -657,7 +657,6 @@ function DocUploader({docs,taskId,onUpdate}){
       <span className="doc-name" title={d.name}>{d.name}</span>
       {d.size&&<span style={{fontSize:10,color:'#94a3b8',flexShrink:0}}>{fmtSize(d.size)}</span>}
       <div className="doc-actions">
-        <a href={`https://docs.google.com/gview?url=${encodeURIComponent(d.url)}&embedded=true`} target="_blank" rel="noopener noreferrer">View</a>
         <a href={d.url} download style={{padding:'4px 8px',borderRadius:5,fontSize:11,fontWeight:500,cursor:'pointer',border:'1px solid #e2e8f0',background:'#fff',color:'#475569',textDecoration:'none'}}>Download</a>
         <button className="del-btn" onClick={()=>removeDoc(d)}>Delete</button>
       </div>
@@ -1094,7 +1093,16 @@ function App(){
       // Starred always first
       const aS=starred.has(a.id)?0:1;const bS=starred.has(b.id)?0:1;
       if(aS!==bS)return aS-bS;
-      if(sortBy==="priority"){const o={high:0,medium:1,low:2};return(o[a.priority]||1)-(o[b.priority]||1);}
+      // Done tasks always last
+      const aD=a.status==='done'?1:0;const bD=b.status==='done'?1:0;
+      if(aD!==bD)return aD-bD;
+      // Sort by selected criteria
+      if(sortBy==="priority"){
+        const o={high:0,medium:1,low:2};const ap=o[a.priority]??1;const bp=o[b.priority]??1;
+        if(ap!==bp)return ap-bp;
+        // Within same priority: in_progress > todo > waiting
+        const so={in_progress:0,todo:1,waiting:2};return(so[a.status]??1)-(so[b.status]??1);
+      }
       if(sortBy==="status"){const o={in_progress:0,todo:1,waiting:2,done:3};return(o[a.status]||1)-(o[b.status]||1);}
       if(sortBy==="deadline"){const aD=a.deadline||"zzz";const bD=b.deadline||"zzz";return aD.localeCompare(bD);}
       return(a.title||"").localeCompare(b.title||"");
