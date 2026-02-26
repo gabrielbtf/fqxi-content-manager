@@ -324,6 +324,22 @@
   /* ─── DRAG & DROP ─── */
   .upload-zone.dragging { border-color: #e4d344; background: #fffbeb; border-style: solid; }
 
+  /* ─── DOCUMENTS ─── */
+  .doc-list { display: flex; flex-direction: column; gap: 6px; margin-top: 8px; }
+  .doc-item { display: flex; align-items: center; gap: 10px; padding: 8px 12px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 12px; transition: all 0.15s; }
+  .doc-item:hover { border-color: #cbd5e1; background: #f1f5f9; }
+  .doc-icon { font-size: 18px; flex-shrink: 0; }
+  .doc-name { flex: 1; font-weight: 500; color: #334155; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .doc-actions { display: flex; gap: 4px; flex-shrink: 0; }
+  .doc-actions a, .doc-actions button { padding: 4px 8px; border-radius: 5px; font-size: 11px; font-weight: 500; cursor: pointer; border: 1px solid #e2e8f0; background: #fff; color: #475569; text-decoration: none; transition: all 0.15s; font-family: inherit; }
+  .doc-actions a:hover, .doc-actions button:hover { background: #f1f5f9; }
+  .doc-actions button.del-btn { color: #dc2626; border-color: #fecaca; }
+  .doc-actions button.del-btn:hover { background: #fef2f2; }
+  .doc-upload-zone { border: 2px dashed #d1d5db; border-radius: 8px; padding: 10px; text-align: center; cursor: pointer; margin-top: 8px; font-size: 12px; color: #94a3b8; transition: all 0.15s; }
+  .doc-upload-zone:hover { border-color: #e4d344; color: #475569; }
+  .doc-upload-zone.dragging { border-color: #e4d344; background: #fffbeb; border-style: solid; }
+  .doc-upload-zone input { display: none; }
+
   /* ─── KEYBOARD HELP ─── */
   .shortcuts-help { font-size: 10px; color: #cbd5e1; display: flex; gap: 12px; padding: 8px 0 0; flex-wrap: wrap; }
   .shortcuts-help span { display: flex; align-items: center; gap: 3px; }
@@ -376,27 +392,27 @@ const REVIEW_LABELS = { none:"", submitted:"In Review", resubmitted:"Resubmitted
 const MEDIA_TYPES = ["single","carousel","video"];
 
 const defaultTasks = [
-  { title: "David Wallace Q&A Post", category: "Metascience / Articles", status: "todo", priority: "high", deadline: "", description: "Post the David Wallace Q&A. This is FLI/Metascience work \u2014 tag accordingly.", notes: "", captions: {...EMPTY_CAPTIONS}, review_status:"none", review_notes:[], media_type:"single", subtasks: [{ text: "Draft caption for each platform", done: false }, { text: "Tag under FLI/Metascience", done: false }, { text: "Schedule post", done: false }], image_urls: [] },
-  { title: "Catalina Press Release Post", category: "Metascience / Articles", status: "todo", priority: "high", deadline: "", description: "Press release is up. Use the photo from the press release for the social post.", notes: "Photo available in the press release.", captions: {...EMPTY_CAPTIONS}, review_status:"none", review_notes:[], media_type:"single", subtasks: [{ text: "Pull photo from press release", done: false }, { text: "Write captions", done: false }, { text: "Post", done: false }], image_urls: [] },
-  { title: "Risk Aversion in Science Research Article", category: "Metascience / Articles", status: "waiting", priority: "high", deadline: "Before March (tentative)", description: "Zeeya edited article on risk aversion. Title like \"Risk GM\u2026\". Waiting for writer approval. Draft available \u2014 DO NOT publish yet.", notes: "Can draft post now. DO NOT publish until writer approves.", captions: {...EMPTY_CAPTIONS}, review_status:"none", review_notes:[], media_type:"single", subtasks: [{ text: "Review draft article", done: false }, { text: "Draft social post (hold for approval)", done: false }, { text: "Get confirmation from Zeeya", done: false }, { text: "Publish", done: false }], image_urls: [] },
-  { title: "FQxI Member Survey Report (Peer Review)", category: "Metascience / Articles", status: "waiting", priority: "high", deadline: "Before March (likely)", description: "Zeeya's long report on member survey about peer review. Likely before March.", notes: "On radar. Zeeya putting together.", captions: {...EMPTY_CAPTIONS}, review_status:"none", review_notes:[], media_type:"single", subtasks: [{ text: "Receive report from Zeeya", done: false }, { text: "Pull key points", done: false }, { text: "Draft promotion posts", done: false }, { text: "Post", done: false }], image_urls: [] },
-  { title: "Fred Adams Q&A (Miriam Frankel)", category: "Pending / Waiting", status: "waiting", priority: "medium", deadline: "TBD", description: "Pinned \u2014 needs research to decide if priority now.", notes: "\u26a0\ufe0f Question mark. Do more research.", captions: {...EMPTY_CAPTIONS}, review_status:"none", review_notes:[], media_type:"single", subtasks: [{ text: "Research priority", done: false }, { text: "Decide timeline", done: false }], image_urls: [] },
-  { title: "Brandon Ogbunu Article", category: "Pending / Waiting", status: "waiting", priority: "medium", deadline: "March/April", description: "Zeeya hasn't sent it yet.", notes: "Waiting on Zeeya.", captions: {...EMPTY_CAPTIONS}, review_status:"none", review_notes:[], media_type:"single", subtasks: [{ text: "Receive article", done: false }, { text: "Review and draft post", done: false }, { text: "Post", done: false }], image_urls: [] },
-  { title: "Archive Story: Reducing AI Slop", category: "Pending / Waiting", status: "waiting", priority: "medium", deadline: "Could come in Feb", description: "Nicola Jones's pitch. May or may not run. Zeeya will send draft if greenlit.", notes: "Could arrive imminently.", captions: {...EMPTY_CAPTIONS}, review_status:"none", review_notes:[], media_type:"single", subtasks: [{ text: "Wait for draft", done: false }, { text: "Draft social post", done: false }, { text: "Post", done: false }], image_urls: [] },
-  { title: "Cambridge-Related Post", category: "Pending / Waiting", status: "todo", priority: "medium", deadline: "", description: "FQxI person in Cambridge social media video. Promote it.", notes: "Check Zeeya's text for details.", captions: {...EMPTY_CAPTIONS}, review_status:"none", review_notes:[], media_type:"single", subtasks: [{ text: "Get video link from Zeeya", done: false }, { text: "Draft post", done: false }, { text: "Post", done: false }], image_urls: [] },
-  { title: "RSA Competition Winner Profiles (Daily Posts)", category: "Active / Daily", status: "in_progress", priority: "high", deadline: "Next ~7 days", description: "One post per day. Headshot + quote per winner.", notes: "ACTIVE daily schedule. Rishabh Ghosh done.", captions: {...EMPTY_CAPTIONS}, review_status:"none", review_notes:[], media_type:"single", subtasks: [{ text: "Rishabh Ghosh profile", done: true }, { text: "Winner 2", done: false }, { text: "Winner 3", done: false }, { text: "Winner 4", done: false }, { text: "Winner 5", done: false }, { text: "Winner 6", done: false }, { text: "Winner 7", done: false }, { text: "Winner 8", done: false }], image_urls: [] },
-  { title: "Paradox Reels \u2014 Edit & Post Winner Interviews", category: "Paradox Reels", status: "waiting", priority: "high", deadline: "After Saturday's interview", description: "5 done, 3 declined. Clip per winner (<90s) + possible 10-min narrative.", notes: "Can't edit until Saturday.", captions: {...EMPTY_CAPTIONS}, review_status:"none", review_notes:[], media_type:"single", subtasks: [{ text: "Final interview (Saturday)", done: false }, { text: "Edit short clips", done: false }, { text: "Consider 10-min video", done: false }, { text: "Posting strategy", done: false }, { text: "Post", done: false }], image_urls: [] },
-  { title: "Fulcrum Grant Outreach (20th Anniversary)", category: "FQxI 20th Anniversary", status: "in_progress", priority: "medium", deadline: "Ongoing", description: "Outreach to past 10 years of Fulcrum grant winners.", notes: "Some replied. Keep emailing.", captions: {...EMPTY_CAPTIONS}, review_status:"none", review_notes:[], media_type:"single", subtasks: [{ text: "Send more emails", done: false }, { text: "Follow up", done: false }, { text: "Collect videos", done: false }], image_urls: [] },
-  { title: "Edit Anniversary Videos", category: "FQxI 20th Anniversary", status: "in_progress", priority: "medium", deadline: "Ongoing", description: "Editing videos from grant winners.", notes: "", captions: {...EMPTY_CAPTIONS}, review_status:"none", review_notes:[], media_type:"single", subtasks: [{ text: "Edit received videos", done: false }, { text: "Format for social", done: false }], image_urls: [] },
-  { title: "Brainstorm FQxI at 20 Celebration Ideas", category: "FQxI 20th Anniversary", status: "todo", priority: "medium", deadline: "", description: "What else can we do for the 20th?", notes: "Open brainstorm.", captions: {...EMPTY_CAPTIONS}, review_status:"none", review_notes:[], media_type:"single", subtasks: [{ text: "Brainstorm ideas", done: false }, { text: "Pick top 2\u20133", done: false }, { text: "Plan execution", done: false }], image_urls: [] },
-  { title: "Elise Crull Video Edit (Perimeter)", category: "Perimeter / Video", status: "todo", priority: "medium", deadline: "", description: "Video needs editing.", notes: "", captions: {...EMPTY_CAPTIONS}, review_status:"none", review_notes:[], media_type:"single", subtasks: [{ text: "Edit video", done: false }, { text: "Draft post", done: false }, { text: "Post", done: false }], image_urls: [] },
-  { title: "Katie's Videos (\u00d72)", category: "Perimeter / Video", status: "waiting", priority: "low", deadline: "TBD", description: "Book video (hold until published) + SciComm video.", notes: "SciComm may be ready sooner.", captions: {...EMPTY_CAPTIONS}, review_status:"none", review_notes:[], media_type:"single", subtasks: [{ text: "Check SciComm video", done: false }, { text: "Book video \u2014 wait", done: false }], image_urls: [] },
-  { title: "Bernard Carr \u2014 Podcast Promo Post", category: "Perimeter / Video", status: "in_progress", priority: "medium", deadline: "", description: "Hook: \"Hawking's student studying poltergeists.\" Instagram carousel + Twitter.", notes: "Slides 1\u20132 have quotes.", captions: {...EMPTY_CAPTIONS}, review_status:"none", review_notes:[], media_type:"single", subtasks: [{ text: "Finalise hook", done: false }, { text: "Pull quotes", done: false }, { text: "Design carousel", done: false }, { text: "Twitter/X format", done: false }, { text: "Post", done: false }], image_urls: [] },
-  { title: "XPANSE Video Clips", category: "Lower Priority", status: "todo", priority: "low", deadline: "", description: "Repurpose into something engaging.", notes: "Raw clips are boring.", captions: {...EMPTY_CAPTIONS}, review_status:"none", review_notes:[], media_type:"single", subtasks: [{ text: "Brainstorm repurposing", done: false }, { text: "Edit", done: false }, { text: "Post", done: false }], image_urls: [] },
-  { title: "Upload Old Posts to New Cloud Storage", category: "Lower Priority", status: "todo", priority: "low", deadline: "", description: "Migrate to new FQxI admin cloud.", notes: "", captions: {...EMPTY_CAPTIONS}, review_status:"none", review_notes:[], media_type:"single", subtasks: [{ text: "Identify what to migrate", done: false }, { text: "Upload", done: false }, { text: "Verify", done: false }], image_urls: [] },
-  { title: "Build a Content Plan / Calendar", category: "Strategic / Ongoing", status: "todo", priority: "medium", deadline: "", description: "Proper content plan + engagement ideas.", notes: "", captions: {...EMPTY_CAPTIONS}, review_status:"none", review_notes:[], media_type:"single", subtasks: [{ text: "Outline cadence", done: false }, { text: "Brainstorm engagement", done: false }, { text: "Build calendar", done: false }], image_urls: [] },
-  { title: "Study Quanta Magazine's Instagram", category: "Strategic / Ongoing", status: "todo", priority: "medium", deadline: "", description: "Study @quantamag for inspiration.", notes: "What makes their posts work?", captions: {...EMPTY_CAPTIONS}, review_status:"none", review_notes:[], media_type:"single", subtasks: [{ text: "Review posts", done: false }, { text: "Note what works", done: false }, { text: "Adapt ideas", done: false }], image_urls: [] },
-  { title: "QSpace Forums \u2014 Backup Content", category: "Strategic / Ongoing", status: "todo", priority: "low", deadline: "Ongoing", description: "Fallback: physics announcement board for shareable content.", notes: "Jobs, conferences, courses.", captions: {...EMPTY_CAPTIONS}, review_status:"none", review_notes:[], media_type:"single", subtasks: [{ text: "Bookmark board", done: false }, { text: "Check periodically", done: false }], image_urls: [] },
+  { title: "David Wallace Q&A Post", category: "Metascience / Articles", status: "todo", priority: "high", deadline: "", description: "Post the David Wallace Q&A. This is FLI/Metascience work \u2014 tag accordingly.", notes: "", captions: {...EMPTY_CAPTIONS}, review_status:"none", review_notes:[], media_type:"single", doc_urls:[], subtasks: [{ text: "Draft caption for each platform", done: false }, { text: "Tag under FLI/Metascience", done: false }, { text: "Schedule post", done: false }], image_urls: [] },
+  { title: "Catalina Press Release Post", category: "Metascience / Articles", status: "todo", priority: "high", deadline: "", description: "Press release is up. Use the photo from the press release for the social post.", notes: "Photo available in the press release.", captions: {...EMPTY_CAPTIONS}, review_status:"none", review_notes:[], media_type:"single", doc_urls:[], subtasks: [{ text: "Pull photo from press release", done: false }, { text: "Write captions", done: false }, { text: "Post", done: false }], image_urls: [] },
+  { title: "Risk Aversion in Science Research Article", category: "Metascience / Articles", status: "waiting", priority: "high", deadline: "Before March (tentative)", description: "Zeeya edited article on risk aversion. Title like \"Risk GM\u2026\". Waiting for writer approval. Draft available \u2014 DO NOT publish yet.", notes: "Can draft post now. DO NOT publish until writer approves.", captions: {...EMPTY_CAPTIONS}, review_status:"none", review_notes:[], media_type:"single", doc_urls:[], subtasks: [{ text: "Review draft article", done: false }, { text: "Draft social post (hold for approval)", done: false }, { text: "Get confirmation from Zeeya", done: false }, { text: "Publish", done: false }], image_urls: [] },
+  { title: "FQxI Member Survey Report (Peer Review)", category: "Metascience / Articles", status: "waiting", priority: "high", deadline: "Before March (likely)", description: "Zeeya's long report on member survey about peer review. Likely before March.", notes: "On radar. Zeeya putting together.", captions: {...EMPTY_CAPTIONS}, review_status:"none", review_notes:[], media_type:"single", doc_urls:[], subtasks: [{ text: "Receive report from Zeeya", done: false }, { text: "Pull key points", done: false }, { text: "Draft promotion posts", done: false }, { text: "Post", done: false }], image_urls: [] },
+  { title: "Fred Adams Q&A (Miriam Frankel)", category: "Pending / Waiting", status: "waiting", priority: "medium", deadline: "TBD", description: "Pinned \u2014 needs research to decide if priority now.", notes: "\u26a0\ufe0f Question mark. Do more research.", captions: {...EMPTY_CAPTIONS}, review_status:"none", review_notes:[], media_type:"single", doc_urls:[], subtasks: [{ text: "Research priority", done: false }, { text: "Decide timeline", done: false }], image_urls: [] },
+  { title: "Brandon Ogbunu Article", category: "Pending / Waiting", status: "waiting", priority: "medium", deadline: "March/April", description: "Zeeya hasn't sent it yet.", notes: "Waiting on Zeeya.", captions: {...EMPTY_CAPTIONS}, review_status:"none", review_notes:[], media_type:"single", doc_urls:[], subtasks: [{ text: "Receive article", done: false }, { text: "Review and draft post", done: false }, { text: "Post", done: false }], image_urls: [] },
+  { title: "Archive Story: Reducing AI Slop", category: "Pending / Waiting", status: "waiting", priority: "medium", deadline: "Could come in Feb", description: "Nicola Jones's pitch. May or may not run. Zeeya will send draft if greenlit.", notes: "Could arrive imminently.", captions: {...EMPTY_CAPTIONS}, review_status:"none", review_notes:[], media_type:"single", doc_urls:[], subtasks: [{ text: "Wait for draft", done: false }, { text: "Draft social post", done: false }, { text: "Post", done: false }], image_urls: [] },
+  { title: "Cambridge-Related Post", category: "Pending / Waiting", status: "todo", priority: "medium", deadline: "", description: "FQxI person in Cambridge social media video. Promote it.", notes: "Check Zeeya's text for details.", captions: {...EMPTY_CAPTIONS}, review_status:"none", review_notes:[], media_type:"single", doc_urls:[], subtasks: [{ text: "Get video link from Zeeya", done: false }, { text: "Draft post", done: false }, { text: "Post", done: false }], image_urls: [] },
+  { title: "RSA Competition Winner Profiles (Daily Posts)", category: "Active / Daily", status: "in_progress", priority: "high", deadline: "Next ~7 days", description: "One post per day. Headshot + quote per winner.", notes: "ACTIVE daily schedule. Rishabh Ghosh done.", captions: {...EMPTY_CAPTIONS}, review_status:"none", review_notes:[], media_type:"single", doc_urls:[], subtasks: [{ text: "Rishabh Ghosh profile", done: true }, { text: "Winner 2", done: false }, { text: "Winner 3", done: false }, { text: "Winner 4", done: false }, { text: "Winner 5", done: false }, { text: "Winner 6", done: false }, { text: "Winner 7", done: false }, { text: "Winner 8", done: false }], image_urls: [] },
+  { title: "Paradox Reels \u2014 Edit & Post Winner Interviews", category: "Paradox Reels", status: "waiting", priority: "high", deadline: "After Saturday's interview", description: "5 done, 3 declined. Clip per winner (<90s) + possible 10-min narrative.", notes: "Can't edit until Saturday.", captions: {...EMPTY_CAPTIONS}, review_status:"none", review_notes:[], media_type:"single", doc_urls:[], subtasks: [{ text: "Final interview (Saturday)", done: false }, { text: "Edit short clips", done: false }, { text: "Consider 10-min video", done: false }, { text: "Posting strategy", done: false }, { text: "Post", done: false }], image_urls: [] },
+  { title: "Fulcrum Grant Outreach (20th Anniversary)", category: "FQxI 20th Anniversary", status: "in_progress", priority: "medium", deadline: "Ongoing", description: "Outreach to past 10 years of Fulcrum grant winners.", notes: "Some replied. Keep emailing.", captions: {...EMPTY_CAPTIONS}, review_status:"none", review_notes:[], media_type:"single", doc_urls:[], subtasks: [{ text: "Send more emails", done: false }, { text: "Follow up", done: false }, { text: "Collect videos", done: false }], image_urls: [] },
+  { title: "Edit Anniversary Videos", category: "FQxI 20th Anniversary", status: "in_progress", priority: "medium", deadline: "Ongoing", description: "Editing videos from grant winners.", notes: "", captions: {...EMPTY_CAPTIONS}, review_status:"none", review_notes:[], media_type:"single", doc_urls:[], subtasks: [{ text: "Edit received videos", done: false }, { text: "Format for social", done: false }], image_urls: [] },
+  { title: "Brainstorm FQxI at 20 Celebration Ideas", category: "FQxI 20th Anniversary", status: "todo", priority: "medium", deadline: "", description: "What else can we do for the 20th?", notes: "Open brainstorm.", captions: {...EMPTY_CAPTIONS}, review_status:"none", review_notes:[], media_type:"single", doc_urls:[], subtasks: [{ text: "Brainstorm ideas", done: false }, { text: "Pick top 2\u20133", done: false }, { text: "Plan execution", done: false }], image_urls: [] },
+  { title: "Elise Crull Video Edit (Perimeter)", category: "Perimeter / Video", status: "todo", priority: "medium", deadline: "", description: "Video needs editing.", notes: "", captions: {...EMPTY_CAPTIONS}, review_status:"none", review_notes:[], media_type:"single", doc_urls:[], subtasks: [{ text: "Edit video", done: false }, { text: "Draft post", done: false }, { text: "Post", done: false }], image_urls: [] },
+  { title: "Katie's Videos (\u00d72)", category: "Perimeter / Video", status: "waiting", priority: "low", deadline: "TBD", description: "Book video (hold until published) + SciComm video.", notes: "SciComm may be ready sooner.", captions: {...EMPTY_CAPTIONS}, review_status:"none", review_notes:[], media_type:"single", doc_urls:[], subtasks: [{ text: "Check SciComm video", done: false }, { text: "Book video \u2014 wait", done: false }], image_urls: [] },
+  { title: "Bernard Carr \u2014 Podcast Promo Post", category: "Perimeter / Video", status: "in_progress", priority: "medium", deadline: "", description: "Hook: \"Hawking's student studying poltergeists.\" Instagram carousel + Twitter.", notes: "Slides 1\u20132 have quotes.", captions: {...EMPTY_CAPTIONS}, review_status:"none", review_notes:[], media_type:"single", doc_urls:[], subtasks: [{ text: "Finalise hook", done: false }, { text: "Pull quotes", done: false }, { text: "Design carousel", done: false }, { text: "Twitter/X format", done: false }, { text: "Post", done: false }], image_urls: [] },
+  { title: "XPANSE Video Clips", category: "Lower Priority", status: "todo", priority: "low", deadline: "", description: "Repurpose into something engaging.", notes: "Raw clips are boring.", captions: {...EMPTY_CAPTIONS}, review_status:"none", review_notes:[], media_type:"single", doc_urls:[], subtasks: [{ text: "Brainstorm repurposing", done: false }, { text: "Edit", done: false }, { text: "Post", done: false }], image_urls: [] },
+  { title: "Upload Old Posts to New Cloud Storage", category: "Lower Priority", status: "todo", priority: "low", deadline: "", description: "Migrate to new FQxI admin cloud.", notes: "", captions: {...EMPTY_CAPTIONS}, review_status:"none", review_notes:[], media_type:"single", doc_urls:[], subtasks: [{ text: "Identify what to migrate", done: false }, { text: "Upload", done: false }, { text: "Verify", done: false }], image_urls: [] },
+  { title: "Build a Content Plan / Calendar", category: "Strategic / Ongoing", status: "todo", priority: "medium", deadline: "", description: "Proper content plan + engagement ideas.", notes: "", captions: {...EMPTY_CAPTIONS}, review_status:"none", review_notes:[], media_type:"single", doc_urls:[], subtasks: [{ text: "Outline cadence", done: false }, { text: "Brainstorm engagement", done: false }, { text: "Build calendar", done: false }], image_urls: [] },
+  { title: "Study Quanta Magazine's Instagram", category: "Strategic / Ongoing", status: "todo", priority: "medium", deadline: "", description: "Study @quantamag for inspiration.", notes: "What makes their posts work?", captions: {...EMPTY_CAPTIONS}, review_status:"none", review_notes:[], media_type:"single", doc_urls:[], subtasks: [{ text: "Review posts", done: false }, { text: "Note what works", done: false }, { text: "Adapt ideas", done: false }], image_urls: [] },
+  { title: "QSpace Forums \u2014 Backup Content", category: "Strategic / Ongoing", status: "todo", priority: "low", deadline: "Ongoing", description: "Fallback: physics announcement board for shareable content.", notes: "Jobs, conferences, courses.", captions: {...EMPTY_CAPTIONS}, review_status:"none", review_notes:[], media_type:"single", doc_urls:[], subtasks: [{ text: "Bookmark board", done: false }, { text: "Check periodically", done: false }], image_urls: [] },
 ];
 
 /* ============================================================
@@ -526,6 +542,47 @@ function AssetUploader({imageUrls,taskId,onUpdate,mediaType,onMediaTypeChange}){
       <input ref={fileRef} type="file" accept="image/*,video/*" multiple onChange={handleFiles} disabled={uploading}/>
     </div>
     {lightbox&&<div className="lightbox" onClick={()=>setLightbox(null)}>{lightbox.type==='video'?<video src={lightbox.url} controls autoPlay style={{maxWidth:'90vw',maxHeight:'80vh'}} onClick={e=>e.stopPropagation()}/>:<img src={lightbox.url} alt={lightbox.name} onClick={e=>e.stopPropagation()}/>}</div>}
+  </div>);
+}
+
+function DocUploader({docs,taskId,onUpdate}){
+  const fileRef=useRef(null);const[uploading,setUploading]=useState(false);const[dragging,setDragging]=useState(false);
+  const DOC_ACCEPT='.pdf,.doc,.docx,.txt,.rtf,.odt,.xls,.xlsx,.ppt,.pptx';
+  const docIcon=(name)=>{const ext=(name||'').split('.').pop().toLowerCase();if(ext==='pdf')return'\ud83d\udcc4';if(['doc','docx'].includes(ext))return'\ud83d\udcdd';if(['xls','xlsx'].includes(ext))return'\ud83d\udcca';if(['ppt','pptx'].includes(ext))return'\ud83d\udcfd\ufe0f';return'\ud83d\udcc1';};
+
+  const processFiles=async(files)=>{
+    if(!files.length)return;setUploading(true);
+    const newDocs=[...(docs||[])];
+    for(const file of files){
+      const path=`tasks/${taskId}/docs/${Date.now()}_${file.name}`;
+      const{error}=await supabase.storage.from('assets').upload(path,file);
+      if(error){console.error(error);continue;}
+      const{data}=supabase.storage.from('assets').getPublicUrl(path);
+      newDocs.push({url:data.publicUrl,path,name:file.name,size:file.size});
+    }
+    onUpdate(newDocs);setUploading(false);
+  };
+
+  const handleFiles=async(e)=>{await processFiles(Array.from(e.target.files));e.target.value='';};
+  const handleDrop=async(e)=>{e.preventDefault();e.stopPropagation();setDragging(false);await processFiles(Array.from(e.dataTransfer.files));};
+  const removeDoc=async(doc)=>{await supabase.storage.from('assets').remove([doc.path]);onUpdate((docs||[]).filter(d=>d.path!==doc.path));};
+  const fmtSize=(bytes)=>{if(!bytes)return'';if(bytes<1024)return bytes+'B';if(bytes<1048576)return(bytes/1024).toFixed(1)+'KB';return(bytes/1048576).toFixed(1)+'MB';};
+
+  return(<div>
+    <span className="field-label">Documents</span>
+    {(docs||[]).length>0&&<div className="doc-list">{docs.map((d,i)=><div key={i} className="doc-item">
+      <span className="doc-icon">{docIcon(d.name)}</span>
+      <span className="doc-name" title={d.name}>{d.name}</span>
+      {d.size&&<span style={{fontSize:10,color:'#94a3b8',flexShrink:0}}>{fmtSize(d.size)}</span>}
+      <div className="doc-actions">
+        <a href={d.url} target="_blank" rel="noopener noreferrer">Open</a>
+        <button className="del-btn" onClick={()=>removeDoc(d)}>Delete</button>
+      </div>
+    </div>)}</div>}
+    <div className={`doc-upload-zone ${dragging?'dragging':''}`} onClick={()=>fileRef.current?.click()} onDragOver={e=>{e.preventDefault();setDragging(true);}} onDragLeave={e=>{e.preventDefault();setDragging(false);}} onDrop={handleDrop}>
+      {uploading?"Uploading...":dragging?"Drop documents here":"\ud83d\udcc1 Click or drag to upload documents"}
+      <input ref={fileRef} type="file" accept={DOC_ACCEPT} multiple onChange={handleFiles} disabled={uploading}/>
+    </div>
   </div>);
 }
 
@@ -750,6 +807,7 @@ function TaskCard({task,onUpdate,onDelete,categories,isStarred,onToggleStar,forc
           </div>
           <SubtaskList subtasks={task.subtasks||[]} onChange={subtasks=>onUpdate({...task,subtasks})} onAdd={()=>onUpdate({...task,subtasks:[...(task.subtasks||[]),{text:"",done:false}]})} onRemove={i=>onUpdate({...task,subtasks:(task.subtasks||[]).filter((_,idx)=>idx!==i)})}/>
           <CaptionEditor captions={task.captions} onChange={captions=>onUpdate({...task,captions})}/>
+          <DocUploader docs={task.doc_urls||[]} taskId={task.id} onUpdate={urls=>onUpdate({...task,doc_urls:urls})}/>
           <AssetUploader imageUrls={task.image_urls||[]} taskId={task.id} onUpdate={urls=>onUpdate({...task,image_urls:urls})} mediaType={task.media_type||'single'} onMediaTypeChange={mt=>onUpdate({...task,media_type:mt})}/>
           <div style={{paddingTop:8,display:'flex',alignItems:'center',justifyContent:'space-between',flexWrap:'wrap',gap:8}}>
             <button className="btn-open-review" onClick={()=>onOpenReview&&onOpenReview(task.id)}>
@@ -884,6 +942,7 @@ function App(){
     const existing=tasks;
     for(const t of existing){
       if(t.image_urls?.length){for(const img of t.image_urls){await supabase.storage.from('assets').remove([img.path]);}}
+      if(t.doc_urls?.length){for(const doc of t.doc_urls){await supabase.storage.from('assets').remove([doc.path]);}}
     }
     await supabase.from('tasks').delete().neq('id','00000000-0000-0000-0000-000000000000');
     // Insert fresh defaults
@@ -906,13 +965,14 @@ function App(){
   const deleteTask=async(id)=>{
     const task=tasks.find(t=>t.id===id);
     if(task?.image_urls){for(const img of task.image_urls){await supabase.storage.from('assets').remove([img.path]);}}
+    if(task?.doc_urls){for(const doc of task.doc_urls){await supabase.storage.from('assets').remove([doc.path]);}}
     setTasks(prev=>prev.filter(t=>t.id!==id));
     await supabase.from('tasks').delete().eq('id',id);
     addToast("Task deleted");
   };
 
   const addTask=async({title,category,priority})=>{
-    await supabase.from('tasks').insert({title,category,status:'todo',priority,deadline:'',description:'',notes:'',captions:{...EMPTY_CAPTIONS},subtasks:[],image_urls:[],review_status:'none',review_notes:[],media_type:'single',user_id:user.id});
+    await supabase.from('tasks').insert({title,category,status:'todo',priority,deadline:'',description:'',notes:'',captions:{...EMPTY_CAPTIONS},subtasks:[],image_urls:[],doc_urls:[],review_status:'none',review_notes:[],media_type:'single',user_id:user.id});
     setShowNew(false);
     addToast(`"${title}" added`);
   };
