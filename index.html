@@ -414,11 +414,11 @@ const MEDIA_TYPES = ["single","carousel","video"];
 const PRIORITIES = ["high","medium","low"];
 
 const defaultTasks = [
-  { title: "David Wallace Q&A Post", category: "Metascience / Articles", status: "todo", priority: "high", deadline: "", description: "Post the David Wallace Q&A. This is FLI/Metascience work — tag accordingly.", notes: "", captions: {...EMPTY_CAPTIONS}, review_status:"none", review_notes:[], media_type:"single", doc_urls:[], subtasks: [{ text: "Draft caption for each platform", done: false }, { text: "Tag under FLI/Metascience", done: false }, { text: "Schedule post", done: false }], image_urls: [], sort_order: 0 },
-  { title: "Catalina Press Release Post", category: "Metascience / Articles", status: "todo", priority: "high", deadline: "", description: "Press release is up. Use the photo from the press release for the social post.", notes: "Photo available in the press release.", captions: {...EMPTY_CAPTIONS}, review_status:"none", review_notes:[], media_type:"single", doc_urls:[], subtasks: [{ text: "Pull photo from press release", done: false }, { text: "Write captions", done: false }, { text: "Post", done: false }], image_urls: [], sort_order: 1 },
-  { title: "RSA Competition Winner Profiles (Daily Posts)", category: "Active / Daily", status: "in_progress", priority: "high", deadline: "Next ~7 days", description: "One post per day. Headshot + quote per winner.", notes: "ACTIVE daily schedule.", captions: {...EMPTY_CAPTIONS}, review_status:"none", review_notes:[], media_type:"single", doc_urls:[], subtasks: [{ text: "Winner 2", done: false }, { text: "Winner 3", done: false }], image_urls: [], sort_order: 2 },
-  { title: "Risk Aversion in Science Research Article", category: "Metascience / Articles", status: "waiting", priority: "high", deadline: "Before March", description: "Zeeya edited article on risk aversion. Waiting for writer approval.", notes: "Can draft post now. DO NOT publish until writer approves.", captions: {...EMPTY_CAPTIONS}, review_status:"none", review_notes:[], media_type:"single", doc_urls:[], subtasks: [], image_urls: [], sort_order: 3 },
-  { title: "Build a Content Plan / Calendar", category: "Strategic / Ongoing", status: "todo", priority: "medium", deadline: "", description: "Proper content plan + engagement ideas.", notes: "", captions: {...EMPTY_CAPTIONS}, review_status:"none", review_notes:[], media_type:"single", doc_urls:[], subtasks: [], image_urls: [], sort_order: 4 },
+  { title: "David Wallace Q&A Post", category: "Metascience / Articles", status: "todo", priority: "high", deadline: "", description: "Post the David Wallace Q&A. This is FLI/Metascience work — tag accordingly.", notes: "", captions: {...EMPTY_CAPTIONS}, review_status:"none", review_notes:[], media_type:"single", doc_urls:[], subtasks: [{ text: "Draft caption for each platform", done: false }, { text: "Tag under FLI/Metascience", done: false }, { text: "Schedule post", done: false }], image_urls: [] },
+  { title: "Catalina Press Release Post", category: "Metascience / Articles", status: "todo", priority: "high", deadline: "", description: "Press release is up. Use the photo from the press release for the social post.", notes: "Photo available in the press release.", captions: {...EMPTY_CAPTIONS}, review_status:"none", review_notes:[], media_type:"single", doc_urls:[], subtasks: [{ text: "Pull photo from press release", done: false }, { text: "Write captions", done: false }, { text: "Post", done: false }], image_urls: [] },
+  { title: "RSA Competition Winner Profiles (Daily Posts)", category: "Active / Daily", status: "in_progress", priority: "high", deadline: "Next ~7 days", description: "One post per day. Headshot + quote per winner.", notes: "ACTIVE daily schedule.", captions: {...EMPTY_CAPTIONS}, review_status:"none", review_notes:[], media_type:"single", doc_urls:[], subtasks: [{ text: "Winner 2", done: false }, { text: "Winner 3", done: false }], image_urls: [] },
+  { title: "Risk Aversion in Science Research Article", category: "Metascience / Articles", status: "waiting", priority: "high", deadline: "Before March", description: "Zeeya edited article on risk aversion. Waiting for writer approval.", notes: "Can draft post now. DO NOT publish until writer approves.", captions: {...EMPTY_CAPTIONS}, review_status:"none", review_notes:[], media_type:"single", doc_urls:[], subtasks: [], image_urls: [] },
+  { title: "Build a Content Plan / Calendar", category: "Strategic / Ongoing", status: "todo", priority: "medium", deadline: "", description: "Proper content plan + engagement ideas.", notes: "", captions: {...EMPTY_CAPTIONS}, review_status:"none", review_notes:[], media_type:"single", doc_urls:[], subtasks: [], image_urls: [] },
 ];
 
 /* ═══════════════════════════════════════════════════════════
@@ -891,6 +891,33 @@ function App(){
     return()=>{supabase.removeChannel(channel);supabase.removeChannel(catChannel);};
   },[user]);
 
+  // Task ordering stored in meta table (array of task IDs)
+  const[taskOrder,setTaskOrder]=useState([]);
+  const saveTaskOrder=async(order)=>{setTaskOrder(order);await supabase.from('meta').upsert({key:'task_order',value:order});};
+
+  // Load task order from meta table
+  useEffect(()=>{
+    if(!user)return;
+    supabase.from('meta').select('*').eq('key','task_order').single().then(({data})=>{if(data?.value)setTaskOrder(data.value);});
+    const orderChannel=supabase.channel('meta-order').on('postgres_changes',{event:'*',schema:'public',table:'meta',filter:'key=eq.task_order'},(payload)=>{if(payload.new?.value)setTaskOrder(payload.new.value);}).subscribe();
+    return()=>supabase.removeChannel(orderChannel);
+  },[user]);
+
+  // Auto-scroll during drag
+  useEffect(()=>{
+    let scrollInterval=null;
+    const SCROLL_ZONE=80;const SCROLL_SPEED=12;
+    const handleDragOver=(e)=>{
+      const y=e.clientY;const h=window.innerHeight;
+      if(y<SCROLL_ZONE){if(!scrollInterval)scrollInterval=setInterval(()=>window.scrollBy(0,-SCROLL_SPEED),16);}
+      else if(y>h-SCROLL_ZONE){if(!scrollInterval)scrollInterval=setInterval(()=>window.scrollBy(0,SCROLL_SPEED),16);}
+      else{if(scrollInterval){clearInterval(scrollInterval);scrollInterval=null;}}
+    };
+    const stopScroll=()=>{if(scrollInterval){clearInterval(scrollInterval);scrollInterval=null;}};
+    window.addEventListener('dragover',handleDragOver);window.addEventListener('dragend',stopScroll);window.addEventListener('drop',stopScroll);
+    return()=>{window.removeEventListener('dragover',handleDragOver);window.removeEventListener('dragend',stopScroll);window.removeEventListener('drop',stopScroll);stopScroll();};
+  },[]);
+
   // Listen for drag-and-drop reorder events
   useEffect(()=>{
     const handler=(e)=>{
@@ -913,14 +940,14 @@ function App(){
           if(avgP<=0.5)newPriority='high';else if(avgP<=1.5)newPriority='medium';else newPriority='low';
         }else if(above){newPriority=above.priority;}
         else if(below){newPriority=below.priority;}
-        // Update sort_order and priority
-        const result=newTasks.map((t,i)=>({...t,sort_order:i,priority:t.id===draggedId?newPriority:t.priority}));
-        // Persist changes
-        const updated=result.find(t=>t.id===draggedId);
-        if(updated){const{id,...data}=updated;supabase.from('tasks').update({sort_order:data.sort_order,priority:data.priority}).eq('id',id);}
-        // Persist all sort orders
-        result.forEach((t,i)=>{if(t.sort_order!==prev.find(p=>p.id===t.id)?.sort_order){supabase.from('tasks').update({sort_order:i}).eq('id',t.id);}});
-        addToast(`Moved "${dragged.title}" ${newPriority!==dragged.priority?`(priority: ${newPriority})`:''}`);
+        // Update priority on the dragged task only
+        const result=newTasks.map(t=>t.id===draggedId?{...t,priority:newPriority}:t);
+        // Persist priority change if it changed
+        if(newPriority!==dragged.priority){supabase.from('tasks').update({priority:newPriority}).eq('id',draggedId);}
+        // Persist new order to meta table
+        const newOrder=result.map(t=>t.id);
+        saveTaskOrder(newOrder);
+        addToast(`Moved "${dragged.title}"${newPriority!==dragged.priority?' (priority: '+newPriority+')':''}`);
         return result;
       });
     };
@@ -939,37 +966,48 @@ function App(){
     addToast("Reset complete");
   };
 
-  const updateTask=async(updated)=>{const{id,...data}=updated;setTasks(prev=>prev.map(t=>t.id===id?updated:t));await supabase.from('tasks').update(data).eq('id',id);};
-  const deleteTask=async(id)=>{const task=tasks.find(t=>t.id===id);if(task?.image_urls)for(const img of task.image_urls)await supabase.storage.from('assets').remove([img.path]);if(task?.doc_urls)for(const doc of task.doc_urls)await supabase.storage.from('assets').remove([doc.path]);setTasks(prev=>prev.filter(t=>t.id!==id));await supabase.from('tasks').delete().eq('id',id);addToast("Deleted");};
-  const addTask=async({title,category,priority})=>{const maxOrder=tasks.reduce((m,t)=>Math.max(m,t.sort_order||0),0);await supabase.from('tasks').insert({title,category,status:'todo',priority,deadline:'',description:'',notes:'',captions:{...EMPTY_CAPTIONS},subtasks:[],image_urls:[],doc_urls:[],review_status:'none',review_notes:[],media_type:'single',user_id:user.id,sort_order:maxOrder+1});setShowNew(false);addToast(`"${title}" added`);};
+  // Strip local-only fields before sending to Supabase
+  const stripLocal=(obj)=>{const{sort_order,_localOrder,...rest}=obj;return rest;};
+
+  const updateTask=async(updated)=>{const{id,...data}=updated;setTasks(prev=>prev.map(t=>t.id===id?updated:t));const clean=stripLocal(data);await supabase.from('tasks').update(clean).eq('id',id);};
+  const deleteTask=async(id)=>{const task=tasks.find(t=>t.id===id);if(task?.image_urls)for(const img of task.image_urls)await supabase.storage.from('assets').remove([img.path]);if(task?.doc_urls)for(const doc of task.doc_urls)await supabase.storage.from('assets').remove([doc.path]);setTasks(prev=>prev.filter(t=>t.id!==id));await supabase.from('tasks').delete().eq('id',id);saveTaskOrder(taskOrder.filter(tid=>tid!==id));addToast("Deleted");};
+  const addTask=async({title,category,priority})=>{const{data:inserted,error}=await supabase.from('tasks').insert({title,category,status:'todo',priority,deadline:'',description:'',notes:'',captions:{...EMPTY_CAPTIONS},subtasks:[],image_urls:[],doc_urls:[],review_status:'none',review_notes:[],media_type:'single',user_id:user.id}).select();if(error){addToast("Error adding task");return;}if(inserted&&inserted[0]){saveTaskOrder([...taskOrder,inserted[0].id]);}setShowNew(false);addToast(`"${title}" added`);};
   const saveCategories=async(cats)=>{setCategories(cats);await supabase.from('meta').upsert({key:'categories',value:cats});};
   const addCategory=()=>{const n=newCatName.trim();if(!n||categories.includes(n))return;saveCategories([...categories,n]);setNewCatName("");addToast(`"${n}" added`);};
   const renameCategory=async(oldName,newName)=>{if(categories.includes(newName))return;const newCats=categories.map(c=>c===oldName?newName:c);for(const t of tasks.filter(t=>t.category===oldName))await supabase.from('tasks').update({category:newName}).eq('id',t.id);await saveCategories(newCats);if(activeCategory===oldName)setActiveCategory(newName);};
   const deleteCategory=async(cat)=>{const target=categories.find(c=>c!==cat)||"Uncategorized";if(!confirm(`Delete "${cat}"? Tasks move to "${target}".`))return;for(const t of tasks.filter(t=>t.category===cat))await supabase.from('tasks').update({category:target}).eq('id',t.id);await saveCategories(categories.filter(c=>c!==cat));if(activeCategory===cat)setActiveCategory("All");};
   const signOut=()=>supabase.auth.signOut();
 
-  // Move up/down handlers
-  const moveTask=(taskId,direction)=>{
-    setTasks(prev=>{
-      const sorted=[...prev].sort((a,b)=>(a.sort_order||0)-(b.sort_order||0));
-      const idx=sorted.findIndex(t=>t.id===taskId);
-      if(idx<0)return prev;
-      const newIdx=idx+direction;
-      if(newIdx<0||newIdx>=sorted.length)return prev;
-      // Swap
-      const task=sorted[idx];const neighbor=sorted[newIdx];
-      // Auto-adjust priority: take the priority of the position we're moving to
-      const newPriority=neighbor.priority;
-      const updatedTask={...task,sort_order:neighbor.sort_order||newIdx,priority:newPriority};
-      const updatedNeighbor={...neighbor,sort_order:task.sort_order||idx};
-      // Persist
-      const{id:tid,...tdata}=updatedTask;const{id:nid,...ndata}=updatedNeighbor;
-      supabase.from('tasks').update({sort_order:tdata.sort_order,priority:tdata.priority}).eq('id',tid);
-      supabase.from('tasks').update({sort_order:ndata.sort_order}).eq('id',nid);
-      const result=prev.map(t=>{if(t.id===tid)return updatedTask;if(t.id===nid)return updatedNeighbor;return t;});
-      if(newPriority!==task.priority)addToast(`Priority changed to ${newPriority}`);
-      return result;
-    });
+  // Move up/down handlers — uses the currently displayed filtered list order
+  const moveTask=(taskId,direction,displayedList)=>{
+    const idx=displayedList.findIndex(t=>t.id===taskId);
+    if(idx<0)return;
+    const newIdx=idx+direction;
+    if(newIdx<0||newIdx>=displayedList.length)return;
+    const task=displayedList[idx];const neighbor=displayedList[newIdx];
+    // Auto-adjust priority
+    const newPriority=neighbor.priority;
+    if(newPriority!==task.priority){
+      const updated={...task,priority:newPriority};
+      setTasks(prev=>prev.map(t=>t.id===taskId?updated:t));
+      supabase.from('tasks').update({priority:newPriority}).eq('id',taskId);
+      addToast(`Priority: ${newPriority}`);
+    }
+    // Swap in order array
+    const allIds=tasks.map(t=>t.id);
+    // Build new full order: swap the two task IDs
+    const newOrder=[...taskOrder.length>0?taskOrder:allIds];
+    const oi=newOrder.indexOf(taskId);const ni=newOrder.indexOf(neighbor.id);
+    if(oi>=0&&ni>=0){[newOrder[oi],newOrder[ni]]=[newOrder[ni],newOrder[oi]];}
+    else{// fallback: remove and insert
+      const filtered=newOrder.filter(id=>id!==taskId);
+      const targetPos=filtered.indexOf(neighbor.id);
+      filtered.splice(direction<0?targetPos:targetPos+1,0,taskId);
+      saveTaskOrder(filtered);return;
+    }
+    saveTaskOrder(newOrder);
+    // Force re-render by updating local task order
+    setTasks(prev=>{const map=new Map(prev.map(t=>[t.id,t]));return newOrder.map(id=>map.get(id)).filter(Boolean).concat(prev.filter(t=>!newOrder.includes(t.id)));});
   };
 
   if(user===undefined)return<div className="loading-screen">Loading...</div>;
@@ -993,7 +1031,7 @@ function App(){
       const reviewOrder=(t)=>{if(t.review_status==='submitted'||t.review_status==='resubmitted')return 0;if(t.review_status==='needs_changes')return 1;if(t.review_status==='approved')return 2;return 3;};
       const aR=reviewOrder(a);const bR=reviewOrder(b);if(aR!==bR)return aR-bR;
       // Sort by selected criteria
-      if(sortBy==="manual"){return(a.sort_order||0)-(b.sort_order||0);}
+      if(sortBy==="manual"){const oa=taskOrder.indexOf(a.id);const ob=taskOrder.indexOf(b.id);const ia=oa>=0?oa:9999;const ib=ob>=0?ob:9999;return ia-ib;}
       if(sortBy==="priority"){const o={high:0,medium:1,low:2};const ap=o[a.priority]??1;const bp=o[b.priority]??1;if(ap!==bp)return ap-bp;const so={in_progress:0,todo:1,waiting:2};return(so[a.status]??1)-(so[b.status]??1);}
       if(sortBy==="status"){const o={in_progress:0,todo:1,waiting:2,done:3};return(o[a.status]||1)-(o[b.status]||1);}
       if(sortBy==="deadline"){return(a.deadline||"zzz").localeCompare(b.deadline||"zzz");}
@@ -1007,7 +1045,7 @@ function App(){
   const stats={done:tasks.filter(t=>t.status==="done").length,inProgress:tasks.filter(t=>t.status==="in_progress").length,waiting:tasks.filter(t=>t.status==="waiting").length,todo:tasks.filter(t=>t.status==="todo").length};
   const toggleStatusFilter=(status)=>{const mapped={inProgress:"in_progress",waiting:"waiting",todo:"todo",done:"done"}[status];setStatusFilter(prev=>prev===mapped?"all":mapped);};
 
-  const renderTaskCard=(task,idx,list)=>(<TaskCard key={task.id} task={task} onUpdate={updateTask} onDelete={deleteTask} categories={categories} isStarred={starred.has(task.id)} onToggleStar={toggleStar} forceExpand={allExpanded} userEmail={user.email} addToast={addToast} onOpenReview={setReviewingTaskId} onMoveUp={(id)=>moveTask(id,-1)} onMoveDown={(id)=>moveTask(id,1)} isFirst={idx===0} isLast={idx===list.length-1} index={idx}/>);
+  const renderTaskCard=(task,idx,list)=>(<TaskCard key={task.id} task={task} onUpdate={updateTask} onDelete={deleteTask} categories={categories} isStarred={starred.has(task.id)} onToggleStar={toggleStar} forceExpand={allExpanded} userEmail={user.email} addToast={addToast} onOpenReview={setReviewingTaskId} onMoveUp={(id)=>moveTask(id,-1,list)} onMoveDown={(id)=>moveTask(id,1,list)} isFirst={idx===0} isLast={idx===list.length-1} index={idx}/>);
 
   return(
     <div className="app">
