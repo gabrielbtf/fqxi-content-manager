@@ -8,252 +8,281 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.9/babel.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Cormorant+Garamond:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-  body { font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif; background: #f8fafc; color: #1e293b; line-height: 1.5; }
+  body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f1f5f9; color: #1e293b; line-height: 1.5; -webkit-font-smoothing: antialiased; }
   .app { min-height: 100vh; display: flex; flex-direction: column; }
 
   /* ─── HEADER ─── */
-  .header { background: #fff; border-bottom: 1px solid #e2e8f0; position: sticky; top: 0; z-index: 40; }
-  .header-inner { max-width: 1280px; margin: 0 auto; padding: 14px 24px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
-  .header h1 { font-size: 22px; font-weight: 700; color: #0f172a; font-family: 'Cormorant Garamond', Georgia, serif; }
-  .header-sub { font-size: 11px; color: #94a3b8; margin-top: 2px; display: flex; align-items: center; gap: 8px; }
-  .header-right { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
-  .stat-badges { display: flex; gap: 5px; flex-wrap: wrap; }
-  .stat-badge { display: inline-flex; align-items: center; padding: 3px 9px; border-radius: 999px; font-size: 11px; font-weight: 500; cursor: pointer; transition: all 0.15s; border: 1.5px solid transparent; }
-  .stat-badge:hover { transform: scale(1.05); }
-  .stat-badge.filter-active { border-color: currentColor; }
-  .stat-active { background: #eff6ff; color: #1d4ed8; }
-  .stat-waiting { background: #fffbeb; color: #b45309; }
-  .stat-todo { background: #f8fafc; color: #475569; border-color: #e2e8f0; }
-  .stat-done { background: #f0fdf4; color: #15803d; }
+  .header { background: #fff; border-bottom: 1px solid #e2e8f0; position: sticky; top: 0; z-index: 40; box-shadow: 0 1px 3px rgba(0,0,0,0.04); }
+  .header-inner { max-width: 1360px; margin: 0 auto; padding: 12px 24px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
+  .header h1 { font-size: 20px; font-weight: 700; color: #0f172a; font-family: 'Cormorant Garamond', Georgia, serif; letter-spacing: -0.01em; }
+  .header-sub { font-size: 11px; color: #94a3b8; margin-top: 1px; display: flex; align-items: center; gap: 6px; }
+  .header-right { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .stat-pills { display: flex; gap: 4px; flex-wrap: wrap; }
+  .stat-pill { display: inline-flex; align-items: center; gap: 4px; padding: 4px 10px; border-radius: 8px; font-size: 11px; font-weight: 600; cursor: pointer; transition: all 0.15s; border: 1.5px solid transparent; background: #f8fafc; color: #64748b; }
+  .stat-pill:hover { background: #f1f5f9; }
+  .stat-pill.active { border-color: currentColor; }
+  .stat-pill.s-active { background: #eff6ff; color: #2563eb; }
+  .stat-pill.s-waiting { background: #fffbeb; color: #d97706; }
+  .stat-pill.s-todo { background: #f8fafc; color: #64748b; }
+  .stat-pill.s-done { background: #f0fdf4; color: #16a34a; }
+  .stat-pill.s-review { background: #eef2ff; color: #6366f1; }
 
   /* ─── LAYOUT ─── */
-  .layout { max-width: 1280px; margin: 0 auto; width: 100%; flex: 1; display: flex; }
-  .sidebar { width: 250px; flex-shrink: 0; border-right: 1px solid #e2e8f0; padding: 20px 16px 24px 24px; overflow-y: auto; position: sticky; top: 52px; height: calc(100vh - 52px); }
+  .layout { max-width: 1360px; margin: 0 auto; width: 100%; flex: 1; display: flex; gap: 0; }
+  .sidebar { width: 240px; flex-shrink: 0; background: #fff; border-right: 1px solid #e2e8f0; padding: 16px; overflow-y: auto; position: sticky; top: 49px; height: calc(100vh - 49px); }
   .sidebar-section { margin-bottom: 20px; }
-  .sidebar-label { font-size: 10px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 6px; }
-  .sidebar-btn { display: flex; align-items: center; justify-content: space-between; width: 100%; text-align: left; font-size: 13px; padding: 6px 10px; border-radius: 8px; border: none; background: none; cursor: pointer; color: #475569; transition: all 0.15s; gap: 4px; }
+  .sidebar-label { font-size: 10px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 6px; padding-left: 8px; }
+  .sidebar-btn { display: flex; align-items: center; justify-content: space-between; width: 100%; text-align: left; font-size: 13px; padding: 7px 10px; border-radius: 8px; border: none; background: none; cursor: pointer; color: #475569; transition: all 0.12s; gap: 4px; font-family: inherit; }
   .sidebar-btn:hover { background: #f1f5f9; }
-  .sidebar-btn.active { background: #fdf9e2; color: #8a7a10; font-weight: 500; }
-  .sidebar-count { font-size: 11px; color: #94a3b8; flex-shrink: 0; min-width: 18px; text-align: right; }
+  .sidebar-btn.active { background: #0f172a; color: #fff; font-weight: 600; }
+  .sidebar-count { font-size: 11px; opacity: 0.6; flex-shrink: 0; min-width: 18px; text-align: right; }
   .sidebar-cat-row { display: flex; align-items: center; gap: 2px; }
   .sidebar-cat-row:hover .cat-action-btn { opacity: 1; }
   .cat-action-btn { opacity: 0; background: none; border: none; cursor: pointer; color: #94a3b8; padding: 2px; display: flex; transition: opacity 0.15s; flex-shrink: 0; }
-  .cat-action-btn:hover { color: #8a7a10; }
+  .cat-action-btn:hover { color: #0f172a; }
   .cat-action-btn.del:hover { color: #ef4444; }
-  .cat-edit-input { font-size: 13px; border: 1px solid #e4d344; border-radius: 6px; padding: 4px 8px; outline: none; font-family: inherit; width: 100%; box-shadow: 0 0 0 3px rgba(228,211,68,0.25); }
+  .cat-edit-input { font-size: 13px; border: 1px solid #6366f1; border-radius: 6px; padding: 5px 8px; outline: none; font-family: inherit; width: 100%; box-shadow: 0 0 0 3px rgba(99,102,241,0.15); }
   .add-cat-row { display: flex; gap: 4px; margin-top: 8px; }
-  .add-cat-input { flex: 1; border: 1px solid #e2e8f0; border-radius: 6px; padding: 4px 8px; font-size: 12px; outline: none; font-family: inherit; min-width: 0; }
-  .add-cat-btn { background: #e4d344; color: #1e293b; border: none; border-radius: 6px; padding: 4px 8px; font-size: 11px; cursor: pointer; font-family: inherit; font-weight: 600; }
-  .add-cat-btn:disabled { opacity: 0.4; }
+  .add-cat-input { flex: 1; border: 1px solid #e2e8f0; border-radius: 6px; padding: 5px 8px; font-size: 12px; outline: none; font-family: inherit; min-width: 0; }
+  .add-cat-input:focus { border-color: #6366f1; box-shadow: 0 0 0 3px rgba(99,102,241,0.1); }
+  .add-cat-btn { background: #0f172a; color: #fff; border: none; border-radius: 6px; padding: 5px 10px; font-size: 11px; cursor: pointer; font-family: inherit; font-weight: 600; }
+  .add-cat-btn:disabled { opacity: 0.3; }
 
   /* ─── MAIN ─── */
   .main { flex: 1; padding: 20px 24px; min-width: 0; }
-  .filters { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-bottom: 16px; }
+  .filters-bar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-bottom: 16px; background: #fff; padding: 10px 14px; border-radius: 12px; border: 1px solid #e2e8f0; }
   .search-wrap { position: relative; flex: 1; min-width: 180px; max-width: 320px; }
   .search-wrap svg { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: #94a3b8; }
-  .search-input { width: 100%; padding: 7px 12px 7px 32px; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 13px; outline: none; font-family: inherit; }
-  .search-input:focus { border-color: #e4d344; box-shadow: 0 0 0 3px rgba(228,211,68,0.25); }
-  .filter-select { padding: 7px 10px; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 12px; outline: none; font-family: inherit; cursor: pointer; background: #fff; }
-  .filter-select:focus { border-color: #e4d344; box-shadow: 0 0 0 3px rgba(228,211,68,0.25); }
+  .search-input { width: 100%; padding: 7px 12px 7px 32px; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 13px; outline: none; font-family: inherit; background: #f8fafc; transition: all 0.15s; }
+  .search-input:focus { border-color: #6366f1; box-shadow: 0 0 0 3px rgba(99,102,241,0.1); background: #fff; }
+  .filter-select { padding: 7px 10px; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 12px; outline: none; font-family: inherit; cursor: pointer; background: #f8fafc; }
+  .filter-select:focus { border-color: #6366f1; box-shadow: 0 0 0 3px rgba(99,102,241,0.1); }
   .results-count { font-size: 11px; color: #94a3b8; margin-left: auto; white-space: nowrap; }
 
   /* ─── TOOLBAR ─── */
-  .toolbar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; gap: 8px; flex-wrap: wrap; }
-  .toolbar-left { display: flex; align-items: center; gap: 8px; }
-  .toolbar-btn { background: none; border: 1px solid #e2e8f0; color: #64748b; padding: 4px 10px; border-radius: 6px; font-size: 11px; cursor: pointer; display: flex; align-items: center; gap: 4px; font-family: inherit; transition: all 0.15s; }
-  .toolbar-btn:hover { background: #f1f5f9; color: #475569; }
-  .toolbar-btn.active { background: #fdf9e2; border-color: #e4d344; color: #8a7a10; }
+  .toolbar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; gap: 8px; flex-wrap: wrap; }
+  .toolbar-left { display: flex; align-items: center; gap: 6px; }
+  .toolbar-btn { background: #fff; border: 1px solid #e2e8f0; color: #64748b; padding: 5px 10px; border-radius: 8px; font-size: 11px; cursor: pointer; display: flex; align-items: center; gap: 4px; font-family: inherit; transition: all 0.12s; }
+  .toolbar-btn:hover { background: #f1f5f9; color: #475569; border-color: #cbd5e1; }
+  .toolbar-btn.active { background: #0f172a; border-color: #0f172a; color: #fff; }
   .kbd { display: inline-flex; align-items: center; justify-content: center; min-width: 18px; height: 18px; padding: 0 4px; border-radius: 4px; background: #f1f5f9; border: 1px solid #e2e8f0; font-size: 10px; font-family: monospace; color: #94a3b8; margin-left: 4px; }
 
   /* ─── BUTTONS ─── */
-  .btn-primary { background: #e4d344; color: #1e293b; border: none; padding: 7px 14px; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 6px; transition: all 0.15s cubic-bezier(0.16, 1, 0.3, 1); font-family: inherit; }
-  .btn-primary:hover { background: #d4c334; transform: translateY(-2px); }
-  .btn-primary:active { animation: buttonBounce 0.2s ease; }
-  .btn-sm { background: none; border: 1px solid #e2e8f0; color: #475569; padding: 4px 8px; border-radius: 6px; font-size: 11px; cursor: pointer; display: flex; align-items: center; gap: 4px; font-family: inherit; transition: all 0.15s; }
-  .btn-sm:hover { background: #f1f5f9; }
+  .btn-primary { background: #0f172a; color: #fff; border: none; padding: 7px 14px; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 6px; transition: all 0.15s; font-family: inherit; }
+  .btn-primary:hover { background: #1e293b; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(15,23,42,0.15); }
+  .btn-sm { background: #fff; border: 1px solid #e2e8f0; color: #475569; padding: 4px 10px; border-radius: 6px; font-size: 11px; cursor: pointer; display: flex; align-items: center; gap: 4px; font-family: inherit; transition: all 0.12s; }
+  .btn-sm:hover { background: #f1f5f9; border-color: #cbd5e1; }
   .btn-danger { background: none; border: none; color: #ef4444; cursor: pointer; font-size: 12px; display: flex; align-items: center; gap: 4px; padding: 4px 8px; border-radius: 6px; font-family: inherit; }
   .btn-danger:hover { background: #fef2f2; }
 
+  /* ─── REVIEW BANNER ─── */
+  .review-section { margin-bottom: 20px; }
+  .review-section-header { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; padding: 8px 12px; background: linear-gradient(135deg, #eef2ff 0%, #e0e7ff 100%); border-radius: 10px; border: 1px solid #c7d2fe; }
+  .review-section-header h3 { font-size: 13px; font-weight: 700; color: #4338ca; margin: 0; }
+  .review-section-header .review-count { background: #6366f1; color: #fff; font-size: 11px; font-weight: 700; padding: 1px 7px; border-radius: 999px; }
+  .review-divider { height: 1px; background: #e2e8f0; margin: 16px 0; }
+
   /* ─── TASK CARDS ─── */
-  .task-card { background: #fff; border-radius: 12px; border: 1px solid #e2e8f0; box-shadow: 0 1px 2px rgba(0,0,0,0.04); transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1); margin-bottom: 10px; border-left: 4px solid transparent; animation: subtleCardEnter 0.4s ease; }
-  .task-card:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.07); transform: translateY(-2px) scale(1.005); }
-  .task-card.done { opacity: 0.5; }
-  .task-card.p-high { border-left-color: #ef4444; }
-  .task-card.p-medium { border-left-color: #f59e0b; }
-  .task-card.p-low { border-left-color: #d1d5db; }
-  .task-card.starred { border-left-color: #e4d344; box-shadow: 0 1px 3px rgba(228,211,68,0.2); }
-  .task-card.review-needed { background: #f8faff; border-top: 3px solid #3b82f6; }
-  .task-card.review-needed .task-title { color: #1e40af; }
-  .task-card.review-approved { background: #f0fdf4; border-top: 3px solid #22c55e; }
-  .task-card.review-approved .task-title { color: #15803d; }
-  .task-card.review-changes { background: #fffbf0; border-top: 3px solid #f59e0b; }
-  .task-card.review-changes .task-title { color: #92400e; }
-  .task-header { padding: 14px 16px; display: flex; align-items: flex-start; gap: 10px; cursor: pointer; user-select: none; }
-  .check-btn { width: 20px; height: 20px; border-radius: 50%; border: 2px solid #d1d5db; background: none; cursor: pointer; flex-shrink: 0; display: flex; align-items: center; justify-content: center; margin-top: 2px; transition: all 0.15s; }
-  .check-btn:hover { border-color: #86efac; background: #f0fdf4; }
+  .task-card { background: #fff; border-radius: 12px; border: 1px solid #e2e8f0; transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1); margin-bottom: 8px; position: relative; }
+  .task-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.06); border-color: #cbd5e1; }
+  .task-card.done { opacity: 0.45; }
+  .task-card.p-high { border-left: 4px solid #ef4444; }
+  .task-card.p-medium { border-left: 4px solid #f59e0b; }
+  .task-card.p-low { border-left: 4px solid #d1d5db; }
+  .task-card.starred { box-shadow: 0 0 0 1px #fbbf24, 0 2px 8px rgba(251,191,36,0.15); }
+  .task-card.review-needed { background: linear-gradient(135deg, #fafbff 0%, #f0f3ff 100%); border-color: #a5b4fc; }
+  .task-card.review-approved { background: linear-gradient(135deg, #fafffe 0%, #ecfdf5 100%); border-color: #86efac; }
+  .task-card.review-changes { background: linear-gradient(135deg, #fffefa 0%, #fefce8 100%); border-color: #fcd34d; }
+  .task-card.dragging { opacity: 0.5; transform: scale(0.98); }
+  .task-card.drag-over-top { border-top: 3px solid #6366f1; margin-top: -2px; }
+  .task-card.drag-over-bottom { border-bottom: 3px solid #6366f1; margin-bottom: -2px; }
+
+  .drag-handle { cursor: grab; color: #d1d5db; padding: 4px 2px; display: flex; flex-direction: column; gap: 2px; align-items: center; flex-shrink: 0; transition: color 0.15s; margin-top: 2px; }
+  .drag-handle:active { cursor: grabbing; }
+  .task-card:hover .drag-handle { color: #94a3b8; }
+  .drag-dots { display: flex; flex-direction: column; gap: 2px; }
+  .drag-dots span { display: flex; gap: 2px; }
+  .drag-dots span::before, .drag-dots span::after { content: ''; width: 3px; height: 3px; border-radius: 50%; background: currentColor; }
+
+  .task-header { padding: 12px 14px; display: flex; align-items: flex-start; gap: 8px; cursor: pointer; user-select: none; }
+  .check-btn { width: 20px; height: 20px; border-radius: 6px; border: 2px solid #d1d5db; background: none; cursor: pointer; flex-shrink: 0; display: flex; align-items: center; justify-content: center; margin-top: 2px; transition: all 0.15s; }
+  .check-btn:hover { border-color: #22c55e; background: #f0fdf4; }
   .check-btn.checked { background: #22c55e; border-color: #22c55e; }
   .task-content { flex: 1; min-width: 0; }
   .task-title-row { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
-  .task-title { font-size: 15px; font-weight: 600; color: #0f172a; font-family: 'Cormorant Garamond', Georgia, serif; }
+  .task-title { font-size: 14px; font-weight: 600; color: #0f172a; }
   .task-title.struck { text-decoration: line-through; color: #94a3b8; }
-  .task-title-input { font-size: 15px; font-weight: 600; color: #0f172a; border: 1px solid #e4d344; border-radius: 6px; padding: 2px 6px; outline: none; font-family: 'Cormorant Garamond', Georgia, serif; width: 100%; box-shadow: 0 0 0 3px rgba(228,211,68,0.25); }
-  .star-btn { background: none; border: none; cursor: pointer; padding: 2px; display: flex; font-size: 14px; transition: transform 0.2s; flex-shrink: 0; }
-  .star-btn:hover { transform: scale(1.3); }
-  .star-btn.active { animation: starPop 0.3s ease; }
+  .task-title-input { font-size: 14px; font-weight: 600; color: #0f172a; border: 1px solid #6366f1; border-radius: 6px; padding: 2px 6px; outline: none; font-family: inherit; width: 100%; box-shadow: 0 0 0 3px rgba(99,102,241,0.15); }
+  .star-btn { background: none; border: none; cursor: pointer; padding: 2px; display: flex; font-size: 14px; transition: transform 0.2s; flex-shrink: 0; color: #d1d5db; }
+  .star-btn:hover { transform: scale(1.2); }
+  .star-btn.active { color: #f59e0b; animation: starPop 0.3s ease; }
   @keyframes starPop { 0%{transform:scale(1)}50%{transform:scale(1.4)}100%{transform:scale(1)} }
-  @keyframes subtleCardEnter { 0%{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)} }
-  @keyframes cardHoverLift { 0%{transform:translateY(0) scale(1)}to{transform:translateY(-4px) scale(1.01)} }
-  @keyframes buttonBounce { 0%{transform:scale(1)}50%{transform:scale(0.96)}100%{transform:scale(1)} }
-  .edit-title-btn { background: none; border: none; cursor: pointer; color: #cbd5e1; padding: 2px; display: flex; transition: color 0.15s; }
-  .edit-title-btn:hover { color: #8a7a10; }
-  .priority-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
-  .priority-high { background: #ef4444; }
-  .priority-medium { background: #f59e0b; }
-  .priority-low { background: #d1d5db; }
-  .task-meta { display: flex; align-items: center; gap: 6px; margin-top: 4px; flex-wrap: wrap; }
-  .status-select { font-size: 11px; font-weight: 500; padding: 2px 8px; border-radius: 999px; border: 1px solid; cursor: pointer; outline: none; font-family: inherit; appearance: none; -webkit-appearance: none; transition: all 0.15s; }
-  .status-select:hover { opacity: 0.8; }
-  .status-todo { background: #f1f5f9; color: #475569; border-color: #cbd5e1; }
-  .status-in_progress { background: #dbeafe; color: #1d4ed8; border-color: #93c5fd; }
-  .status-waiting { background: #fef3c7; color: #b45309; border-color: #fcd34d; }
-  .status-done { background: #dcfce7; color: #15803d; border-color: #86efac; }
-  .task-category { font-size: 11px; color: #94a3b8; }
+  .edit-title-btn { background: none; border: none; cursor: pointer; color: #d1d5db; padding: 2px; display: flex; transition: color 0.15s; }
+  .edit-title-btn:hover { color: #6366f1; }
+  .priority-badge { font-size: 10px; font-weight: 700; padding: 1px 6px; border-radius: 4px; text-transform: uppercase; letter-spacing: 0.03em; }
+  .priority-badge.pb-high { background: #fef2f2; color: #dc2626; }
+  .priority-badge.pb-medium { background: #fffbeb; color: #d97706; }
+  .priority-badge.pb-low { background: #f8fafc; color: #94a3b8; }
+  .task-meta { display: flex; align-items: center; gap: 6px; margin-top: 5px; flex-wrap: wrap; }
+  .status-chip { font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 6px; border: none; cursor: pointer; outline: none; font-family: inherit; appearance: none; -webkit-appearance: none; transition: all 0.12s; }
+  .status-chip:hover { opacity: 0.85; }
+  .status-todo { background: #f1f5f9; color: #475569; }
+  .status-in_progress { background: #dbeafe; color: #1d4ed8; }
+  .status-waiting { background: #fef3c7; color: #b45309; }
+  .status-done { background: #dcfce7; color: #15803d; }
+  .task-category { font-size: 11px; color: #94a3b8; background: #f8fafc; padding: 2px 6px; border-radius: 4px; }
   .task-deadline { font-size: 11px; color: #ea580c; font-weight: 500; }
-  .task-preview { font-size: 12px; color: #94a3b8; margin-top: 4px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 500px; font-style: italic; }
+  .task-preview { font-size: 12px; color: #94a3b8; margin-top: 4px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 500px; }
   .progress-bar { display: flex; align-items: center; gap: 8px; margin-top: 6px; }
-  .progress-track { flex: 1; height: 5px; background: #f1f5f9; border-radius: 999px; overflow: hidden; }
-  .progress-fill { height: 100%; background: #e4d344; border-radius: 999px; transition: width 0.3s; }
+  .progress-track { flex: 1; height: 4px; background: #f1f5f9; border-radius: 999px; overflow: hidden; }
+  .progress-fill { height: 100%; background: linear-gradient(90deg, #6366f1, #8b5cf6); border-radius: 999px; transition: width 0.3s; }
   .progress-label { font-size: 11px; color: #94a3b8; }
-  .expand-btn { color: #cbd5e1; cursor: pointer; padding: 4px; flex-shrink: 0; background: none; border: none; display: flex; transition: all 0.2s; }
-  .expand-btn:hover { color: #475569; }
+  .expand-btn { color: #cbd5e1; cursor: pointer; padding: 4px; flex-shrink: 0; background: none; border: none; display: flex; transition: all 0.15s; border-radius: 6px; }
+  .expand-btn:hover { color: #475569; background: #f1f5f9; }
   .task-card:hover .expand-btn { color: #94a3b8; }
+
+  /* ─── MOVE BUTTONS ─── */
+  .move-btns { display: flex; flex-direction: column; gap: 1px; flex-shrink: 0; margin-top: 2px; }
+  .move-btn { background: none; border: 1px solid #e2e8f0; color: #94a3b8; width: 22px; height: 18px; border-radius: 4px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 10px; transition: all 0.12s; padding: 0; }
+  .move-btn:hover { background: #6366f1; color: #fff; border-color: #6366f1; }
+  .move-btn:disabled { opacity: 0.2; cursor: default; }
+  .move-btn:disabled:hover { background: none; color: #94a3b8; border-color: #e2e8f0; }
 
   /* ─── EXPANDED TASK ─── */
   .task-expanded-wrap { overflow: hidden; transition: max-height 0.3s ease, opacity 0.2s ease; }
-  .task-expanded-wrap.open { max-height: 2000px; opacity: 1; }
+  .task-expanded-wrap.open { max-height: 3000px; opacity: 1; }
   .task-expanded-wrap.closed { max-height: 0; opacity: 0; }
-  .task-expanded { padding: 0 16px 16px; border-top: 1px solid #f1f5f9; }
+  .task-expanded { padding: 0 14px 14px; border-top: 1px solid #f1f5f9; }
   .field-label { display: block; font-size: 10px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 4px; margin-top: 14px; }
   .field-desc { font-size: 13px; color: #475569; line-height: 1.6; }
-  .field-textarea { width: 100%; border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px; font-size: 13px; outline: none; font-family: inherit; resize: vertical; min-height: 60px; transition: border-color 0.15s; }
-  .field-textarea:focus { border-color: #e4d344; box-shadow: 0 0 0 3px rgba(228,211,68,0.25); }
-  .field-input { width: 100%; border: 1px solid #e2e8f0; border-radius: 8px; padding: 8px 10px; font-size: 13px; outline: none; font-family: inherit; transition: border-color 0.15s; }
-  .field-input:focus { border-color: #e4d344; box-shadow: 0 0 0 3px rgba(228,211,68,0.25); }
-  .field-select { width: 100%; border: 1px solid #e2e8f0; border-radius: 8px; padding: 8px 10px; font-size: 13px; outline: none; font-family: inherit; cursor: pointer; background: #fff; }
+  .field-textarea { width: 100%; border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px; font-size: 13px; outline: none; font-family: inherit; resize: vertical; min-height: 60px; transition: all 0.15s; background: #fafbfc; }
+  .field-textarea:focus { border-color: #6366f1; box-shadow: 0 0 0 3px rgba(99,102,241,0.1); background: #fff; }
+  .field-input { width: 100%; border: 1px solid #e2e8f0; border-radius: 8px; padding: 8px 10px; font-size: 13px; outline: none; font-family: inherit; transition: all 0.15s; background: #fafbfc; }
+  .field-input:focus { border-color: #6366f1; box-shadow: 0 0 0 3px rgba(99,102,241,0.1); background: #fff; }
+  .field-select { width: 100%; border: 1px solid #e2e8f0; border-radius: 8px; padding: 8px 10px; font-size: 13px; outline: none; font-family: inherit; cursor: pointer; background: #fafbfc; }
   .field-row { display: flex; gap: 12px; flex-wrap: wrap; }
   .field-col { flex: 1; min-width: 140px; }
 
   /* ─── SUBTASKS ─── */
-  .subtask-item { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; padding: 2px 0; }
+  .subtask-item { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; padding: 3px 0; }
   .subtask-item:hover .subtask-delete { opacity: 1; }
-  .subtask-check { border-radius: 4px; cursor: pointer; width: 16px; height: 16px; accent-color: #e4d344; }
+  .subtask-check { border-radius: 4px; cursor: pointer; width: 16px; height: 16px; accent-color: #6366f1; }
   .subtask-text { flex: 1; font-size: 13px; background: none; border: none; outline: none; font-family: inherit; color: #334155; padding: 0; }
   .subtask-text.done { text-decoration: line-through; color: #94a3b8; }
   .subtask-delete { opacity: 0; background: none; border: none; cursor: pointer; color: #94a3b8; padding: 2px; transition: opacity 0.15s; display: flex; }
   .subtask-delete:hover { color: #ef4444; }
-  .add-subtask-btn { background: none; border: none; color: #8a7a10; font-size: 12px; cursor: pointer; display: flex; align-items: center; gap: 4px; margin-top: 4px; font-family: inherit; }
+  .add-subtask-btn { background: none; border: none; color: #6366f1; font-size: 12px; cursor: pointer; display: flex; align-items: center; gap: 4px; margin-top: 4px; font-family: inherit; font-weight: 500; }
 
   /* ─── CAPTIONS ─── */
-  .caption-tabs { display: flex; gap: 4px; margin-bottom: 8px; flex-wrap: wrap; }
-  .caption-tab { padding: 4px 10px; border-radius: 6px; font-size: 11px; font-weight: 500; border: none; cursor: pointer; transition: all 0.15s; font-family: inherit; }
-  .caption-tab.active { background: #e4d344; color: #1e293b; font-weight: 600; }
-  .caption-tab.inactive { background: #f1f5f9; color: #475569; }
-  .caption-tab.inactive:hover { background: #e2e8f0; }
-  .caption-tab .has-content { display: inline-block; width: 5px; height: 5px; border-radius: 50%; background: #22c55e; margin-left: 4px; vertical-align: middle; }
+  .caption-tabs { display: flex; gap: 3px; margin-bottom: 8px; flex-wrap: wrap; }
+  .caption-tab { padding: 4px 10px; border-radius: 6px; font-size: 11px; font-weight: 500; border: 1px solid #e2e8f0; cursor: pointer; transition: all 0.12s; font-family: inherit; background: #fff; color: #64748b; }
+  .caption-tab.active { background: #0f172a; color: #fff; border-color: #0f172a; }
+  .caption-tab.inactive:hover { background: #f1f5f9; }
 
   /* ─── ASSETS ─── */
-  .assets-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 8px; margin-top: 8px; }
+  .assets-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(90px, 1fr)); gap: 6px; margin-top: 8px; }
   .asset-thumb { position: relative; border-radius: 8px; overflow: hidden; border: 1px solid #e2e8f0; background: #f8fafc; aspect-ratio: 1; cursor: pointer; }
   .asset-thumb img { width: 100%; height: 100%; object-fit: cover; }
   .asset-thumb:hover .asset-overlay { opacity: 1; }
-  .asset-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; gap: 8px; opacity: 0; transition: opacity 0.15s; }
-  .asset-overlay button { background: rgba(255,255,255,0.9); border: none; border-radius: 6px; padding: 4px 8px; font-size: 11px; cursor: pointer; font-family: inherit; font-weight: 500; }
+  .asset-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; gap: 6px; opacity: 0; transition: opacity 0.15s; }
+  .asset-overlay button { background: rgba(255,255,255,0.95); border: none; border-radius: 6px; padding: 4px 8px; font-size: 11px; cursor: pointer; font-family: inherit; font-weight: 500; }
   .asset-overlay .del-btn { color: #ef4444; }
-  .upload-zone { border: 2px dashed #d1d5db; border-radius: 8px; padding: 14px; text-align: center; cursor: pointer; transition: all 0.15s; margin-top: 8px; }
-  .upload-zone:hover { border-color: #e4d344; background: #fdfbe8; }
+  .upload-zone { border: 2px dashed #d1d5db; border-radius: 8px; padding: 12px; text-align: center; cursor: pointer; transition: all 0.15s; margin-top: 8px; }
+  .upload-zone:hover { border-color: #6366f1; background: #f5f3ff; }
+  .upload-zone.dragging { border-color: #6366f1; background: #f5f3ff; border-style: solid; }
   .upload-zone p { font-size: 12px; color: #94a3b8; }
   .upload-zone input { display: none; }
-  .storage-note { font-size: 10px; color: #94a3b8; margin-top: 4px; }
   .lightbox { position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 60; display: flex; align-items: center; justify-content: center; cursor: pointer; }
   .lightbox img { max-width: 90vw; max-height: 90vh; border-radius: 8px; }
 
+  /* ─── DOCUMENTS ─── */
+  .doc-list { display: flex; flex-direction: column; gap: 4px; margin-top: 8px; }
+  .doc-item { display: flex; align-items: center; gap: 10px; padding: 8px 12px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 12px; }
+  .doc-item:hover { border-color: #cbd5e1; }
+  .doc-icon { font-size: 16px; flex-shrink: 0; }
+  .doc-name { flex: 1; font-weight: 500; color: #334155; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .doc-actions { display: flex; gap: 4px; flex-shrink: 0; }
+  .doc-actions a, .doc-actions button { padding: 4px 8px; border-radius: 5px; font-size: 11px; font-weight: 500; cursor: pointer; border: 1px solid #e2e8f0; background: #fff; color: #475569; text-decoration: none; transition: all 0.12s; font-family: inherit; }
+  .doc-actions a:hover, .doc-actions button:hover { background: #f1f5f9; }
+  .doc-actions button.del-btn { color: #dc2626; border-color: #fecaca; }
+  .doc-upload-zone { border: 2px dashed #d1d5db; border-radius: 8px; padding: 10px; text-align: center; cursor: pointer; margin-top: 8px; font-size: 12px; color: #94a3b8; transition: all 0.15s; }
+  .doc-upload-zone:hover { border-color: #6366f1; color: #475569; }
+  .doc-upload-zone.dragging { border-color: #6366f1; background: #f5f3ff; border-style: solid; }
+  .doc-upload-zone input { display: none; }
+
   /* ─── MODALS ─── */
-  .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.4); display: flex; align-items: center; justify-content: center; z-index: 50; padding: 16px; animation: fadeIn 0.15s ease; }
+  .modal-overlay { position: fixed; inset: 0; background: rgba(15,23,42,0.5); backdrop-filter: blur(4px); display: flex; align-items: center; justify-content: center; z-index: 50; padding: 16px; animation: fadeIn 0.15s ease; }
   @keyframes fadeIn { from{opacity:0}to{opacity:1} }
   .modal { background: #fff; border-radius: 16px; padding: 24px; width: 100%; max-width: 440px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25); animation: slideUp 0.2s ease; }
   @keyframes slideUp { from{transform:translateY(10px);opacity:0}to{transform:translateY(0);opacity:1} }
-  .modal h2 { font-size: 20px; font-weight: 700; color: #0f172a; margin-bottom: 16px; font-family: 'Cormorant Garamond', Georgia, serif; }
+  .modal h2 { font-size: 18px; font-weight: 700; color: #0f172a; margin-bottom: 16px; }
   .modal-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 20px; }
-  .modal-cancel { background: none; border: none; color: #475569; padding: 8px 16px; cursor: pointer; font-size: 13px; font-family: inherit; border-radius: 8px; }
+  .modal-cancel { background: none; border: 1px solid #e2e8f0; color: #475569; padding: 8px 16px; cursor: pointer; font-size: 13px; font-family: inherit; border-radius: 8px; }
   .modal-cancel:hover { background: #f1f5f9; }
-  .modal-confirm { background: #e4d344; color: #1e293b; border: none; padding: 8px 16px; border-radius: 8px; cursor: pointer; font-size: 13px; font-weight: 600; font-family: inherit; transition: background 0.15s; }
-  .modal-confirm:hover { background: #d4c334; }
-  .modal-confirm:disabled { opacity: 0.4; }
-  .modal-field { width: 100%; border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px; font-size: 13px; outline: none; font-family: inherit; margin-bottom: 12px; }
-  .modal-field:focus { border-color: #e4d344; box-shadow: 0 0 0 3px rgba(228,211,68,0.25); }
+  .modal-confirm { background: #0f172a; color: #fff; border: none; padding: 8px 16px; border-radius: 8px; cursor: pointer; font-size: 13px; font-weight: 600; font-family: inherit; transition: all 0.15s; }
+  .modal-confirm:hover { background: #1e293b; }
+  .modal-confirm:disabled { opacity: 0.3; }
+  .modal-field { width: 100%; border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px; font-size: 13px; outline: none; font-family: inherit; margin-bottom: 12px; background: #fafbfc; }
+  .modal-field:focus { border-color: #6366f1; box-shadow: 0 0 0 3px rgba(99,102,241,0.1); background: #fff; }
 
   /* ─── TOAST ─── */
   .toast-container { position: fixed; bottom: 24px; right: 24px; z-index: 70; display: flex; flex-direction: column; gap: 8px; }
-  .toast { background: #1e293b; color: #fff; padding: 10px 16px; border-radius: 10px; font-size: 13px; box-shadow: 0 8px 24px rgba(0,0,0,0.15); display: flex; align-items: center; gap: 8px; animation: toastIn 0.3s ease; }
+  .toast { background: #0f172a; color: #fff; padding: 10px 16px; border-radius: 10px; font-size: 13px; box-shadow: 0 8px 24px rgba(0,0,0,0.2); display: flex; align-items: center; gap: 8px; animation: toastIn 0.3s ease; }
   .toast.leaving { animation: toastOut 0.3s ease forwards; }
-  @keyframes toastIn { from{transform:translateY(10px);opacity:0}to{transform:translateY(0);opacity:1} }
-  @keyframes toastOut { from{transform:translateY(0);opacity:1}to{transform:translateY(10px);opacity:0} }
+  @keyframes toastIn { from{transform:translateX(20px);opacity:0}to{transform:translateX(0);opacity:1} }
+  @keyframes toastOut { from{opacity:1}to{opacity:0;transform:translateX(20px)} }
 
   /* ─── MISC ─── */
-  .sync-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+  .sync-dot { width: 7px; height: 7px; border-radius: 50%; display: inline-block; }
   .sync-live { background: #22c55e; animation: pulse 2s infinite; }
   .sync-off { background: #ef4444; }
-  @keyframes pulse { 0%,100%{opacity:1}50%{opacity:0.5} }
+  @keyframes pulse { 0%,100%{opacity:1}50%{opacity:0.4} }
   .empty-state { text-align: center; padding: 48px; color: #94a3b8; font-size: 13px; }
   .desc-edit-area { width: 100%; border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px; font-size: 13px; outline: none; font-family: inherit; resize: vertical; min-height: 60px; }
-  .desc-edit-area:focus { border-color: #e4d344; box-shadow: 0 0 0 3px rgba(228,211,68,0.25); }
-  .user-pill { display: flex; align-items: center; gap: 6px; background: #f1f5f9; padding: 4px 10px; border-radius: 999px; font-size: 11px; color: #475569; }
+  .desc-edit-area:focus { border-color: #6366f1; box-shadow: 0 0 0 3px rgba(99,102,241,0.1); }
+  .user-pill { display: flex; align-items: center; gap: 6px; background: #f1f5f9; padding: 5px 12px; border-radius: 999px; font-size: 11px; color: #475569; }
   .signout-btn { background: none; border: none; color: #94a3b8; cursor: pointer; font-size: 11px; text-decoration: underline; margin-left: 4px; font-family: inherit; }
   .export-bar { display: flex; flex-direction: column; gap: 6px; margin-top: 20px; padding-top: 16px; border-top: 1px solid #e2e8f0; }
-  .btn-export { background: #f1f5f9; color: #475569; border: none; padding: 8px 14px; border-radius: 8px; font-size: 12px; font-weight: 500; cursor: pointer; font-family: inherit; text-align: left; transition: background 0.15s; }
+  .btn-export { background: #f1f5f9; color: #475569; border: none; padding: 8px 14px; border-radius: 8px; font-size: 12px; font-weight: 500; cursor: pointer; font-family: inherit; text-align: left; transition: all 0.12s; }
   .btn-export:hover { background: #e2e8f0; }
 
   /* ─── AUTH ─── */
-  .auth-screen { display: flex; align-items: center; justify-content: center; min-height: 100vh; background: linear-gradient(135deg, #f8fafc 0%, #fdfbe8 100%); }
+  .auth-screen { display: flex; align-items: center; justify-content: center; min-height: 100vh; background: linear-gradient(135deg, #f1f5f9 0%, #e0e7ff 100%); }
   .auth-card { background: #fff; border-radius: 16px; padding: 40px; width: 100%; max-width: 380px; box-shadow: 0 4px 24px rgba(0,0,0,0.08); text-align: center; }
-  .auth-card h1 { font-size: 26px; font-weight: 700; margin-bottom: 4px; font-family: 'Cormorant Garamond', Georgia, serif; }
+  .auth-card h1 { font-size: 24px; font-weight: 700; margin-bottom: 4px; font-family: 'Cormorant Garamond', Georgia, serif; }
   .auth-card p { font-size: 13px; color: #94a3b8; margin-bottom: 24px; }
-  .auth-input { width: 100%; padding: 10px 14px; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 14px; outline: none; font-family: inherit; margin-bottom: 12px; transition: border-color 0.15s; }
-  .auth-input:focus { border-color: #e4d344; box-shadow: 0 0 0 3px rgba(228,211,68,0.25); }
-  .auth-btn { width: 100%; padding: 12px; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; font-family: inherit; border: none; background: #e4d344; color: #1e293b; transition: all 0.15s; margin-bottom: 8px; }
-  .auth-btn:hover { background: #d4c334; }
-  .auth-btn:disabled { opacity: 0.5; }
-  .auth-btn-google { background: #fff; color: #1e293b; border: 1px solid #e2e8f0; display: flex; align-items: center; justify-content: center; gap: 8px; }
-  .auth-btn-google:hover { background: #f8fafc; }
+  .auth-input { width: 100%; padding: 10px 14px; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 14px; outline: none; font-family: inherit; margin-bottom: 12px; background: #fafbfc; }
+  .auth-input:focus { border-color: #6366f1; box-shadow: 0 0 0 3px rgba(99,102,241,0.1); background: #fff; }
+  .auth-btn { width: 100%; padding: 12px; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; font-family: inherit; border: none; background: #0f172a; color: #fff; transition: all 0.15s; margin-bottom: 8px; }
+  .auth-btn:hover { background: #1e293b; }
+  .auth-btn:disabled { opacity: 0.4; }
   .auth-toggle { font-size: 13px; color: #64748b; margin-top: 12px; }
-  .auth-toggle button { background: none; border: none; color: #8a7a10; cursor: pointer; font-family: inherit; font-size: 13px; text-decoration: underline; }
+  .auth-toggle button { background: none; border: none; color: #6366f1; cursor: pointer; font-family: inherit; font-size: 13px; text-decoration: underline; }
   .auth-error { color: #ef4444; font-size: 12px; margin-bottom: 8px; }
   .loading-screen { display: flex; align-items: center; justify-content: center; min-height: 100vh; color: #94a3b8; }
 
   /* ─── REVIEW BADGES ─── */
-  .review-badge { display: inline-flex; align-items: center; gap: 4px; font-size: 10px; font-weight: 600; padding: 2px 8px; border-radius: 999px; text-transform: uppercase; letter-spacing: 0.04em; }
+  .review-badge { display: inline-flex; align-items: center; gap: 4px; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 6px; text-transform: uppercase; letter-spacing: 0.03em; }
   .review-badge.rb-submitted { background: #dbeafe; color: #1d4ed8; }
   .review-badge.rb-resubmitted { background: #ede9fe; color: #7c3aed; }
   .review-badge.rb-approved { background: #dcfce7; color: #15803d; }
   .review-badge.rb-needs_changes { background: #fef2f2; color: #dc2626; }
 
-  /* ─── MEDIA VIEWER (SLIDESHOW) ─── */
+  /* ─── MEDIA VIEWER ─── */
   .media-viewer { margin-top: 8px; }
-  .media-type-row { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
-  .media-type-select { padding: 4px 10px; border: 1px solid #e2e8f0; border-radius: 6px; font-size: 12px; font-family: inherit; cursor: pointer; background: #fff; outline: none; }
   .slideshow { position: relative; background: #0f172a; border-radius: 12px; overflow: hidden; aspect-ratio: 4/5; max-height: 500px; display: flex; align-items: center; justify-content: center; }
   .slideshow img, .slideshow video { max-width: 100%; max-height: 100%; object-fit: contain; }
-  .slideshow-nav { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(255,255,255,0.85); border: none; width: 36px; height: 36px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 18px; color: #1e293b; transition: all 0.15s; box-shadow: 0 2px 8px rgba(0,0,0,0.15); z-index: 2; }
+  .slideshow-nav { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(255,255,255,0.9); border: none; width: 36px; height: 36px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 18px; color: #1e293b; transition: all 0.15s; box-shadow: 0 2px 8px rgba(0,0,0,0.15); z-index: 2; }
   .slideshow-nav:hover { background: #fff; transform: translateY(-50%) scale(1.1); }
   .slideshow-nav.prev { left: 10px; }
   .slideshow-nav.next { right: 10px; }
   .slideshow-counter { position: absolute; bottom: 10px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.6); color: #fff; font-size: 12px; font-weight: 500; padding: 3px 12px; border-radius: 999px; z-index: 2; }
   .slideshow-thumbs { display: flex; gap: 6px; margin-top: 8px; overflow-x: auto; padding: 4px 0; }
   .slideshow-thumb { width: 56px; height: 56px; border-radius: 6px; overflow: hidden; border: 2px solid transparent; cursor: pointer; flex-shrink: 0; transition: border-color 0.15s; }
-  .slideshow-thumb.active { border-color: #e4d344; }
+  .slideshow-thumb.active { border-color: #6366f1; }
   .slideshow-thumb img { width: 100%; height: 100%; object-fit: cover; }
   .single-media { border-radius: 12px; overflow: hidden; background: #0f172a; max-height: 500px; display: flex; align-items: center; justify-content: center; }
   .single-media img, .single-media video { max-width: 100%; max-height: 500px; object-fit: contain; }
@@ -275,13 +304,13 @@
   .rm-close { position: absolute; top: 12px; right: 12px; width: 32px; height: 32px; border-radius: 50%; border: none; background: rgba(255,255,255,0.9); cursor: pointer; font-size: 20px; color: #475569; z-index: 201; display: flex; align-items: center; justify-content: center; transition: all 0.15s; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
   .rm-close:hover { background: #fff; transform: scale(1.1); color: #0f172a; }
   .rm-body { display: flex; flex: 1; overflow: hidden; min-height: 0; }
-  .rm-left { flex: 0 0 65%; background: #0f172a; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 24px; overflow-y: auto; position: relative; }
+  .rm-left { flex: 0 0 65%; background: #0f172a; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 24px; overflow-y: auto; }
   .rm-left .slideshow { max-height: 600px; width: 100%; aspect-ratio: 4/5; }
   .rm-left .single-media { max-height: 600px; width: 100%; }
   .rm-left .single-media img { max-height: 600px; }
   .rm-left .video-player { width: 100%; }
   .rm-left .video-player video { max-height: 600px; }
-  .rm-right { flex: 0 0 35%; display: flex; flex-direction: column; overflow-y: auto; overflow-x: hidden; border-left: 1px solid #e2e8f0; min-width: 0; }
+  .rm-right { flex: 0 0 35%; display: flex; flex-direction: column; overflow-y: auto; border-left: 1px solid #e2e8f0; }
   .rm-right-inner { padding: 24px; display: flex; flex-direction: column; gap: 20px; flex: 1; }
   .rm-header { display: flex; flex-direction: column; gap: 8px; }
   .rm-title { font-size: 18px; font-weight: 700; font-family: 'Cormorant Garamond', Georgia, serif; color: #0f172a; margin: 0; }
@@ -290,9 +319,9 @@
   .rm-section-title { font-size: 10px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.06em; }
   .rm-caption-tabs { display: flex; gap: 4px; flex-wrap: wrap; }
   .rm-caption-tab { padding: 5px 10px; border-radius: 6px; font-size: 11px; font-weight: 600; cursor: pointer; border: 1px solid #e2e8f0; background: #fff; color: #64748b; transition: all 0.15s; position: relative; }
-  .rm-caption-tab.active { background: #e4d344; color: #1e1b4b; border-color: #e4d344; }
+  .rm-caption-tab.active { background: #0f172a; color: #fff; border-color: #0f172a; }
   .rm-caption-tab .has-dot { position: absolute; top: 3px; right: 3px; width: 5px; height: 5px; border-radius: 50%; background: #22c55e; }
-  .rm-caption-text { padding: 12px; background: #f8fafc; border-radius: 8px; font-size: 13px; line-height: 1.6; color: #334155; max-height: 200px; overflow-y: auto; white-space: pre-wrap; word-break: break-word; overflow-wrap: break-word; }
+  .rm-caption-text { padding: 12px; background: #f8fafc; border-radius: 8px; font-size: 13px; line-height: 1.6; color: #334155; max-height: 200px; overflow-y: auto; white-space: pre-wrap; word-break: break-word; }
   .rm-caption-empty { color: #cbd5e1; font-style: italic; }
   .rm-actions { display: flex; flex-direction: column; gap: 8px; }
   .rm-divider { height: 1px; background: #e2e8f0; margin: 0; }
@@ -300,8 +329,8 @@
   .btn-review { padding: 8px 16px; border-radius: 8px; font-size: 12px; font-weight: 600; cursor: pointer; border: none; font-family: inherit; transition: all 0.15s; display: flex; align-items: center; gap: 5px; }
   .btn-review:hover { transform: translateY(-1px); box-shadow: 0 2px 8px rgba(0,0,0,0.12); }
   .btn-review:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
-  .btn-submit-review { background: #3b82f6; color: #fff; }
-  .btn-submit-review:hover { background: #2563eb; }
+  .btn-submit-review { background: #6366f1; color: #fff; }
+  .btn-submit-review:hover { background: #4f46e5; }
   .btn-approve { background: #22c55e; color: #fff; }
   .btn-approve:hover { background: #16a34a; }
   .btn-request-changes { background: #f59e0b; color: #fff; }
@@ -309,11 +338,10 @@
   .btn-resubmit { background: #7c3aed; color: #fff; }
   .btn-resubmit:hover { background: #6d28d9; }
   .review-note-input { width: 100%; border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px; font-size: 13px; outline: none; font-family: inherit; resize: vertical; min-height: 50px; margin-bottom: 8px; box-sizing: border-box; }
-  .review-note-input:focus { border-color: #e4d344; box-shadow: 0 0 0 3px rgba(228,211,68,0.25); }
+  .review-note-input:focus { border-color: #6366f1; box-shadow: 0 0 0 3px rgba(99,102,241,0.1); }
   .review-history { display: flex; flex-direction: column; gap: 6px; }
-  .review-history-title { font-size: 10px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 4px; }
   .review-entry { padding: 10px 12px; border-radius: 8px; font-size: 12px; line-height: 1.5; }
-  .review-entry.re-submit, .review-entry.re-resubmit { background: #eff6ff; border-left: 3px solid #3b82f6; }
+  .review-entry.re-submit, .review-entry.re-resubmit { background: #eff6ff; border-left: 3px solid #6366f1; }
   .review-entry.re-changes { background: #fffbeb; border-left: 3px solid #f59e0b; }
   .review-entry.re-approve { background: #f0fdf4; border-left: 3px solid #22c55e; }
   .review-entry-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px; }
@@ -328,28 +356,8 @@
   .review-entry-img-comments { margin-top: 6px; padding-top: 6px; border-top: 1px solid rgba(0,0,0,0.06); }
   .review-entry-img-comment { font-size: 11px; color: #64748b; padding: 2px 0; }
   .review-entry-img-comment strong { color: #475569; }
-  .stat-review { background: #eff6ff; color: #1d4ed8; }
-  .btn-open-review { display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px; border-radius: 8px; font-size: 12px; font-weight: 600; cursor: pointer; border: 1px solid #e2e8f0; background: #f8fafc; color: #475569; font-family: inherit; transition: all 0.15s; margin-top: 12px; }
-  .btn-open-review:hover { background: #e4d344; color: #1e1b4b; border-color: #e4d344; }
-
-  /* ─── DRAG & DROP ─── */
-  .upload-zone.dragging { border-color: #e4d344; background: #fffbeb; border-style: solid; }
-
-  /* ─── DOCUMENTS ─── */
-  .doc-list { display: flex; flex-direction: column; gap: 6px; margin-top: 8px; }
-  .doc-item { display: flex; align-items: center; gap: 10px; padding: 8px 12px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 12px; transition: all 0.15s; }
-  .doc-item:hover { border-color: #cbd5e1; background: #f1f5f9; }
-  .doc-icon { font-size: 18px; flex-shrink: 0; }
-  .doc-name { flex: 1; font-weight: 500; color: #334155; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .doc-actions { display: flex; gap: 4px; flex-shrink: 0; }
-  .doc-actions a, .doc-actions button { padding: 4px 8px; border-radius: 5px; font-size: 11px; font-weight: 500; cursor: pointer; border: 1px solid #e2e8f0; background: #fff; color: #475569; text-decoration: none; transition: all 0.15s; font-family: inherit; }
-  .doc-actions a:hover, .doc-actions button:hover { background: #f1f5f9; }
-  .doc-actions button.del-btn { color: #dc2626; border-color: #fecaca; }
-  .doc-actions button.del-btn:hover { background: #fef2f2; }
-  .doc-upload-zone { border: 2px dashed #d1d5db; border-radius: 8px; padding: 10px; text-align: center; cursor: pointer; margin-top: 8px; font-size: 12px; color: #94a3b8; transition: all 0.15s; }
-  .doc-upload-zone:hover { border-color: #e4d344; color: #475569; }
-  .doc-upload-zone.dragging { border-color: #e4d344; background: #fffbeb; border-style: solid; }
-  .doc-upload-zone input { display: none; }
+  .btn-open-review { display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px; border-radius: 8px; font-size: 12px; font-weight: 600; cursor: pointer; border: 1px solid #c7d2fe; background: #eef2ff; color: #4338ca; font-family: inherit; transition: all 0.15s; margin-top: 12px; }
+  .btn-open-review:hover { background: #6366f1; color: #fff; border-color: #6366f1; }
 
   /* ─── KEYBOARD HELP ─── */
   .shortcuts-help { font-size: 10px; color: #cbd5e1; display: flex; gap: 12px; padding: 8px 0 0; flex-wrap: wrap; }
@@ -367,7 +375,7 @@
     .task-preview { max-width: 280px; }
     .header-inner { padding: 12px 16px; }
     .main { padding: 16px; }
-    .stat-badges { display: none; }
+    .stat-pills { display: none; }
     .toast-container { bottom: 12px; right: 12px; left: 12px; }
     .rm-body { flex-direction: column; }
     .rm-left { flex: 0 0 auto; max-height: 50vh; padding: 16px; }
@@ -375,23 +383,25 @@
     .rm-right-inner { padding: 16px; }
     .rm-overlay { padding: 8px; }
     .rm-modal { max-height: 95vh; }
+    .drag-handle { display: none; }
   }
 </style>
 </head>
 <body>
 <div id="root"></div>
-
 <script type="text/babel">
 const { useState, useEffect, useRef, useCallback, useMemo } = React;
 
-/* ╔════════════════════════════════════════════════════════════╗
-   ║  SUPABASE CONFIG                                          ║
-   ╚════════════════════════════════════════════════════════════╝ */
+/* ═══════════════════════════════════════════════════════════
+   SUPABASE CONFIG
+   ═══════════════════════════════════════════════════════════ */
 const SUPABASE_URL = "https://zlnmhrxcszyqoxdwzwiq.supabase.co";
 const SUPABASE_ANON_KEY = "sb_publishable_X_gtNEHE0TMkFUbeIhmxsw_O7VfiQWf";
 const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-/* ============================================================ */
+/* ═══════════════════════════════════════════════════════════
+   CONSTANTS
+   ═══════════════════════════════════════════════════════════ */
 const PLATFORMS = ["Instagram/TikTok", "Twitter/X", "Facebook", "LinkedIn", "YouTube", "Threads", "Bluesky"];
 const PLATFORM_LIMITS = { "Threads": 500, "Bluesky": 300 };
 const STATUSES = ["todo", "in_progress", "waiting", "done"];
@@ -401,34 +411,19 @@ const EMPTY_CAPTIONS = {"Instagram/TikTok":"","Twitter/X":"",Facebook:"",LinkedI
 const REVIEW_STATUSES = { none:"none", submitted:"submitted", resubmitted:"resubmitted", needs_changes:"needs_changes", approved:"approved" };
 const REVIEW_LABELS = { none:"", submitted:"Review Needed", resubmitted:"Review Needed", needs_changes:"Needs Changes", approved:"Approved" };
 const MEDIA_TYPES = ["single","carousel","video"];
+const PRIORITIES = ["high","medium","low"];
 
 const defaultTasks = [
-  { title: "David Wallace Q&A Post", category: "Metascience / Articles", status: "todo", priority: "high", deadline: "", description: "Post the David Wallace Q&A. This is FLI/Metascience work \u2014 tag accordingly.", notes: "", captions: {...EMPTY_CAPTIONS}, review_status:"none", review_notes:[], media_type:"single", doc_urls:[], subtasks: [{ text: "Draft caption for each platform", done: false }, { text: "Tag under FLI/Metascience", done: false }, { text: "Schedule post", done: false }], image_urls: [] },
-  { title: "Catalina Press Release Post", category: "Metascience / Articles", status: "todo", priority: "high", deadline: "", description: "Press release is up. Use the photo from the press release for the social post.", notes: "Photo available in the press release.", captions: {...EMPTY_CAPTIONS}, review_status:"none", review_notes:[], media_type:"single", doc_urls:[], subtasks: [{ text: "Pull photo from press release", done: false }, { text: "Write captions", done: false }, { text: "Post", done: false }], image_urls: [] },
-  { title: "Risk Aversion in Science Research Article", category: "Metascience / Articles", status: "waiting", priority: "high", deadline: "Before March (tentative)", description: "Zeeya edited article on risk aversion. Title like \"Risk GM\u2026\". Waiting for writer approval. Draft available \u2014 DO NOT publish yet.", notes: "Can draft post now. DO NOT publish until writer approves.", captions: {...EMPTY_CAPTIONS}, review_status:"none", review_notes:[], media_type:"single", doc_urls:[], subtasks: [{ text: "Review draft article", done: false }, { text: "Draft social post (hold for approval)", done: false }, { text: "Get confirmation from Zeeya", done: false }, { text: "Publish", done: false }], image_urls: [] },
-  { title: "FQxI Member Survey Report (Peer Review)", category: "Metascience / Articles", status: "waiting", priority: "high", deadline: "Before March (likely)", description: "Zeeya's long report on member survey about peer review. Likely before March.", notes: "On radar. Zeeya putting together.", captions: {...EMPTY_CAPTIONS}, review_status:"none", review_notes:[], media_type:"single", doc_urls:[], subtasks: [{ text: "Receive report from Zeeya", done: false }, { text: "Pull key points", done: false }, { text: "Draft promotion posts", done: false }, { text: "Post", done: false }], image_urls: [] },
-  { title: "Fred Adams Q&A (Miriam Frankel)", category: "Pending / Waiting", status: "waiting", priority: "medium", deadline: "TBD", description: "Pinned \u2014 needs research to decide if priority now.", notes: "\u26a0\ufe0f Question mark. Do more research.", captions: {...EMPTY_CAPTIONS}, review_status:"none", review_notes:[], media_type:"single", doc_urls:[], subtasks: [{ text: "Research priority", done: false }, { text: "Decide timeline", done: false }], image_urls: [] },
-  { title: "Brandon Ogbunu Article", category: "Pending / Waiting", status: "waiting", priority: "medium", deadline: "March/April", description: "Zeeya hasn't sent it yet.", notes: "Waiting on Zeeya.", captions: {...EMPTY_CAPTIONS}, review_status:"none", review_notes:[], media_type:"single", doc_urls:[], subtasks: [{ text: "Receive article", done: false }, { text: "Review and draft post", done: false }, { text: "Post", done: false }], image_urls: [] },
-  { title: "Archive Story: Reducing AI Slop", category: "Pending / Waiting", status: "waiting", priority: "medium", deadline: "Could come in Feb", description: "Nicola Jones's pitch. May or may not run. Zeeya will send draft if greenlit.", notes: "Could arrive imminently.", captions: {...EMPTY_CAPTIONS}, review_status:"none", review_notes:[], media_type:"single", doc_urls:[], subtasks: [{ text: "Wait for draft", done: false }, { text: "Draft social post", done: false }, { text: "Post", done: false }], image_urls: [] },
-  { title: "Cambridge-Related Post", category: "Pending / Waiting", status: "todo", priority: "medium", deadline: "", description: "FQxI person in Cambridge social media video. Promote it.", notes: "Check Zeeya's text for details.", captions: {...EMPTY_CAPTIONS}, review_status:"none", review_notes:[], media_type:"single", doc_urls:[], subtasks: [{ text: "Get video link from Zeeya", done: false }, { text: "Draft post", done: false }, { text: "Post", done: false }], image_urls: [] },
-  { title: "RSA Competition Winner Profiles (Daily Posts)", category: "Active / Daily", status: "in_progress", priority: "high", deadline: "Next ~7 days", description: "One post per day. Headshot + quote per winner.", notes: "ACTIVE daily schedule. Rishabh Ghosh done.", captions: {...EMPTY_CAPTIONS}, review_status:"none", review_notes:[], media_type:"single", doc_urls:[], subtasks: [{ text: "Rishabh Ghosh profile", done: true }, { text: "Winner 2", done: false }, { text: "Winner 3", done: false }, { text: "Winner 4", done: false }, { text: "Winner 5", done: false }, { text: "Winner 6", done: false }, { text: "Winner 7", done: false }, { text: "Winner 8", done: false }], image_urls: [] },
-  { title: "Paradox Reels \u2014 Edit & Post Winner Interviews", category: "Paradox Reels", status: "waiting", priority: "high", deadline: "After Saturday's interview", description: "5 done, 3 declined. Clip per winner (<90s) + possible 10-min narrative.", notes: "Can't edit until Saturday.", captions: {...EMPTY_CAPTIONS}, review_status:"none", review_notes:[], media_type:"single", doc_urls:[], subtasks: [{ text: "Final interview (Saturday)", done: false }, { text: "Edit short clips", done: false }, { text: "Consider 10-min video", done: false }, { text: "Posting strategy", done: false }, { text: "Post", done: false }], image_urls: [] },
-  { title: "Fulcrum Grant Outreach (20th Anniversary)", category: "FQxI 20th Anniversary", status: "in_progress", priority: "medium", deadline: "Ongoing", description: "Outreach to past 10 years of Fulcrum grant winners.", notes: "Some replied. Keep emailing.", captions: {...EMPTY_CAPTIONS}, review_status:"none", review_notes:[], media_type:"single", doc_urls:[], subtasks: [{ text: "Send more emails", done: false }, { text: "Follow up", done: false }, { text: "Collect videos", done: false }], image_urls: [] },
-  { title: "Edit Anniversary Videos", category: "FQxI 20th Anniversary", status: "in_progress", priority: "medium", deadline: "Ongoing", description: "Editing videos from grant winners.", notes: "", captions: {...EMPTY_CAPTIONS}, review_status:"none", review_notes:[], media_type:"single", doc_urls:[], subtasks: [{ text: "Edit received videos", done: false }, { text: "Format for social", done: false }], image_urls: [] },
-  { title: "Brainstorm FQxI at 20 Celebration Ideas", category: "FQxI 20th Anniversary", status: "todo", priority: "medium", deadline: "", description: "What else can we do for the 20th?", notes: "Open brainstorm.", captions: {...EMPTY_CAPTIONS}, review_status:"none", review_notes:[], media_type:"single", doc_urls:[], subtasks: [{ text: "Brainstorm ideas", done: false }, { text: "Pick top 2\u20133", done: false }, { text: "Plan execution", done: false }], image_urls: [] },
-  { title: "Elise Crull Video Edit (Perimeter)", category: "Perimeter / Video", status: "todo", priority: "medium", deadline: "", description: "Video needs editing.", notes: "", captions: {...EMPTY_CAPTIONS}, review_status:"none", review_notes:[], media_type:"single", doc_urls:[], subtasks: [{ text: "Edit video", done: false }, { text: "Draft post", done: false }, { text: "Post", done: false }], image_urls: [] },
-  { title: "Katie's Videos (\u00d72)", category: "Perimeter / Video", status: "waiting", priority: "low", deadline: "TBD", description: "Book video (hold until published) + SciComm video.", notes: "SciComm may be ready sooner.", captions: {...EMPTY_CAPTIONS}, review_status:"none", review_notes:[], media_type:"single", doc_urls:[], subtasks: [{ text: "Check SciComm video", done: false }, { text: "Book video \u2014 wait", done: false }], image_urls: [] },
-  { title: "Bernard Carr \u2014 Podcast Promo Post", category: "Perimeter / Video", status: "in_progress", priority: "medium", deadline: "", description: "Hook: \"Hawking's student studying poltergeists.\" Instagram carousel + Twitter.", notes: "Slides 1\u20132 have quotes.", captions: {...EMPTY_CAPTIONS}, review_status:"none", review_notes:[], media_type:"single", doc_urls:[], subtasks: [{ text: "Finalise hook", done: false }, { text: "Pull quotes", done: false }, { text: "Design carousel", done: false }, { text: "Twitter/X format", done: false }, { text: "Post", done: false }], image_urls: [] },
-  { title: "XPANSE Video Clips", category: "Lower Priority", status: "todo", priority: "low", deadline: "", description: "Repurpose into something engaging.", notes: "Raw clips are boring.", captions: {...EMPTY_CAPTIONS}, review_status:"none", review_notes:[], media_type:"single", doc_urls:[], subtasks: [{ text: "Brainstorm repurposing", done: false }, { text: "Edit", done: false }, { text: "Post", done: false }], image_urls: [] },
-  { title: "Upload Old Posts to New Cloud Storage", category: "Lower Priority", status: "todo", priority: "low", deadline: "", description: "Migrate to new FQxI admin cloud.", notes: "", captions: {...EMPTY_CAPTIONS}, review_status:"none", review_notes:[], media_type:"single", doc_urls:[], subtasks: [{ text: "Identify what to migrate", done: false }, { text: "Upload", done: false }, { text: "Verify", done: false }], image_urls: [] },
-  { title: "Build a Content Plan / Calendar", category: "Strategic / Ongoing", status: "todo", priority: "medium", deadline: "", description: "Proper content plan + engagement ideas.", notes: "", captions: {...EMPTY_CAPTIONS}, review_status:"none", review_notes:[], media_type:"single", doc_urls:[], subtasks: [{ text: "Outline cadence", done: false }, { text: "Brainstorm engagement", done: false }, { text: "Build calendar", done: false }], image_urls: [] },
-  { title: "Study Quanta Magazine's Instagram", category: "Strategic / Ongoing", status: "todo", priority: "medium", deadline: "", description: "Study @quantamag for inspiration.", notes: "What makes their posts work?", captions: {...EMPTY_CAPTIONS}, review_status:"none", review_notes:[], media_type:"single", doc_urls:[], subtasks: [{ text: "Review posts", done: false }, { text: "Note what works", done: false }, { text: "Adapt ideas", done: false }], image_urls: [] },
-  { title: "QSpace Forums \u2014 Backup Content", category: "Strategic / Ongoing", status: "todo", priority: "low", deadline: "Ongoing", description: "Fallback: physics announcement board for shareable content.", notes: "Jobs, conferences, courses.", captions: {...EMPTY_CAPTIONS}, review_status:"none", review_notes:[], media_type:"single", doc_urls:[], subtasks: [{ text: "Bookmark board", done: false }, { text: "Check periodically", done: false }], image_urls: [] },
+  { title: "David Wallace Q&A Post", category: "Metascience / Articles", status: "todo", priority: "high", deadline: "", description: "Post the David Wallace Q&A. This is FLI/Metascience work — tag accordingly.", notes: "", captions: {...EMPTY_CAPTIONS}, review_status:"none", review_notes:[], media_type:"single", doc_urls:[], subtasks: [{ text: "Draft caption for each platform", done: false }, { text: "Tag under FLI/Metascience", done: false }, { text: "Schedule post", done: false }], image_urls: [], sort_order: 0 },
+  { title: "Catalina Press Release Post", category: "Metascience / Articles", status: "todo", priority: "high", deadline: "", description: "Press release is up. Use the photo from the press release for the social post.", notes: "Photo available in the press release.", captions: {...EMPTY_CAPTIONS}, review_status:"none", review_notes:[], media_type:"single", doc_urls:[], subtasks: [{ text: "Pull photo from press release", done: false }, { text: "Write captions", done: false }, { text: "Post", done: false }], image_urls: [], sort_order: 1 },
+  { title: "RSA Competition Winner Profiles (Daily Posts)", category: "Active / Daily", status: "in_progress", priority: "high", deadline: "Next ~7 days", description: "One post per day. Headshot + quote per winner.", notes: "ACTIVE daily schedule.", captions: {...EMPTY_CAPTIONS}, review_status:"none", review_notes:[], media_type:"single", doc_urls:[], subtasks: [{ text: "Winner 2", done: false }, { text: "Winner 3", done: false }], image_urls: [], sort_order: 2 },
+  { title: "Risk Aversion in Science Research Article", category: "Metascience / Articles", status: "waiting", priority: "high", deadline: "Before March", description: "Zeeya edited article on risk aversion. Waiting for writer approval.", notes: "Can draft post now. DO NOT publish until writer approves.", captions: {...EMPTY_CAPTIONS}, review_status:"none", review_notes:[], media_type:"single", doc_urls:[], subtasks: [], image_urls: [], sort_order: 3 },
+  { title: "Build a Content Plan / Calendar", category: "Strategic / Ongoing", status: "todo", priority: "medium", deadline: "", description: "Proper content plan + engagement ideas.", notes: "", captions: {...EMPTY_CAPTIONS}, review_status:"none", review_notes:[], media_type:"single", doc_urls:[], subtasks: [], image_urls: [], sort_order: 4 },
 ];
 
-/* ============================================================
+/* ═══════════════════════════════════════════════════════════
    ICONS
-   ============================================================ */
+   ═══════════════════════════════════════════════════════════ */
 const IC = {
   chevronDown: <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M6 9l6 6 6-6"/></svg>,
   chevronRight: <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 18l6-6-6-6"/></svg>,
@@ -443,11 +438,13 @@ const IC = {
   collapse: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="4 14 10 14 10 20"/><polyline points="20 10 14 10 14 4"/><line x1="14" y1="10" x2="21" y2="3"/><line x1="3" y1="21" x2="10" y2="14"/></svg>,
   expand: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/><line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/></svg>,
   menu: <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>,
+  arrowUp: <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg>,
+  arrowDown: <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12 5v14M19 12l-7 7-7-7"/></svg>,
 };
 
-/* ============================================================
+/* ═══════════════════════════════════════════════════════════
    HOOKS
-   ============================================================ */
+   ═══════════════════════════════════════════════════════════ */
 function useDebounce(fn, ms) { const t=useRef(null); return useCallback((...a)=>{clearTimeout(t.current);t.current=setTimeout(()=>fn(...a),ms);},[fn,ms]); }
 
 function useStarred() {
@@ -462,9 +459,9 @@ function useToast(){
   return{toasts,add};
 }
 
-/* ============================================================
-   COMPONENTS
-   ============================================================ */
+/* ═══════════════════════════════════════════════════════════
+   SMALL COMPONENTS
+   ═══════════════════════════════════════════════════════════ */
 function CaptionEditor({captions={},onChange}){
   const caps=captions||EMPTY_CAPTIONS;
   const[masterCaption,setMasterCaption]=useState(caps.master||"");
@@ -482,11 +479,8 @@ function CaptionEditor({captions={},onChange}){
     PLATFORMS.forEach(p=>{
       if(detachedPlatforms[p]===undefined){
         const limit=PLATFORM_LIMITS[p];
-        if(limit&&value.length>limit){
-          newCaps[p]=value.substring(0,limit-3)+"...";
-        }else{
-          newCaps[p]=value;
-        }
+        if(limit&&value.length>limit){newCaps[p]=value.substring(0,limit-3)+"...";}
+        else{newCaps[p]=value;}
       }
     });
     onChange(newCaps);
@@ -509,46 +503,24 @@ function CaptionEditor({captions={},onChange}){
     <span className="field-label">Master Caption</span>
     <p style={{fontSize:12,color:'#64748b',marginBottom:6}}>Write once, adapt per platform</p>
     <textarea className="field-textarea" placeholder="Write your main caption here..." value={masterCaption} onChange={e=>handleMasterChange(e.target.value)} rows={3}/>
-
     <div style={{marginTop:14}}>
       <span className="field-label">Platform Versions</span>
       <div className="caption-tabs">{PLATFORMS.map(p=>
-        <button key={p} className={`caption-tab ${tab===p?'active':'inactive'}`} onClick={()=>setTab(p)} title={detachedPlatforms[p]?"Detached from master":"Synced from master"} style={{position:'relative'}}>
-          {p}{detachedPlatforms[p]&&<span style={{marginLeft:4,fontSize:9,fontWeight:700,color:'#ea580c'}}>●</span>}
+        <button key={p} className={`caption-tab ${tab===p?'active':'inactive'}`} onClick={()=>setTab(p)}>
+          {p}{detachedPlatforms[p]&&<span style={{marginLeft:4,fontSize:9,fontWeight:700,color:'#ea580c'}}>*</span>}
         </button>
       )}</div>
-
-      {(() => {
+      {(()=>{
         const platform=tab;
         const limit=PLATFORM_LIMITS[platform];
         const isDetached=detachedPlatforms[platform]!==undefined;
         const currentValue=getPlatformCaption(platform);
         const charCount=currentValue.length;
         const overLimit=limit&&charCount>limit;
-        const warnings={
-          'Instagram/TikTok':'Links in captions are not clickable on Instagram',
-          'Threads':null,
-          'Bluesky':null
-        };
-
         return(<div>
-          <div style={{position:'relative',marginBottom:8}}>
-            <textarea
-              className="field-textarea"
-              placeholder={`${platform} caption...`}
-              value={currentValue}
-              onChange={e=>handlePlatformChange(platform,e.target.value)}
-              rows={2}
-              style={overLimit?{borderColor:'#ef4444',boxShadow:'0 0 0 3px rgba(239,68,68,0.2)'}:{}}
-            />
-            {isDetached&&<button className="btn-sm" onClick={()=>handleResetPlatform(platform)} style={{marginTop:6}}>↻ Reset to master</button>}
-          </div>
-
-          {limit&&<p style={{fontSize:11,marginTop:4,color:overLimit?'#ef4444':'#94a3b8',fontWeight:overLimit?600:400}}>
-            {charCount} / {limit} characters{overLimit?" — over limit!":""}
-          </p>}
-
-          {warnings[platform]&&<p style={{fontSize:11,marginTop:4,color:'#f59e0b',fontWeight:500}}>⚠️ {warnings[platform]}</p>}
+          <textarea className="field-textarea" placeholder={`${platform} caption...`} value={currentValue} onChange={e=>handlePlatformChange(platform,e.target.value)} rows={2} style={overLimit?{borderColor:'#ef4444',boxShadow:'0 0 0 3px rgba(239,68,68,0.15)'}:{}}/>
+          {isDetached&&<button className="btn-sm" onClick={()=>handleResetPlatform(platform)} style={{marginTop:6}}>Reset to master</button>}
+          {limit&&<p style={{fontSize:11,marginTop:4,color:overLimit?'#ef4444':'#94a3b8',fontWeight:overLimit?600:400}}>{charCount} / {limit}{overLimit?" — over limit!":""}</p>}
         </div>);
       })()}
     </div>
@@ -576,102 +548,47 @@ function AssetUploader({imageUrls,taskId,onUpdate,mediaType,onMediaTypeChange,ad
   const MAX_FILE_MB=50;const MAX_FILE_SIZE=MAX_FILE_MB*1024*1024;
 
   const compressVideo=(file)=>new Promise((resolve,reject)=>{
-    const video=document.createElement('video');
-    video.playsInline=true;
-    // IMPORTANT: do NOT set muted=true — that prevents audio decoding
-    video.src=URL.createObjectURL(file);
-    video.onloadedmetadata=()=>{
-      video.currentTime=0;
-      video.oncanplay=()=>{
-        const origW=video.videoWidth;const origH=video.videoHeight;
-        const maxH=720;const scale=origH>maxH?maxH/origH:1;
-        const w=Math.round(origW*scale/2)*2;const h=Math.round(origH*scale/2)*2;
-        const canvas=document.createElement('canvas');canvas.width=w;canvas.height=h;
-        const ctx=canvas.getContext('2d');
-        const canvasStream=canvas.captureStream(30);
-
-        // Audio: use AudioContext to silently capture audio
-        // createMediaElementSource takes exclusive control — audio won't play through speakers
-        let ac,dest;
-        try{
-          ac=new AudioContext();
-          const src=ac.createMediaElementSource(video); // steals audio from speakers
-          dest=ac.createMediaStreamDestination();
-          src.connect(dest); // route to capturable stream only (NOT to ac.destination = silence)
-          dest.stream.getAudioTracks().forEach(t=>canvasStream.addTrack(t));
-        }catch(e){console.warn('Audio capture failed, video will be silent:',e);}
-
-        const durSec=video.duration||60;
-        const targetBits=Math.min(2500000,Math.floor((40*8*1024*1024)/durSec));
-        let recorder;
-        const mimeTypes=['video/webm;codecs=vp8,opus','video/webm;codecs=vp9,opus','video/webm;codecs=vp8','video/webm'];
-        for(const mime of mimeTypes){try{recorder=new MediaRecorder(canvasStream,{mimeType:mime,videoBitsPerSecond:targetBits,audioBitsPerSecond:128000});break;}catch(e){}}
-        if(!recorder){reject(new Error('Browser does not support video compression'));return;}
-        const chunks=[];
-        recorder.ondataavailable=(e)=>{if(e.data.size>0)chunks.push(e.data);};
-        recorder.onstop=()=>{
-          URL.revokeObjectURL(video.src);
-          if(ac)ac.close().catch(()=>{});
-          const blob=new Blob(chunks,{type:recorder.mimeType||'video/webm'});
-          const name=file.name.replace(/\.[^.]+$/,'.webm');
-          resolve(new File([blob],name,{type:'video/webm'}));
-        };
-        recorder.onerror=(e)=>{reject(e);};
-        recorder.start(1000);
-        video.play();
-        const drawFrame=()=>{
-          if(video.ended||video.paused){recorder.stop();return;}
-          ctx.drawImage(video,0,0,w,h);
-          const pct=Math.round((video.currentTime/video.duration)*100);
-          setCompressProgress(`Compressing video... ${pct}%`);
-          requestAnimationFrame(drawFrame);
-        };
-        drawFrame();
-        video.onended=()=>{recorder.stop();};
-      };
-    };
-    video.onerror=()=>{reject(new Error('Could not load video'));};
+    const video=document.createElement('video');video.playsInline=true;video.src=URL.createObjectURL(file);
+    video.onloadedmetadata=()=>{video.currentTime=0;video.oncanplay=()=>{
+      const origW=video.videoWidth;const origH=video.videoHeight;const maxH=720;const scale=origH>maxH?maxH/origH:1;
+      const w=Math.round(origW*scale/2)*2;const h=Math.round(origH*scale/2)*2;
+      const canvas=document.createElement('canvas');canvas.width=w;canvas.height=h;const ctx=canvas.getContext('2d');
+      const canvasStream=canvas.captureStream(30);
+      let ac,dest;try{ac=new AudioContext();const src=ac.createMediaElementSource(video);dest=ac.createMediaStreamDestination();src.connect(dest);dest.stream.getAudioTracks().forEach(t=>canvasStream.addTrack(t));}catch(e){console.warn('Audio capture failed:',e);}
+      const durSec=video.duration||60;const targetBits=Math.min(2500000,Math.floor((40*8*1024*1024)/durSec));
+      let recorder;const mimeTypes=['video/webm;codecs=vp8,opus','video/webm;codecs=vp9,opus','video/webm;codecs=vp8','video/webm'];
+      for(const mime of mimeTypes){try{recorder=new MediaRecorder(canvasStream,{mimeType:mime,videoBitsPerSecond:targetBits,audioBitsPerSecond:128000});break;}catch(e){}}
+      if(!recorder){reject(new Error('Browser does not support video compression'));return;}
+      const chunks=[];recorder.ondataavailable=(e)=>{if(e.data.size>0)chunks.push(e.data);};
+      recorder.onstop=()=>{URL.revokeObjectURL(video.src);if(ac)ac.close().catch(()=>{});const blob=new Blob(chunks,{type:recorder.mimeType||'video/webm'});resolve(new File([blob],file.name.replace(/\.[^.]+$/,'.webm'),{type:'video/webm'}));};
+      recorder.onerror=(e)=>{reject(e);};recorder.start(1000);video.play();
+      const drawFrame=()=>{if(video.ended||video.paused){recorder.stop();return;}ctx.drawImage(video,0,0,w,h);const pct=Math.round((video.currentTime/video.duration)*100);setCompressProgress(`Compressing... ${pct}%`);requestAnimationFrame(drawFrame);};
+      drawFrame();video.onended=()=>{recorder.stop();};
+    };};video.onerror=()=>{reject(new Error('Could not load video'));};
   });
 
-  const autoDetect=(files)=>{
-    const imgs=files.filter(f=>f.type.startsWith('image/'));const vids=files.filter(f=>f.type.startsWith('video/'));
-    if(vids.length>0)return'video';
-    if(imgs.length>1)return'carousel';
-    if(imgs.length===1&&(imageUrls||[]).length>=1)return'carousel';
-    return'single';
-  };
+  const autoDetect=(files)=>{const vids=files.filter(f=>f.type.startsWith('video/'));if(vids.length>0)return'video';const imgs=files.filter(f=>f.type.startsWith('image/'));if(imgs.length>1)return'carousel';if(imgs.length===1&&(imageUrls||[]).length>=1)return'carousel';return'single';};
 
   const processFiles=async(files)=>{
-    if(!files.length)return;
-    const processed=[];
+    if(!files.length)return;const processed=[];
     for(const file of files){
       if(file.type.startsWith('video/')&&file.size>MAX_FILE_SIZE){
-        addToast&&addToast(`Compressing ${file.name} (${(file.size/1048576).toFixed(0)}MB)...`);
-        setCompressProgress('Compressing video... 0%');
-        try{
-          const compressed=await compressVideo(file);
-          setCompressProgress(null);
-          if(compressed.size>MAX_FILE_SIZE){
-            addToast&&addToast(`Still ${(compressed.size/1048576).toFixed(0)}MB after compression. Try a shorter clip or compress with HandBrake.`);continue;
-          }
-          addToast&&addToast(`Compressed to ${(compressed.size/1048576).toFixed(1)}MB`);
-          processed.push(compressed);
-        }catch(e){console.error(e);setCompressProgress(null);addToast&&addToast('Compression failed — try HandBrake instead.');continue;}
-      } else if(file.size>MAX_FILE_SIZE){
-        addToast&&addToast(`${file.name} is ${(file.size/1048576).toFixed(0)}MB — max is ${MAX_FILE_MB}MB.`);continue;
-      } else {processed.push(file);}
+        addToast&&addToast(`Compressing ${file.name}...`);setCompressProgress('Compressing... 0%');
+        try{const compressed=await compressVideo(file);setCompressProgress(null);
+          if(compressed.size>MAX_FILE_SIZE){addToast&&addToast(`Still too large. Try HandBrake.`);continue;}
+          addToast&&addToast(`Compressed to ${(compressed.size/1048576).toFixed(1)}MB`);processed.push(compressed);
+        }catch(e){setCompressProgress(null);addToast&&addToast('Compression failed');continue;}
+      }else if(file.size>MAX_FILE_SIZE){addToast&&addToast(`${file.name} exceeds ${MAX_FILE_MB}MB limit.`);continue;}
+      else{processed.push(file);}
     }
-    if(!processed.length)return;
-    setUploading(true);
-    const detected=autoDetect(processed);
-    if(detected!==mt&&onMediaTypeChange)onMediaTypeChange(detected);
+    if(!processed.length)return;setUploading(true);
+    const detected=autoDetect(processed);if(detected!==mt&&onMediaTypeChange)onMediaTypeChange(detected);
     const newUrls=[...(imageUrls||[])];
     for(const file of processed){
-      const isImg=file.type.startsWith('image/');const isVid=file.type.startsWith('video/');
-      if(!isImg&&!isVid)continue;
+      const isImg=file.type.startsWith('image/');const isVid=file.type.startsWith('video/');if(!isImg&&!isVid)continue;
       const path=`tasks/${taskId}/${Date.now()}_${file.name}`;
       const{error}=await supabase.storage.from('assets').upload(path,file);
-      if(error){console.error(error);addToast&&addToast('Upload failed: '+error.message);continue;}
+      if(error){addToast&&addToast('Upload failed: '+error.message);continue;}
       const{data}=supabase.storage.from('assets').getPublicUrl(path);
       newUrls.push({url:data.publicUrl,path,name:file.name,type:isVid?'video':'image'});
     }
@@ -679,30 +596,22 @@ function AssetUploader({imageUrls,taskId,onUpdate,mediaType,onMediaTypeChange,ad
   };
 
   const handleFiles=async(e)=>{await processFiles(Array.from(e.target.files));e.target.value='';};
-  const handleDrop=async(e)=>{e.preventDefault();e.stopPropagation();setDragging(false);await processFiles(Array.from(e.dataTransfer.files));};
-  const handleDragOver=(e)=>{e.preventDefault();e.stopPropagation();setDragging(true);};
-  const handleDragLeave=(e)=>{e.preventDefault();e.stopPropagation();setDragging(false);};
-
-  const removeAsset=async(asset)=>{
-    await supabase.storage.from('assets').remove([asset.path]);
-    const remaining=(imageUrls||[]).filter(a=>a.path!==asset.path);
-    onUpdate(remaining);
-    if(remaining.length<=1&&mt==='carousel'&&onMediaTypeChange)onMediaTypeChange('single');
-  };
+  const handleDrop=async(e)=>{e.preventDefault();setDragging(false);await processFiles(Array.from(e.dataTransfer.files));};
+  const removeAsset=async(asset)=>{await supabase.storage.from('assets').remove([asset.path]);const remaining=(imageUrls||[]).filter(a=>a.path!==asset.path);onUpdate(remaining);if(remaining.length<=1&&mt==='carousel'&&onMediaTypeChange)onMediaTypeChange('single');};
 
   return(<div>
     <span className="field-label">Assets / Media</span>
-    <div style={{display:'flex',alignItems:'center',gap:8,marginBottom:8}}>
-      <span style={{fontSize:12,color:'#94a3b8'}}>Type:</span>
-      {MEDIA_TYPES.map(t=><button key={t} className="btn-sm" onClick={()=>onMediaTypeChange&&onMediaTypeChange(t)} style={mt===t?{background:'#e4d344',color:'#1e1b4b',border:'1px solid #e4d344'}:{}}>{t==='single'?'Single':t==='carousel'?'Carousel':'Video'}</button>)}
+    <div style={{display:'flex',alignItems:'center',gap:6,marginBottom:8}}>
+      <span style={{fontSize:11,color:'#94a3b8'}}>Type:</span>
+      {MEDIA_TYPES.map(t=><button key={t} className="btn-sm" onClick={()=>onMediaTypeChange&&onMediaTypeChange(t)} style={mt===t?{background:'#0f172a',color:'#fff',border:'1px solid #0f172a'}:{}}>{t==='single'?'Single':t==='carousel'?'Carousel':'Video'}</button>)}
     </div>
     {(imageUrls||[]).length>0&&<div className="assets-grid">{imageUrls.map((a,i)=><div key={i} className="asset-thumb">
       {a.type==='video'?<video src={a.url} style={{width:'100%',height:'100%',objectFit:'cover'}}/>:<img src={a.url} alt={a.name} onClick={()=>setLightbox(a)}/>}
-      <div className="asset-overlay"><button onClick={()=>setLightbox(a)}>View</button><button className="del-btn" onClick={()=>removeAsset(a)}>Delete</button></div>
+      <div className="asset-overlay"><button onClick={()=>setLightbox(a)}>View</button><button className="del-btn" onClick={()=>removeAsset(a)}>Del</button></div>
     </div>)}</div>}
-    {compressProgress&&<div style={{padding:'12px 16px',background:'#fffbeb',border:'1px solid #fcd34d',borderRadius:8,marginTop:8,fontSize:12,fontWeight:600,color:'#92400e',display:'flex',alignItems:'center',gap:8}}><span style={{width:14,height:14,border:'2px solid #fcd34d',borderTopColor:'#92400e',borderRadius:'50%',animation:'spin 0.8s linear infinite',flexShrink:0}}/>{compressProgress}</div>}
-    <div className={`upload-zone ${dragging?'dragging':''}`} onClick={()=>fileRef.current?.click()} onDragOver={handleDragOver} onDragLeave={handleDragLeave} onDrop={handleDrop}>
-      <p>{uploading?"Uploading...":<>{IC.image} {dragging?"Drop files here":<>Click or drag to upload <span style={{fontSize:10,color:'#94a3b8'}}>(large videos auto-compressed)</span></>}</>}</p>
+    {compressProgress&&<div style={{padding:'10px 14px',background:'#eef2ff',border:'1px solid #c7d2fe',borderRadius:8,marginTop:8,fontSize:12,fontWeight:600,color:'#4338ca',display:'flex',alignItems:'center',gap:8}}><span style={{width:14,height:14,border:'2px solid #c7d2fe',borderTopColor:'#4338ca',borderRadius:'50%',animation:'spin 0.8s linear infinite',flexShrink:0}}/>{compressProgress}</div>}
+    <div className={`upload-zone ${dragging?'dragging':''}`} onClick={()=>fileRef.current?.click()} onDragOver={e=>{e.preventDefault();setDragging(true);}} onDragLeave={e=>{e.preventDefault();setDragging(false);}} onDrop={handleDrop}>
+      <p>{uploading?"Uploading...":<>{IC.image} {dragging?"Drop files here":"Click or drag to upload"}</>}</p>
       <input ref={fileRef} type="file" accept="image/*,video/*" multiple onChange={handleFiles} disabled={uploading||!!compressProgress}/>
     </div>
     {lightbox&&<div className="lightbox" onClick={()=>setLightbox(null)}>{lightbox.type==='video'?<video src={lightbox.url} controls autoPlay style={{maxWidth:'90vw',maxHeight:'80vh'}} onClick={e=>e.stopPropagation()}/>:<img src={lightbox.url} alt={lightbox.name} onClick={e=>e.stopPropagation()}/>}</div>}
@@ -713,275 +622,164 @@ function DocUploader({docs,taskId,onUpdate}){
   const fileRef=useRef(null);const[uploading,setUploading]=useState(false);const[dragging,setDragging]=useState(false);
   const DOC_ACCEPT='.pdf,.doc,.docx,.txt,.rtf,.odt,.xls,.xlsx,.ppt,.pptx';
   const docIcon=(name)=>{const ext=(name||'').split('.').pop().toLowerCase();if(ext==='pdf')return'\ud83d\udcc4';if(['doc','docx'].includes(ext))return'\ud83d\udcdd';if(['xls','xlsx'].includes(ext))return'\ud83d\udcca';if(['ppt','pptx'].includes(ext))return'\ud83d\udcfd\ufe0f';return'\ud83d\udcc1';};
-
   const processFiles=async(files)=>{
-    if(!files.length)return;setUploading(true);
-    const newDocs=[...(docs||[])];
-    for(const file of files){
-      const path=`tasks/${taskId}/docs/${Date.now()}_${file.name}`;
-      const{error}=await supabase.storage.from('assets').upload(path,file);
-      if(error){console.error(error);continue;}
-      const{data}=supabase.storage.from('assets').getPublicUrl(path);
-      newDocs.push({url:data.publicUrl,path,name:file.name,size:file.size});
-    }
+    if(!files.length)return;setUploading(true);const newDocs=[...(docs||[])];
+    for(const file of files){const path=`tasks/${taskId}/docs/${Date.now()}_${file.name}`;const{error}=await supabase.storage.from('assets').upload(path,file);if(error)continue;const{data}=supabase.storage.from('assets').getPublicUrl(path);newDocs.push({url:data.publicUrl,path,name:file.name,size:file.size});}
     onUpdate(newDocs);setUploading(false);
   };
-
   const handleFiles=async(e)=>{await processFiles(Array.from(e.target.files));e.target.value='';};
-  const handleDrop=async(e)=>{e.preventDefault();e.stopPropagation();setDragging(false);await processFiles(Array.from(e.dataTransfer.files));};
+  const handleDrop=async(e)=>{e.preventDefault();setDragging(false);await processFiles(Array.from(e.dataTransfer.files));};
   const removeDoc=async(doc)=>{await supabase.storage.from('assets').remove([doc.path]);onUpdate((docs||[]).filter(d=>d.path!==doc.path));};
   const fmtSize=(bytes)=>{if(!bytes)return'';if(bytes<1024)return bytes+'B';if(bytes<1048576)return(bytes/1024).toFixed(1)+'KB';return(bytes/1048576).toFixed(1)+'MB';};
-
   return(<div>
     <span className="field-label">Documents</span>
-    {(docs||[]).length>0&&<div className="doc-list">{docs.map((d,i)=><div key={i} className="doc-item">
-      <span className="doc-icon">{docIcon(d.name)}</span>
-      <span className="doc-name" title={d.name}>{d.name}</span>
-      {d.size&&<span style={{fontSize:10,color:'#94a3b8',flexShrink:0}}>{fmtSize(d.size)}</span>}
-      <div className="doc-actions">
-        <a href={d.url} download style={{padding:'4px 8px',borderRadius:5,fontSize:11,fontWeight:500,cursor:'pointer',border:'1px solid #e2e8f0',background:'#fff',color:'#475569',textDecoration:'none'}}>Download</a>
-        <button className="del-btn" onClick={()=>removeDoc(d)}>Delete</button>
-      </div>
-    </div>)}</div>}
+    {(docs||[]).length>0&&<div className="doc-list">{docs.map((d,i)=><div key={i} className="doc-item"><span className="doc-icon">{docIcon(d.name)}</span><span className="doc-name" title={d.name}>{d.name}</span>{d.size&&<span style={{fontSize:10,color:'#94a3b8',flexShrink:0}}>{fmtSize(d.size)}</span>}<div className="doc-actions"><a href={d.url} download>Download</a><button className="del-btn" onClick={()=>removeDoc(d)}>Delete</button></div></div>)}</div>}
     <div className={`doc-upload-zone ${dragging?'dragging':''}`} onClick={()=>fileRef.current?.click()} onDragOver={e=>{e.preventDefault();setDragging(true);}} onDragLeave={e=>{e.preventDefault();setDragging(false);}} onDrop={handleDrop}>
-      {uploading?"Uploading...":dragging?"Drop documents here":"\ud83d\udcc1 Click or drag to upload documents"}
+      {uploading?"Uploading...":dragging?"Drop documents here":"Click or drag to upload documents"}
       <input ref={fileRef} type="file" accept={DOC_ACCEPT} multiple onChange={handleFiles} disabled={uploading}/>
     </div>
   </div>);
 }
 
 function MediaViewer({assets,mediaType,imageComments,onImageComment,reviewMode}){
-  const[idx,setIdx]=useState(0);
-  const[commenting,setCommenting]=useState(null);
-  const[commentDraft,setCommentDraft]=useState("");
-  const items=assets||[];
-  if(items.length===0)return null;
-  const safeIdx=Math.min(idx,items.length-1);
-
-  if(mediaType==="video"){
-    return(<div className="media-viewer"><div className="video-player"><video src={items[0]?.url} controls playsInline preload="metadata" style={{width:'100%',maxHeight:500}}>Your browser does not support video.</video></div>
-      {reviewMode&&<div style={{marginTop:6}}><button className="btn-sm" onClick={()=>{setCommenting(commenting===0?null:0);setCommentDraft("");}}>Leave comment on video</button>
-        {commenting===0&&<div className="img-comment-area"><textarea value={commentDraft} onChange={e=>setCommentDraft(e.target.value)} placeholder="Comment on this video..."/><button className="btn-sm" style={{marginTop:4}} onClick={()=>{if(commentDraft.trim()){onImageComment(0,commentDraft.trim());setCommentDraft("");setCommenting(null);}}}>Add</button></div>}
-        {imageComments?.[0]&&<div className="img-comment-existing">{imageComments[0]}</div>}
-      </div>}
-    </div>);
-  }
-
-  if(mediaType==="single"||items.length===1){
-    return(<div className="media-viewer"><div className="single-media" style={{cursor:'pointer'}}><img src={items[0]?.url} alt={items[0]?.name}/></div>
-      {reviewMode&&<div style={{marginTop:6}}><button className="btn-sm" onClick={()=>{setCommenting(commenting===0?null:0);setCommentDraft("");}}>Leave comment</button>
-        {commenting===0&&<div className="img-comment-area"><textarea value={commentDraft} onChange={e=>setCommentDraft(e.target.value)} placeholder="Comment on this image..."/><button className="btn-sm" style={{marginTop:4}} onClick={()=>{if(commentDraft.trim()){onImageComment(0,commentDraft.trim());setCommentDraft("");setCommenting(null);}}}>Add</button></div>}
-        {imageComments?.[0]&&<div className="img-comment-existing">{imageComments[0]}</div>}
-      </div>}
-    </div>);
-  }
-
-  // Carousel slideshow
-  return(<div className="media-viewer">
-    <div className="slideshow">
-      <img src={items[safeIdx]?.url} alt={items[safeIdx]?.name}/>
-      {items.length>1&&<><button className="slideshow-nav prev" onClick={()=>setIdx((safeIdx-1+items.length)%items.length)}>{"\u2039"}</button><button className="slideshow-nav next" onClick={()=>setIdx((safeIdx+1)%items.length)}>{"\u203a"}</button></>}
-      <span className="slideshow-counter">{safeIdx+1} / {items.length}</span>
-    </div>
+  const[idx,setIdx]=useState(0);const[commenting,setCommenting]=useState(null);const[commentDraft,setCommentDraft]=useState("");
+  const items=assets||[];if(items.length===0)return null;const safeIdx=Math.min(idx,items.length-1);
+  if(mediaType==="video"){return(<div className="media-viewer"><div className="video-player"><video src={items[0]?.url} controls playsInline preload="metadata" style={{width:'100%',maxHeight:500}}/></div>
+    {reviewMode&&<div style={{marginTop:6}}><button className="btn-sm" onClick={()=>{setCommenting(commenting===0?null:0);setCommentDraft("");}}>Comment on video</button>
+      {commenting===0&&<div className="img-comment-area"><textarea value={commentDraft} onChange={e=>setCommentDraft(e.target.value)} placeholder="Comment on this video..."/><button className="btn-sm" style={{marginTop:4}} onClick={()=>{if(commentDraft.trim()){onImageComment(0,commentDraft.trim());setCommentDraft("");setCommenting(null);}}}>Add</button></div>}
+      {imageComments?.[0]&&<div className="img-comment-existing">{imageComments[0]}</div>}
+    </div>}
+  </div>);}
+  if(mediaType==="single"||items.length===1){return(<div className="media-viewer"><div className="single-media"><img src={items[0]?.url} alt={items[0]?.name}/></div>
+    {reviewMode&&<div style={{marginTop:6}}><button className="btn-sm" onClick={()=>{setCommenting(commenting===0?null:0);setCommentDraft("");}}>Comment</button>
+      {commenting===0&&<div className="img-comment-area"><textarea value={commentDraft} onChange={e=>setCommentDraft(e.target.value)} placeholder="Comment on this image..."/><button className="btn-sm" style={{marginTop:4}} onClick={()=>{if(commentDraft.trim()){onImageComment(0,commentDraft.trim());setCommentDraft("");setCommenting(null);}}}>Add</button></div>}
+      {imageComments?.[0]&&<div className="img-comment-existing">{imageComments[0]}</div>}
+    </div>}
+  </div>);}
+  return(<div className="media-viewer"><div className="slideshow"><img src={items[safeIdx]?.url} alt={items[safeIdx]?.name}/>{items.length>1&&<><button className="slideshow-nav prev" onClick={()=>setIdx((safeIdx-1+items.length)%items.length)}>{"\u2039"}</button><button className="slideshow-nav next" onClick={()=>setIdx((safeIdx+1)%items.length)}>{"\u203a"}</button></>}<span className="slideshow-counter">{safeIdx+1} / {items.length}</span></div>
     <div className="slideshow-thumbs">{items.map((a,i)=><div key={i} className={`slideshow-thumb ${i===safeIdx?'active':''}`} onClick={()=>setIdx(i)}><img src={a.url} alt={a.name}/></div>)}</div>
-    {reviewMode&&<div style={{marginTop:6}}>
-      <button className="btn-sm" onClick={()=>{setCommenting(commenting===safeIdx?null:safeIdx);setCommentDraft("");}}>Comment on slide {safeIdx+1}</button>
+    {reviewMode&&<div style={{marginTop:6}}><button className="btn-sm" onClick={()=>{setCommenting(commenting===safeIdx?null:safeIdx);setCommentDraft("");}}>Comment on slide {safeIdx+1}</button>
       {commenting===safeIdx&&<div className="img-comment-area"><textarea value={commentDraft} onChange={e=>setCommentDraft(e.target.value)} placeholder={`Comment on slide ${safeIdx+1}...`}/><button className="btn-sm" style={{marginTop:4}} onClick={()=>{if(commentDraft.trim()){onImageComment(safeIdx,commentDraft.trim());setCommentDraft("");setCommenting(null);}}}>Add</button></div>}
-      {imageComments?.[safeIdx]&&<div className="img-comment-existing"><span className="img-comment-author">Comment on slide {safeIdx+1}:</span> {imageComments[safeIdx]}</div>}
+      {imageComments?.[safeIdx]&&<div className="img-comment-existing"><span className="img-comment-author">Slide {safeIdx+1}:</span> {imageComments[safeIdx]}</div>}
     </div>}
   </div>);
 }
 
+/* ═══════════════════════════════════════════════════════════
+   REVIEW MODAL
+   ═══════════════════════════════════════════════════════════ */
 function ReviewModal({task,onClose,onUpdate,userEmail,addToast}){
-  const rs=task.review_status||"none";
-  const notes=task.review_notes||[];
-  const[msg,setMsg]=useState("");
-  const[showChangesForm,setShowChangesForm]=useState(false);
-  const[imgComments,setImgComments]=useState({});
-  const[captionTab,setCaptionTab]=useState(PLATFORMS[0]);
-
+  const rs=task.review_status||"none";const notes=task.review_notes||[];
+  const[msg,setMsg]=useState("");const[showChangesForm,setShowChangesForm]=useState(false);
+  const[imgComments,setImgComments]=useState({});const[captionTab,setCaptionTab]=useState(PLATFORMS[0]);
   useEffect(()=>{const h=(e)=>{if(e.key==='Escape')onClose();};document.addEventListener('keydown',h);return()=>document.removeEventListener('keydown',h);},[onClose]);
-
-  const addReviewNote=(type,message,image_comments)=>{
-    const entry={author:userEmail,date:new Date().toISOString(),type,message};
-    if(image_comments&&Object.keys(image_comments).length>0)entry.image_comments=image_comments;
-    return[...notes,entry];
-  };
-
+  const addReviewNote=(type,message,image_comments)=>{const entry={author:userEmail,date:new Date().toISOString(),type,message};if(image_comments&&Object.keys(image_comments).length>0)entry.image_comments=image_comments;return[...notes,entry];};
   const submitForReview=()=>{onUpdate({...task,review_status:"submitted",review_notes:addReviewNote("submit",msg||"Ready for review")});setMsg("");addToast("Submitted for review");};
-  const resubmit=()=>{onUpdate({...task,review_status:"resubmitted",review_notes:addReviewNote("resubmit",msg||"Updated and resubmitted")});setMsg("");addToast("Resubmitted for review");};
-  const approve=()=>{onUpdate({...task,review_status:"approved",review_notes:addReviewNote("approve",msg||"Approved!")});setMsg("");addToast("Post approved!");};
+  const resubmit=()=>{onUpdate({...task,review_status:"resubmitted",review_notes:addReviewNote("resubmit",msg||"Updated and resubmitted")});setMsg("");addToast("Resubmitted");};
+  const approve=()=>{onUpdate({...task,review_status:"approved",review_notes:addReviewNote("approve",msg||"Approved!")});setMsg("");addToast("Approved!");};
   const requestChanges=()=>{onUpdate({...task,review_status:"needs_changes",review_notes:addReviewNote("changes",msg,imgComments)});setMsg("");setImgComments({});setShowChangesForm(false);addToast("Changes requested");};
-  const undoReview=()=>{if(!confirm("Return this task to editing? Review status will be reset."))return;onUpdate({...task,review_status:"none",review_notes:addReviewNote("undo","Returned to editing")});addToast("Returned to editing");};
+  const undoReview=()=>{if(!confirm("Return to editing?"))return;onUpdate({...task,review_status:"none",review_notes:addReviewNote("undo","Returned to editing")});addToast("Returned to editing");};
   const handleImgComment=(slideIdx,comment)=>{setImgComments(prev=>({...prev,[slideIdx]:comment}));};
-
-  const isReviewable=rs==="submitted"||rs==="resubmitted";
-  const canSubmit=rs==="none";
-  const canResubmit=rs==="needs_changes";
+  const isReviewable=rs==="submitted"||rs==="resubmitted";const canSubmit=rs==="none";const canResubmit=rs==="needs_changes";
   const formatDate=(d)=>{try{return new Date(d).toLocaleString('en-GB',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'});}catch{return d;}};
   const typeLabels={submit:"Submitted",resubmit:"Resubmitted",changes:"Changes Requested",approve:"Approved"};
   const caps=task.captions||{};
 
-  return(<div className="rm-overlay" onClick={onClose}>
-    <div className="rm-modal" onClick={e=>e.stopPropagation()}>
-      <button className="rm-close" onClick={onClose}>{"\u00d7"}</button>
-      <div className="rm-body">
-        {/* LEFT: Media preview */}
-        <div className="rm-left">
-          {(task.image_urls||[]).length>0?
-            <MediaViewer assets={task.image_urls} mediaType={task.media_type||"single"} imageComments={showChangesForm?imgComments:null} onImageComment={handleImgComment} reviewMode={showChangesForm}/>
-            :<div style={{color:'#64748b',fontSize:14,textAlign:'center',padding:40}}>No media uploaded yet.<br/>Upload images or video from the task card.</div>
-          }
+  return(<div className="rm-overlay" onClick={onClose}><div className="rm-modal" onClick={e=>e.stopPropagation()}>
+    <button className="rm-close" onClick={onClose}>{"\u00d7"}</button>
+    <div className="rm-body">
+      <div className="rm-left">{(task.image_urls||[]).length>0?<MediaViewer assets={task.image_urls} mediaType={task.media_type||"single"} imageComments={showChangesForm?imgComments:null} onImageComment={handleImgComment} reviewMode={showChangesForm}/>:<div style={{color:'#64748b',fontSize:14,textAlign:'center',padding:40}}>No media uploaded yet.</div>}</div>
+      <div className="rm-right"><div className="rm-right-inner">
+        <div className="rm-header"><h2 className="rm-title">{task.title}</h2><div className="rm-meta"><span className="task-category">{task.category}</span>{rs!=="none"&&<span className={`review-badge rb-${rs}`}>{REVIEW_LABELS[rs]}</span>}</div></div>
+        {task.description&&<div className="rm-section"><div className="rm-section-title">Description</div><p style={{fontSize:13,color:'#475569',lineHeight:1.6,margin:0}}>{task.description}</p></div>}
+        <div className="rm-divider"/>
+        <div className="rm-section"><div className="rm-section-title">Platform Captions</div><div className="rm-caption-tabs">{PLATFORMS.map(p=><button key={p} className={`rm-caption-tab ${captionTab===p?'active':''}`} onClick={()=>setCaptionTab(p)}>{p}{caps[p]?<span className="has-dot"/>:""}</button>)}</div><div className="rm-caption-text">{caps[captionTab]?caps[captionTab]:<span className="rm-caption-empty">No caption for {captionTab}.</span>}</div></div>
+        <div className="rm-divider"/>
+        <div className="rm-section"><div className="rm-section-title">Review</div>
+          {canSubmit&&<div className="rm-actions"><textarea className="review-note-input" value={msg} onChange={e=>setMsg(e.target.value)} placeholder="Optional message for reviewer..." rows={2}/><button className="btn-review btn-submit-review" onClick={submitForReview}>Submit for Review</button></div>}
+          {canResubmit&&<div className="rm-actions"><textarea className="review-note-input" value={msg} onChange={e=>setMsg(e.target.value)} placeholder="What did you change?" rows={2}/><button className="btn-review btn-resubmit" onClick={resubmit}>Resubmit for Review</button></div>}
+          {isReviewable&&<div className="rm-actions">{!showChangesForm?<div className="review-actions"><button className="btn-review btn-approve" onClick={approve}>Approve</button><button className="btn-review btn-request-changes" onClick={()=>setShowChangesForm(true)}>Request Changes</button><button className="btn-sm" onClick={undoReview} style={{color:'#94a3b8',fontSize:11}}>Undo</button></div>:<div style={{width:'100%'}}><p style={{fontSize:12,fontWeight:600,color:'#475569',marginBottom:6}}>Describe what needs changing:</p><textarea className="review-note-input" value={msg} onChange={e=>setMsg(e.target.value)} placeholder="What needs to change?" rows={3}/>{Object.keys(imgComments).length>0&&<div style={{marginBottom:8}}>{Object.entries(imgComments).map(([k,v])=><p key={k} style={{fontSize:11,color:'#64748b'}}>Slide {parseInt(k)+1}: {v}</p>)}</div>}<div style={{display:'flex',gap:8}}><button className="btn-review btn-request-changes" onClick={requestChanges} disabled={!msg.trim()}>Send Feedback</button><button className="btn-sm" onClick={()=>{setShowChangesForm(false);setImgComments({});}}>Cancel</button></div></div>}</div>}
+          {rs==="approved"&&<div className="rm-actions"><p style={{fontSize:13,color:'#15803d',fontWeight:500,margin:0}}>This post is approved and ready to go live.</p><button className="btn-sm" onClick={undoReview} style={{color:'#94a3b8',fontSize:11,marginTop:4}}>Undo approval</button></div>}
         </div>
-
-        {/* RIGHT: Review controls */}
-        <div className="rm-right">
-          <div className="rm-right-inner">
-            <div className="rm-header">
-              <h2 className="rm-title">{task.title}</h2>
-              <div className="rm-meta">
-                <span className="task-category">{task.category}</span>
-                {rs!=="none"&&<span className={`review-badge rb-${rs}`}>{REVIEW_LABELS[rs]}</span>}
-                {task.media_type&&task.media_type!=='single'&&<span style={{fontSize:10,color:'#94a3b8',textTransform:'uppercase',fontWeight:600}}>{task.media_type}</span>}
-              </div>
-            </div>
-
-            {task.description&&<div className="rm-section"><div className="rm-section-title">Description</div><p style={{fontSize:13,color:'#475569',lineHeight:1.6,margin:0}}>{task.description}</p></div>}
-
-            <div className="rm-divider"/>
-
-            <div className="rm-section">
-              <div className="rm-section-title">Platform Captions</div>
-              <div className="rm-caption-tabs">{PLATFORMS.map(p=><button key={p} className={`rm-caption-tab ${captionTab===p?'active':''}`} onClick={()=>setCaptionTab(p)}>{p}{caps[p]?<span className="has-dot"/>:""}</button>)}</div>
-              <div className="rm-caption-text">{caps[captionTab]?caps[captionTab]:<span className="rm-caption-empty">No caption for {captionTab}.</span>}</div>
-            </div>
-
-            <div className="rm-divider"/>
-
-            {/* Review Actions */}
-            <div className="rm-section">
-              <div className="rm-section-title">Review</div>
-
-              {canSubmit&&<div className="rm-actions">
-                <textarea className="review-note-input" value={msg} onChange={e=>setMsg(e.target.value)} placeholder="Optional message for reviewer..." rows={2}/>
-                <button className="btn-review btn-submit-review" onClick={submitForReview}>Submit for Review</button>
-              </div>}
-
-              {canResubmit&&<div className="rm-actions">
-                <textarea className="review-note-input" value={msg} onChange={e=>setMsg(e.target.value)} placeholder="What did you change?" rows={2}/>
-                <div style={{display:'flex',gap:8,alignItems:'center'}}><button className="btn-review btn-resubmit" onClick={resubmit}>Resubmit for Review</button></div>
-              </div>}
-
-              {isReviewable&&<div className="rm-actions">
-                {!showChangesForm?<div className="review-actions">
-                  <button className="btn-review btn-approve" onClick={approve}>Approve</button>
-                  <button className="btn-review btn-request-changes" onClick={()=>setShowChangesForm(true)}>Request Changes</button>
-                  <button className="btn-sm" onClick={undoReview} style={{color:'#94a3b8',fontSize:11}}>Undo — return to editing</button>
-                </div>:<div style={{width:'100%'}}>
-                  <p style={{fontSize:12,fontWeight:600,color:'#475569',marginBottom:6}}>Describe what needs changing. Click slides on the left to add per-image comments.</p>
-                  <textarea className="review-note-input" value={msg} onChange={e=>setMsg(e.target.value)} placeholder="What needs to change?" rows={3}/>
-                  {Object.keys(imgComments).length>0&&<div style={{marginBottom:8}}><p style={{fontSize:11,color:'#94a3b8',fontWeight:600}}>Image comments:</p>{Object.entries(imgComments).map(([k,v])=><p key={k} style={{fontSize:11,color:'#64748b'}}>Slide {parseInt(k)+1}: {v}</p>)}</div>}
-                  <div style={{display:'flex',gap:8}}><button className="btn-review btn-request-changes" onClick={requestChanges} disabled={!msg.trim()}>Send Feedback</button><button className="btn-sm" onClick={()=>{setShowChangesForm(false);setImgComments({});}}>Cancel</button></div>
-                </div>}
-              </div>}
-
-              {rs==="approved"&&<div className="rm-actions">
-                <p style={{fontSize:13,color:'#15803d',fontWeight:500,margin:0}}>This post has been approved and is ready to go live.</p>
-                <button className="btn-sm" onClick={undoReview} style={{color:'#94a3b8',fontSize:11,marginTop:4}}>Undo approval — return to editing</button>
-              </div>}
-            </div>
-
-            {/* Review History */}
-            {notes.length>0&&<>
-              <div className="rm-divider"/>
-              <div className="rm-section" style={{flex:1}}>
-                <div className="rm-section-title">Review History</div>
-                <div className="review-history">
-                  {[...notes].reverse().map((n,i)=>(
-                    <div key={i} className={`review-entry re-${n.type}`}>
-                      <div className="review-entry-header">
-                        <span className="review-entry-author">{n.author}</span>
-                        <div style={{display:'flex',alignItems:'center',gap:6}}>
-                          <span className={`review-entry-type ret-${n.type}`}>{typeLabels[n.type]||n.type}</span>
-                          <span className="review-entry-date">{formatDate(n.date)}</span>
-                        </div>
-                      </div>
-                      {n.message&&<p className="review-entry-msg">{n.message}</p>}
-                      {n.image_comments&&Object.keys(n.image_comments).length>0&&<div className="review-entry-img-comments">{Object.entries(n.image_comments).map(([k,v])=><p key={k} className="review-entry-img-comment"><strong>Slide {parseInt(k)+1}:</strong> {v}</p>)}</div>}
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </>}
-          </div>
-        </div>
-      </div>
+        {notes.length>0&&<><div className="rm-divider"/><div className="rm-section" style={{flex:1}}><div className="rm-section-title">Review History</div><div className="review-history">{[...notes].reverse().map((n,i)=>(<div key={i} className={`review-entry re-${n.type}`}><div className="review-entry-header"><span className="review-entry-author">{n.author}</span><div style={{display:'flex',alignItems:'center',gap:6}}><span className={`review-entry-type ret-${n.type}`}>{typeLabels[n.type]||n.type}</span><span className="review-entry-date">{formatDate(n.date)}</span></div></div>{n.message&&<p className="review-entry-msg">{n.message}</p>}{n.image_comments&&Object.keys(n.image_comments).length>0&&<div className="review-entry-img-comments">{Object.entries(n.image_comments).map(([k,v])=><p key={k} className="review-entry-img-comment"><strong>Slide {parseInt(k)+1}:</strong> {v}</p>)}</div>}</div>))}</div></div></>}
+      </div></div>
     </div>
-  </div>);
+  </div></div>);
 }
 
-function TaskCard({task,onUpdate,onDelete,categories,isStarred,onToggleStar,forceExpand,userEmail,addToast,onOpenReview}){
+/* ═══════════════════════════════════════════════════════════
+   TASK CARD
+   ═══════════════════════════════════════════════════════════ */
+function TaskCard({task,onUpdate,onDelete,categories,isStarred,onToggleStar,forceExpand,userEmail,addToast,onOpenReview,onMoveUp,onMoveDown,isFirst,isLast,index}){
   const[expanded,setExpanded]=useState(false);
-  const[editingTitle,setEditingTitle]=useState(false);
-  const[titleDraft,setTitleDraft]=useState(task.title);
-  const[editingDesc,setEditingDesc]=useState(false);
-  const[descDraft,setDescDraft]=useState(task.description);
-  const titleRef=useRef(null);
+  const[editingTitle,setEditingTitle]=useState(false);const[titleDraft,setTitleDraft]=useState(task.title);
+  const[editingDesc,setEditingDesc]=useState(false);const[descDraft,setDescDraft]=useState(task.description);
+  const titleRef=useRef(null);const cardRef=useRef(null);
 
   useEffect(()=>{if(editingTitle&&titleRef.current)titleRef.current.focus();},[editingTitle]);
   useEffect(()=>{if(forceExpand!==undefined)setExpanded(forceExpand);},[forceExpand]);
 
-  const done=task.subtasks?.filter(s=>s.done).length||0;
-  const total=task.subtasks?.length||0;
-  const pct=total>0?Math.round((done/total)*100):0;
+  const done=task.subtasks?.filter(s=>s.done).length||0;const total=task.subtasks?.length||0;const pct=total>0?Math.round((done/total)*100):0;
   const saveTitle=()=>{if(titleDraft.trim())onUpdate({...task,title:titleDraft.trim()});else setTitleDraft(task.title);setEditingTitle(false);};
   const saveDesc=()=>{onUpdate({...task,description:descDraft});setEditingDesc(false);};
-
   const reviewClass=(task.review_status==='submitted'||task.review_status==='resubmitted')?'review-needed':task.review_status==='approved'?'review-approved':task.review_status==='needs_changes'?'review-changes':'';
   const cardClass=`task-card ${task.status==='done'?'done':''} p-${task.priority} ${isStarred?'starred':''} ${reviewClass}`;
 
-  const handleHeaderClick=(e)=>{
-    const target=e.target;
-    if(target.closest('button')||target.closest('select')||target.closest('input')){return;}
-    setExpanded(!expanded);
+  const handleHeaderClick=(e)=>{if(e.target.closest('button')||e.target.closest('select')||e.target.closest('input'))return;setExpanded(!expanded);};
+
+  // Drag handlers
+  const handleDragStart=(e)=>{e.dataTransfer.setData('text/plain',task.id);e.dataTransfer.effectAllowed='move';cardRef.current?.classList.add('dragging');};
+  const handleDragEnd=()=>{cardRef.current?.classList.remove('dragging');};
+  const handleDragOver=(e)=>{e.preventDefault();e.dataTransfer.dropEffect='move';
+    const rect=cardRef.current?.getBoundingClientRect();if(!rect)return;
+    const midY=rect.top+rect.height/2;
+    cardRef.current.classList.remove('drag-over-top','drag-over-bottom');
+    if(e.clientY<midY)cardRef.current.classList.add('drag-over-top');
+    else cardRef.current.classList.add('drag-over-bottom');
+  };
+  const handleDragLeave=()=>{cardRef.current?.classList.remove('drag-over-top','drag-over-bottom');};
+  const handleDrop=(e)=>{e.preventDefault();cardRef.current?.classList.remove('drag-over-top','drag-over-bottom');
+    const draggedId=e.dataTransfer.getData('text/plain');if(draggedId===task.id)return;
+    const rect=cardRef.current?.getBoundingClientRect();if(!rect)return;
+    const midY=rect.top+rect.height/2;const position=e.clientY<midY?'before':'after';
+    window.dispatchEvent(new CustomEvent('task-reorder',{detail:{draggedId,targetId:task.id,position}}));
   };
 
   return(
-    <div className={cardClass}>
+    <div ref={cardRef} className={cardClass} draggable="true" onDragStart={handleDragStart} onDragEnd={handleDragEnd} onDragOver={handleDragOver} onDragLeave={handleDragLeave} onDrop={handleDrop}>
       <div className="task-header" onClick={handleHeaderClick}>
+        <div className="drag-handle" title="Drag to reorder"><div className="drag-dots"><span/><span/><span/></div></div>
+        <div className="move-btns">
+          <button className="move-btn" disabled={isFirst} onClick={e=>{e.stopPropagation();onMoveUp&&onMoveUp(task.id);}} title="Move up">{IC.arrowUp}</button>
+          <button className="move-btn" disabled={isLast} onClick={e=>{e.stopPropagation();onMoveDown&&onMoveDown(task.id);}} title="Move down">{IC.arrowDown}</button>
+        </div>
         <button className={`check-btn ${task.status==='done'?'checked':''}`} onClick={e=>{e.stopPropagation();onUpdate({...task,status:task.status==='done'?'todo':'done'});}}>{task.status==='done'&&IC.check}</button>
         <div className="task-content">
           <div className="task-title-row">
-            <button className={`star-btn ${isStarred?'active':''}`} onClick={e=>{e.stopPropagation();onToggleStar(task.id);}} title="Star this task">{isStarred?"\u2605":"\u2606"}</button>
-            {editingTitle?
-              <input ref={titleRef} className="task-title-input" value={titleDraft} onChange={e=>setTitleDraft(e.target.value)} onBlur={saveTitle} onKeyDown={e=>{if(e.key==='Enter')saveTitle();if(e.key==='Escape'){setTitleDraft(task.title);setEditingTitle(false);}}} onClick={e=>e.stopPropagation()}/>
-              :<><span className={`task-title ${task.status==='done'?'struck':''}`}>{task.title}</span><button className="edit-title-btn" onClick={e=>{e.stopPropagation();setTitleDraft(task.title);setEditingTitle(true);}}>{IC.edit}</button></>
-            }
+            <button className={`star-btn ${isStarred?'active':''}`} onClick={e=>{e.stopPropagation();onToggleStar(task.id);}}>{isStarred?"\u2605":"\u2606"}</button>
+            {editingTitle?<input ref={titleRef} className="task-title-input" value={titleDraft} onChange={e=>setTitleDraft(e.target.value)} onBlur={saveTitle} onKeyDown={e=>{if(e.key==='Enter')saveTitle();if(e.key==='Escape'){setTitleDraft(task.title);setEditingTitle(false);}}} onClick={e=>e.stopPropagation()}/>
+            :<><span className={`task-title ${task.status==='done'?'struck':''}`}>{task.title}</span><button className="edit-title-btn" onClick={e=>{e.stopPropagation();setTitleDraft(task.title);setEditingTitle(true);}}>{IC.edit}</button></>}
           </div>
           <div className="task-meta">
             {(()=>{const inReview=task.review_status==='submitted'||task.review_status==='resubmitted';
-              return inReview?
-                <span className="status-select" style={{background:'#dbeafe',color:'#1d4ed8',borderColor:'#93c5fd',cursor:'default',fontWeight:600}}>Review Needed</span>
-                :<select className={`status-select status-${task.status}`} value={task.status} onChange={e=>{e.stopPropagation();onUpdate({...task,status:e.target.value})}} onClick={e=>e.stopPropagation()}>{STATUSES.map(s=><option key={s} value={s}>{STATUS_LABELS[s]}</option>)}</select>;
+              return inReview?<span className="status-chip" style={{background:'#eef2ff',color:'#4338ca',cursor:'default',fontWeight:700}}>In Review</span>
+              :<select className={`status-chip status-${task.status}`} value={task.status} onChange={e=>{e.stopPropagation();onUpdate({...task,status:e.target.value})}} onClick={e=>e.stopPropagation()}>{STATUSES.map(s=><option key={s} value={s}>{STATUS_LABELS[s]}</option>)}</select>;
             })()}
+            <span className={`priority-badge pb-${task.priority}`}>{task.priority}</span>
             <span className="task-category">{task.category}</span>
-            {task.deadline&&<span className="task-deadline">{"\ud83d\udcc5"} {task.deadline}</span>}
-            {(task.image_urls||[]).length>0&&<span style={{fontSize:11,color:'#8a7a10'}}>{"\ud83d\uddbc\ufe0f"} {task.image_urls.length}</span>}
-            {task.review_status&&task.review_status!=='none'&&
-              <button onClick={e=>{e.stopPropagation();onOpenReview&&onOpenReview(task.id);}} style={{display:'inline-flex',alignItems:'center',gap:5,padding:'3px 10px',borderRadius:999,fontSize:11,fontWeight:600,cursor:'pointer',border:'none',background:task.review_status==='approved'?'#dcfce7':task.review_status==='needs_changes'?'#fef2f2':'#dbeafe',color:task.review_status==='approved'?'#15803d':task.review_status==='needs_changes'?'#dc2626':'#1d4ed8',transition:'all 0.15s',fontFamily:'inherit'}}>
-                {task.review_status==='approved'?'Approved — View':'Open Review'} →
-              </button>
-            }
+            {task.deadline&&<span className="task-deadline">{task.deadline}</span>}
+            {(task.image_urls||[]).length>0&&<span style={{fontSize:11,color:'#6366f1'}}>{task.image_urls.length} file{task.image_urls.length>1?'s':''}</span>}
+            {task.review_status&&task.review_status!=='none'&&<button onClick={e=>{e.stopPropagation();onOpenReview&&onOpenReview(task.id);}} style={{display:'inline-flex',alignItems:'center',gap:4,padding:'2px 8px',borderRadius:6,fontSize:10,fontWeight:700,cursor:'pointer',border:'none',background:task.review_status==='approved'?'#dcfce7':task.review_status==='needs_changes'?'#fef2f2':'#eef2ff',color:task.review_status==='approved'?'#15803d':task.review_status==='needs_changes'?'#dc2626':'#4338ca',fontFamily:'inherit'}}>{task.review_status==='approved'?'Approved':'Review'} &rarr;</button>}
           </div>
           {!expanded&&task.description&&<p className="task-preview">{task.description}</p>}
           {total>0&&<div className="progress-bar"><div className="progress-track"><div className="progress-fill" style={{width:pct+'%'}}/></div><span className="progress-label">{done}/{total}</span></div>}
         </div>
-        <button className="expand-btn" onClick={e=>{e.stopPropagation();setExpanded(!expanded);}} title={expanded?"Collapse":"Expand"}>{expanded?IC.chevronDown:IC.chevronRight}</button>
+        <button className="expand-btn" onClick={e=>{e.stopPropagation();setExpanded(!expanded);}}>{expanded?IC.chevronDown:IC.chevronRight}</button>
       </div>
       <div className={`task-expanded-wrap ${expanded?'open':'closed'}`}>
         {expanded&&<div className="task-expanded">
           <span className="field-label" style={{display:'flex',alignItems:'center',gap:6}}>Description <button className="edit-title-btn" onClick={()=>{setDescDraft(task.description);setEditingDesc(!editingDesc);}}>{IC.edit}</button></span>
-          {editingDesc?<div><textarea className="desc-edit-area" value={descDraft} onChange={e=>setDescDraft(e.target.value)} rows={3}/><div style={{display:'flex',gap:6,marginTop:4}}><button className="btn-sm" onClick={saveDesc}>Save</button><button className="btn-sm" onClick={()=>setEditingDesc(false)}>Cancel</button></div></div>:<p className="field-desc">{task.description||<span style={{color:'#cbd5e1',fontStyle:'italic'}}>No description yet.</span>}</p>}
+          {editingDesc?<div><textarea className="desc-edit-area" value={descDraft} onChange={e=>setDescDraft(e.target.value)} rows={3}/><div style={{display:'flex',gap:6,marginTop:4}}><button className="btn-sm" onClick={saveDesc}>Save</button><button className="btn-sm" onClick={()=>setEditingDesc(false)}>Cancel</button></div></div>:<p className="field-desc">{task.description||<span style={{color:'#cbd5e1',fontStyle:'italic'}}>No description.</span>}</p>}
           <span className="field-label">Notes</span>
           <textarea className="field-textarea" placeholder="Notes..." defaultValue={task.notes} onBlur={e=>onUpdate({...task,notes:e.target.value})} rows={2}/>
           <div className="field-row" style={{marginTop:12}}>
@@ -994,11 +792,8 @@ function TaskCard({task,onUpdate,onDelete,categories,isStarred,onToggleStar,forc
           <DocUploader docs={task.doc_urls||[]} taskId={task.id} onUpdate={urls=>onUpdate({...task,doc_urls:urls})}/>
           <AssetUploader imageUrls={task.image_urls||[]} taskId={task.id} onUpdate={urls=>onUpdate({...task,image_urls:urls})} mediaType={task.media_type||'single'} onMediaTypeChange={mt=>onUpdate({...task,media_type:mt})} addToast={addToast}/>
           <div style={{paddingTop:8,display:'flex',alignItems:'center',justifyContent:'space-between',flexWrap:'wrap',gap:8}}>
-            <button className="btn-open-review" onClick={()=>onOpenReview&&onOpenReview(task.id)}>
-              {task.review_status&&task.review_status!=='none'?<span className={`review-badge rb-${task.review_status}`}>{REVIEW_LABELS[task.review_status]}</span>:null}
-              Open Review
-            </button>
-            <button className="btn-danger" onClick={()=>{if(confirm("Delete this task?"))onDelete(task.id);}}>{IC.trash} Delete task</button>
+            <button className="btn-open-review" onClick={()=>onOpenReview&&onOpenReview(task.id)}>{task.review_status&&task.review_status!=='none'?<span className={`review-badge rb-${task.review_status}`}>{REVIEW_LABELS[task.review_status]}</span>:null} Open Review</button>
+            <button className="btn-danger" onClick={()=>{if(confirm("Delete this task?"))onDelete(task.id);}}>{IC.trash} Delete</button>
           </div>
         </div>}
       </div>
@@ -1010,7 +805,7 @@ function CategoryItem({cat,isActive,count,highCount,onSelect,onRename,onDelete})
   const[editing,setEditing]=useState(false);const[draft,setDraft]=useState(cat);const ref=useRef(null);
   useEffect(()=>{if(editing&&ref.current)ref.current.focus();},[editing]);
   const save=()=>{const t=draft.trim();if(t&&t!==cat)onRename(cat,t);else setDraft(cat);setEditing(false);};
-  return(<div className="sidebar-cat-row">{editing?<input ref={ref} className="cat-edit-input" value={draft} onChange={e=>setDraft(e.target.value)} onBlur={save} onKeyDown={e=>{if(e.key==='Enter')save();if(e.key==='Escape'){setDraft(cat);setEditing(false);}}}/>:<><button className={`sidebar-btn ${isActive?'active':''}`} onClick={onSelect} style={{flex:1}}><span style={{overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{cat}</span><span style={{display:'flex',alignItems:'center',gap:4}}>{highCount>0&&<span style={{fontSize:9,fontWeight:700,color:'#ef4444',background:'#fef2f2',padding:'1px 5px',borderRadius:999}}>{highCount}</span>}<span className="sidebar-count">{count}</span></span></button><button className="cat-action-btn" onClick={()=>{setDraft(cat);setEditing(true);}}>{IC.edit}</button><button className="cat-action-btn del" onClick={()=>onDelete(cat)}>{IC.x}</button></>}</div>);
+  return(<div className="sidebar-cat-row">{editing?<input ref={ref} className="cat-edit-input" value={draft} onChange={e=>setDraft(e.target.value)} onBlur={save} onKeyDown={e=>{if(e.key==='Enter')save();if(e.key==='Escape'){setDraft(cat);setEditing(false);}}}/>:<><button className={`sidebar-btn ${isActive?'active':''}`} onClick={onSelect} style={{flex:1}}><span style={{overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{cat}</span><span style={{display:'flex',alignItems:'center',gap:4}}>{highCount>0&&<span style={{fontSize:9,fontWeight:700,color:'#fff',background:'#ef4444',padding:'0px 5px',borderRadius:999}}>{highCount}</span>}<span className="sidebar-count">{count}</span></span></button><button className="cat-action-btn" onClick={()=>{setDraft(cat);setEditing(true);}}>{IC.edit}</button><button className="cat-action-btn del" onClick={()=>onDelete(cat)}>{IC.x}</button></>}</div>);
 }
 
 function NewTaskModal({onAdd,onClose,categories}){
@@ -1026,65 +821,36 @@ function NewTaskModal({onAdd,onClose,categories}){
   </div></div>);
 }
 
-function ToastContainer({toasts}){
-  return(<div className="toast-container">{toasts.map(t=><div key={t.id} className={`toast ${t.leaving?'leaving':''}`}>{t.msg}</div>)}</div>);
-}
+function ToastContainer({toasts}){return(<div className="toast-container">{toasts.map(t=><div key={t.id} className={`toast ${t.leaving?'leaving':''}`}>{t.msg}</div>)}</div>);}
 
-/* ============================================================
+/* ═══════════════════════════════════════════════════════════
    AUTH
-   ============================================================ */
+   ═══════════════════════════════════════════════════════════ */
 function AuthScreen(){
   const[mode,setMode]=useState("login");const[email,setEmail]=useState("");const[password,setPassword]=useState("");const[loading,setLoading]=useState(false);const[error,setError]=useState("");const[success,setSuccess]=useState("");
   const handleEmail=async(e)=>{
     e.preventDefault();setLoading(true);setError("");setSuccess("");
-    if(mode==="signup"){
-      const{error}=await supabase.auth.signUp({email,password});
-      if(error){setError(error.message);}
-      else{setSuccess("Check your email for a verification link. Click the link, then come back here and sign in.");}
-    }else{
-      const{error}=await supabase.auth.signInWithPassword({email,password});
-      if(error)setError(error.message);
-    }
+    if(mode==="signup"){const{error}=await supabase.auth.signUp({email,password});if(error)setError(error.message);else setSuccess("Check your email for a verification link, then sign in.");}
+    else{const{error}=await supabase.auth.signInWithPassword({email,password});if(error)setError(error.message);}
     setLoading(false);
   };
-  return(
-    <div className="auth-screen"><div className="auth-card">
-      <h1>FQxI Content Manager</h1>
-      <p style={{color:'#64748b',fontSize:13,marginBottom:4}}>Collaborative social media task board</p>
-
-      {/* Mode tabs */}
-      <div style={{display:'flex',gap:0,marginBottom:20,borderRadius:10,overflow:'hidden',border:'1px solid #e2e8f0'}}>
-        <button onClick={()=>{setMode("login");setError("");setSuccess("");}} style={{flex:1,padding:'10px 0',fontSize:14,fontWeight:mode==='login'?700:400,border:'none',cursor:'pointer',fontFamily:'inherit',background:mode==='login'?'#e4d344':'#f8fafc',color:mode==='login'?'#1e293b':'#94a3b8',transition:'all 0.15s'}}>Sign In</button>
-        <button onClick={()=>{setMode("signup");setError("");setSuccess("");}} style={{flex:1,padding:'10px 0',fontSize:14,fontWeight:mode==='signup'?700:400,border:'none',borderLeft:'1px solid #e2e8f0',cursor:'pointer',fontFamily:'inherit',background:mode==='signup'?'#e4d344':'#f8fafc',color:mode==='signup'?'#1e293b':'#94a3b8',transition:'all 0.15s'}}>Create Account</button>
-      </div>
-
-      {mode==="signup"&&<div style={{background:'#eff6ff',border:'1px solid #bfdbfe',borderRadius:10,padding:'12px 14px',marginBottom:16,textAlign:'left'}}>
-        <p style={{fontSize:12,fontWeight:600,color:'#1e40af',margin:'0 0 4px'}}>How sign-up works:</p>
-        <p style={{fontSize:12,color:'#1e40af',margin:'0 0 2px'}}>1. Enter your email and choose a password</p>
-        <p style={{fontSize:12,color:'#1e40af',margin:'0 0 2px'}}>2. You'll receive a verification email — click the link in it</p>
-        <p style={{fontSize:12,color:'#1e40af',margin:0}}>3. Come back here and sign in with your email and password</p>
-      </div>}
-
-      {error&&<p className="auth-error">{error}</p>}
-      {success&&<div style={{background:'#f0fdf4',border:'1px solid #86efac',borderRadius:10,padding:'12px 14px',marginBottom:12,textAlign:'left'}}>
-        <p style={{fontSize:13,fontWeight:600,color:'#15803d',margin:'0 0 4px'}}>Account created!</p>
-        <p style={{fontSize:12,color:'#166534',margin:0}}>{success}</p>
-      </div>}
-
-      {!success&&<form onSubmit={handleEmail}>
-        <input className="auth-input" type="email" placeholder="Email address" value={email} onChange={e=>setEmail(e.target.value)} required/>
-        <input className="auth-input" type="password" placeholder={mode==="signup"?"Choose a password (min 6 chars)":"Password"} value={password} onChange={e=>setPassword(e.target.value)} required minLength={6}/>
-        <button className="auth-btn" type="submit" disabled={loading}>{loading?"...":(mode==="signup"?"Create Account":"Sign In")}</button>
-      </form>}
-
-      {success&&<button className="auth-btn" onClick={()=>{setMode("login");setSuccess("");}} style={{marginTop:8}}>Go to Sign In</button>}
-    </div></div>
-  );
+  return(<div className="auth-screen"><div className="auth-card">
+    <h1>FQxI Content Manager</h1><p style={{color:'#64748b',fontSize:13,marginBottom:4}}>Collaborative content task board</p>
+    <div style={{display:'flex',gap:0,marginBottom:20,borderRadius:10,overflow:'hidden',border:'1px solid #e2e8f0'}}>
+      <button onClick={()=>{setMode("login");setError("");setSuccess("");}} style={{flex:1,padding:'10px 0',fontSize:14,fontWeight:mode==='login'?700:400,border:'none',cursor:'pointer',fontFamily:'inherit',background:mode==='login'?'#0f172a':'#f8fafc',color:mode==='login'?'#fff':'#94a3b8',transition:'all 0.15s'}}>Sign In</button>
+      <button onClick={()=>{setMode("signup");setError("");setSuccess("");}} style={{flex:1,padding:'10px 0',fontSize:14,fontWeight:mode==='signup'?700:400,border:'none',borderLeft:'1px solid #e2e8f0',cursor:'pointer',fontFamily:'inherit',background:mode==='signup'?'#0f172a':'#f8fafc',color:mode==='signup'?'#fff':'#94a3b8',transition:'all 0.15s'}}>Create Account</button>
+    </div>
+    {mode==="signup"&&<div style={{background:'#eef2ff',border:'1px solid #c7d2fe',borderRadius:10,padding:'12px 14px',marginBottom:16,textAlign:'left'}}><p style={{fontSize:12,fontWeight:600,color:'#4338ca',margin:'0 0 4px'}}>How sign-up works:</p><p style={{fontSize:12,color:'#4338ca',margin:0}}>1. Enter email + password &rarr; 2. Verify via email &rarr; 3. Sign in</p></div>}
+    {error&&<p className="auth-error">{error}</p>}
+    {success&&<div style={{background:'#f0fdf4',border:'1px solid #86efac',borderRadius:10,padding:'12px 14px',marginBottom:12,textAlign:'left'}}><p style={{fontSize:13,fontWeight:600,color:'#15803d',margin:0}}>{success}</p></div>}
+    {!success&&<form onSubmit={handleEmail}><input className="auth-input" type="email" placeholder="Email address" value={email} onChange={e=>setEmail(e.target.value)} required/><input className="auth-input" type="password" placeholder={mode==="signup"?"Choose a password (min 6)":"Password"} value={password} onChange={e=>setPassword(e.target.value)} required minLength={6}/><button className="auth-btn" type="submit" disabled={loading}>{loading?"...":(mode==="signup"?"Create Account":"Sign In")}</button></form>}
+    {success&&<button className="auth-btn" onClick={()=>{setMode("login");setSuccess("");}}>Go to Sign In</button>}
+  </div></div>);
 }
 
-/* ============================================================
+/* ═══════════════════════════════════════════════════════════
    MAIN APP
-   ============================================================ */
+   ═══════════════════════════════════════════════════════════ */
 function App(){
   const[user,setUser]=useState(undefined);
   const[tasks,setTasks]=useState([]);
@@ -1094,7 +860,7 @@ function App(){
   const[statusFilter,setStatusFilter]=useState("all");
   const[priorityFilter,setPriorityFilter]=useState("all");
   const[showNew,setShowNew]=useState(false);
-  const[sortBy,setSortBy]=useState("priority");
+  const[sortBy,setSortBy]=useState("manual");
   const[synced,setSynced]=useState(false);
   const[newCatName,setNewCatName]=useState("");
   const[allExpanded,setAllExpanded]=useState(undefined);
@@ -1105,33 +871,15 @@ function App(){
   const searchRef=useRef(null);
 
   // Keyboard shortcuts
-  useEffect(()=>{
-    const h=(e)=>{
-      if(e.target.tagName==='INPUT'||e.target.tagName==='TEXTAREA'||e.target.tagName==='SELECT')return;
-      if(e.key==='n'&&!e.metaKey&&!e.ctrlKey){e.preventDefault();setShowNew(true);}
-      if(e.key==='/'&&!e.metaKey&&!e.ctrlKey){e.preventDefault();searchRef.current?.focus();}
-    };
-    window.addEventListener('keydown',h);
-    return()=>window.removeEventListener('keydown',h);
-  },[]);
+  useEffect(()=>{const h=(e)=>{if(e.target.tagName==='INPUT'||e.target.tagName==='TEXTAREA'||e.target.tagName==='SELECT')return;if(e.key==='n'&&!e.metaKey&&!e.ctrlKey){e.preventDefault();setShowNew(true);}if(e.key==='/'&&!e.metaKey&&!e.ctrlKey){e.preventDefault();searchRef.current?.focus();}};window.addEventListener('keydown',h);return()=>window.removeEventListener('keydown',h);},[]);
 
   // Auth
-  useEffect(()=>{
-    supabase.auth.getSession().then(({data:{session}})=>setUser(session?.user||null));
-    const{data:{subscription}}=supabase.auth.onAuthStateChange((_,session)=>setUser(session?.user||null));
-    return()=>subscription.unsubscribe();
-  },[]);
+  useEffect(()=>{supabase.auth.getSession().then(({data:{session}})=>setUser(session?.user||null));const{data:{subscription}}=supabase.auth.onAuthStateChange((_,session)=>setUser(session?.user||null));return()=>subscription.unsubscribe();},[]);
 
   // Load tasks + real-time
   useEffect(()=>{
     if(!user)return;
-    const loadTasks=async()=>{
-      const{data,error}=await supabase.from('tasks').select('*').order('created_at',{ascending:true});
-      if(!error&&data){
-        setTasks(data);setSynced(true);
-        if(data.length===0)seedDefaults();
-      }
-    };
+    const loadTasks=async()=>{const{data,error}=await supabase.from('tasks').select('*').order('created_at',{ascending:true});if(!error&&data){setTasks(data);setSynced(true);if(data.length===0)seedDefaults();}};
     loadTasks();
     const channel=supabase.channel('tasks-changes').on('postgres_changes',{event:'*',schema:'public',table:'tasks'},(payload)=>{
       if(payload.eventType==='INSERT')setTasks(prev=>[...prev.filter(t=>t.id!==payload.new.id),payload.new]);
@@ -1139,171 +887,195 @@ function App(){
       if(payload.eventType==='DELETE')setTasks(prev=>prev.filter(t=>t.id!==payload.old.id));
     }).subscribe();
     supabase.from('meta').select('*').eq('key','categories').single().then(({data})=>{if(data?.value)setCategories(data.value);});
-    const catChannel=supabase.channel('meta-changes').on('postgres_changes',{event:'*',schema:'public',table:'meta',filter:'key=eq.categories'},(payload)=>{
-      if(payload.new?.value)setCategories(payload.new.value);
-    }).subscribe();
+    const catChannel=supabase.channel('meta-changes').on('postgres_changes',{event:'*',schema:'public',table:'meta',filter:'key=eq.categories'},(payload)=>{if(payload.new?.value)setCategories(payload.new.value);}).subscribe();
     return()=>{supabase.removeChannel(channel);supabase.removeChannel(catChannel);};
   },[user]);
 
+  // Listen for drag-and-drop reorder events
+  useEffect(()=>{
+    const handler=(e)=>{
+      const{draggedId,targetId,position}=e.detail;
+      setTasks(prev=>{
+        const dragged=prev.find(t=>t.id===draggedId);const target=prev.find(t=>t.id===targetId);
+        if(!dragged||!target)return prev;
+        const without=prev.filter(t=>t.id!==draggedId);
+        const targetIdx=without.findIndex(t=>t.id===targetId);
+        const insertIdx=position==='before'?targetIdx:targetIdx+1;
+        const newTasks=[...without];newTasks.splice(insertIdx,0,dragged);
+        // Auto-adjust priority based on neighbors
+        const newIdx=newTasks.findIndex(t=>t.id===draggedId);
+        const above=newIdx>0?newTasks[newIdx-1]:null;
+        const below=newIdx<newTasks.length-1?newTasks[newIdx+1]:null;
+        let newPriority=dragged.priority;
+        if(above&&below){
+          const po={high:0,medium:1,low:2};
+          const avgP=(po[above.priority]+po[below.priority])/2;
+          if(avgP<=0.5)newPriority='high';else if(avgP<=1.5)newPriority='medium';else newPriority='low';
+        }else if(above){newPriority=above.priority;}
+        else if(below){newPriority=below.priority;}
+        // Update sort_order and priority
+        const result=newTasks.map((t,i)=>({...t,sort_order:i,priority:t.id===draggedId?newPriority:t.priority}));
+        // Persist changes
+        const updated=result.find(t=>t.id===draggedId);
+        if(updated){const{id,...data}=updated;supabase.from('tasks').update({sort_order:data.sort_order,priority:data.priority}).eq('id',id);}
+        // Persist all sort orders
+        result.forEach((t,i)=>{if(t.sort_order!==prev.find(p=>p.id===t.id)?.sort_order){supabase.from('tasks').update({sort_order:i}).eq('id',t.id);}});
+        addToast(`Moved "${dragged.title}" ${newPriority!==dragged.priority?`(priority: ${newPriority})`:''}`);
+        return result;
+      });
+    };
+    window.addEventListener('task-reorder',handler);return()=>window.removeEventListener('task-reorder',handler);
+  },[addToast]);
+
   const seedDefaults=async()=>{
-    if(!confirm("This will delete all current tasks and replace them with the defaults. Are you sure?"))return;
-    // Delete all existing tasks and their assets
-    const existing=tasks;
-    for(const t of existing){
-      if(t.image_urls?.length){for(const img of t.image_urls){await supabase.storage.from('assets').remove([img.path]);}}
-      if(t.doc_urls?.length){for(const doc of t.doc_urls){await supabase.storage.from('assets').remove([doc.path]);}}
-    }
+    if(!confirm("Reset to default tasks?"))return;
+    for(const t of tasks){if(t.image_urls?.length)for(const img of t.image_urls)await supabase.storage.from('assets').remove([img.path]);if(t.doc_urls?.length)for(const doc of t.doc_urls)await supabase.storage.from('assets').remove([doc.path]);}
     await supabase.from('tasks').delete().neq('id','00000000-0000-0000-0000-000000000000');
-    // Insert fresh defaults
     const rows=defaultTasks.map(t=>({...t,user_id:user.id}));
-    const{error}=await supabase.from('tasks').insert(rows);
-    if(error){console.error('Seed error:',error);addToast("Error resetting tasks");return;}
-    // Re-fetch to ensure state is correct (realtime may miss bulk inserts)
+    await supabase.from('tasks').insert(rows);
     const{data}=await supabase.from('tasks').select('*').order('created_at',{ascending:true});
     if(data)setTasks(data);
     await supabase.from('meta').upsert({key:'categories',value:DEFAULT_CATEGORIES});
-    addToast("Reset complete — default tasks loaded");
+    addToast("Reset complete");
   };
 
-  const updateTask=async(updated)=>{
-    const{id,...data}=updated;
-    setTasks(prev=>prev.map(t=>t.id===id?updated:t));
-    await supabase.from('tasks').update(data).eq('id',id);
-  };
-
-  const deleteTask=async(id)=>{
-    const task=tasks.find(t=>t.id===id);
-    if(task?.image_urls){for(const img of task.image_urls){await supabase.storage.from('assets').remove([img.path]);}}
-    if(task?.doc_urls){for(const doc of task.doc_urls){await supabase.storage.from('assets').remove([doc.path]);}}
-    setTasks(prev=>prev.filter(t=>t.id!==id));
-    await supabase.from('tasks').delete().eq('id',id);
-    addToast("Task deleted");
-  };
-
-  const addTask=async({title,category,priority})=>{
-    await supabase.from('tasks').insert({title,category,status:'todo',priority,deadline:'',description:'',notes:'',captions:{...EMPTY_CAPTIONS},subtasks:[],image_urls:[],doc_urls:[],review_status:'none',review_notes:[],media_type:'single',user_id:user.id});
-    setShowNew(false);
-    addToast(`"${title}" added`);
-  };
-
+  const updateTask=async(updated)=>{const{id,...data}=updated;setTasks(prev=>prev.map(t=>t.id===id?updated:t));await supabase.from('tasks').update(data).eq('id',id);};
+  const deleteTask=async(id)=>{const task=tasks.find(t=>t.id===id);if(task?.image_urls)for(const img of task.image_urls)await supabase.storage.from('assets').remove([img.path]);if(task?.doc_urls)for(const doc of task.doc_urls)await supabase.storage.from('assets').remove([doc.path]);setTasks(prev=>prev.filter(t=>t.id!==id));await supabase.from('tasks').delete().eq('id',id);addToast("Deleted");};
+  const addTask=async({title,category,priority})=>{const maxOrder=tasks.reduce((m,t)=>Math.max(m,t.sort_order||0),0);await supabase.from('tasks').insert({title,category,status:'todo',priority,deadline:'',description:'',notes:'',captions:{...EMPTY_CAPTIONS},subtasks:[],image_urls:[],doc_urls:[],review_status:'none',review_notes:[],media_type:'single',user_id:user.id,sort_order:maxOrder+1});setShowNew(false);addToast(`"${title}" added`);};
   const saveCategories=async(cats)=>{setCategories(cats);await supabase.from('meta').upsert({key:'categories',value:cats});};
-  const addCategory=()=>{const n=newCatName.trim();if(!n||categories.includes(n))return;saveCategories([...categories,n]);setNewCatName("");addToast(`Category "${n}" added`);};
-  const renameCategory=async(oldName,newName)=>{
-    if(categories.includes(newName)){alert(`"${newName}" exists.`);return;}
-    const newCats=categories.map(c=>c===oldName?newName:c);
-    const toUpdate=tasks.filter(t=>t.category===oldName);
-    for(const t of toUpdate){await supabase.from('tasks').update({category:newName}).eq('id',t.id);}
-    await saveCategories(newCats);
-    if(activeCategory===oldName)setActiveCategory(newName);
-  };
-  const deleteCategory=async(cat)=>{
-    const target=categories.find(c=>c!==cat)||"Uncategorized";
-    if(!confirm(`Delete "${cat}"? Tasks move to "${target}".`))return;
-    const toUpdate=tasks.filter(t=>t.category===cat);
-    for(const t of toUpdate){await supabase.from('tasks').update({category:target}).eq('id',t.id);}
-    await saveCategories(categories.filter(c=>c!==cat));
-    if(activeCategory===cat)setActiveCategory("All");
-  };
-
+  const addCategory=()=>{const n=newCatName.trim();if(!n||categories.includes(n))return;saveCategories([...categories,n]);setNewCatName("");addToast(`"${n}" added`);};
+  const renameCategory=async(oldName,newName)=>{if(categories.includes(newName))return;const newCats=categories.map(c=>c===oldName?newName:c);for(const t of tasks.filter(t=>t.category===oldName))await supabase.from('tasks').update({category:newName}).eq('id',t.id);await saveCategories(newCats);if(activeCategory===oldName)setActiveCategory(newName);};
+  const deleteCategory=async(cat)=>{const target=categories.find(c=>c!==cat)||"Uncategorized";if(!confirm(`Delete "${cat}"? Tasks move to "${target}".`))return;for(const t of tasks.filter(t=>t.category===cat))await supabase.from('tasks').update({category:target}).eq('id',t.id);await saveCategories(categories.filter(c=>c!==cat));if(activeCategory===cat)setActiveCategory("All");};
   const signOut=()=>supabase.auth.signOut();
+
+  // Move up/down handlers
+  const moveTask=(taskId,direction)=>{
+    setTasks(prev=>{
+      const sorted=[...prev].sort((a,b)=>(a.sort_order||0)-(b.sort_order||0));
+      const idx=sorted.findIndex(t=>t.id===taskId);
+      if(idx<0)return prev;
+      const newIdx=idx+direction;
+      if(newIdx<0||newIdx>=sorted.length)return prev;
+      // Swap
+      const task=sorted[idx];const neighbor=sorted[newIdx];
+      // Auto-adjust priority: take the priority of the position we're moving to
+      const newPriority=neighbor.priority;
+      const updatedTask={...task,sort_order:neighbor.sort_order||newIdx,priority:newPriority};
+      const updatedNeighbor={...neighbor,sort_order:task.sort_order||idx};
+      // Persist
+      const{id:tid,...tdata}=updatedTask;const{id:nid,...ndata}=updatedNeighbor;
+      supabase.from('tasks').update({sort_order:tdata.sort_order,priority:tdata.priority}).eq('id',tid);
+      supabase.from('tasks').update({sort_order:ndata.sort_order}).eq('id',nid);
+      const result=prev.map(t=>{if(t.id===tid)return updatedTask;if(t.id===nid)return updatedNeighbor;return t;});
+      if(newPriority!==task.priority)addToast(`Priority changed to ${newPriority}`);
+      return result;
+    });
+  };
 
   if(user===undefined)return<div className="loading-screen">Loading...</div>;
   if(user===null)return<AuthScreen/>;
 
   // Filter + sort
+  const isReviewItem=(t)=>t.review_status&&t.review_status!=='none'&&t.review_status!=='approved';
+  const reviewCount=tasks.filter(isReviewItem).length;
+
   const filtered=tasks
-    .filter(t=>activeCategory==="All"||(activeCategory==="Starred"?starred.has(t.id):activeCategory==="In Review"?(t.review_status&&t.review_status!=='none'&&t.review_status!=='approved'):t.category===activeCategory))
+    .filter(t=>activeCategory==="All"||(activeCategory==="Starred"?starred.has(t.id):activeCategory==="In Review"?isReviewItem(t):t.category===activeCategory))
     .filter(t=>statusFilter==="all"||t.status===statusFilter)
     .filter(t=>priorityFilter==="all"||t.priority===priorityFilter)
     .filter(t=>{if(!search)return true;const q=search.toLowerCase();return t.title?.toLowerCase().includes(q)||t.description?.toLowerCase().includes(q)||t.notes?.toLowerCase().includes(q);})
     .sort((a,b)=>{
       // Starred always first
-      const aS=starred.has(a.id)?0:1;const bS=starred.has(b.id)?0:1;
-      if(aS!==bS)return aS-bS;
+      const aS=starred.has(a.id)?0:1;const bS=starred.has(b.id)?0:1;if(aS!==bS)return aS-bS;
       // Done tasks always last
-      const aD=a.status==='done'?1:0;const bD=b.status==='done'?1:0;
-      if(aD!==bD)return aD-bD;
-      // Review tasks float to top: approved first (ready to post), then review-needed
-      const reviewOrder=(t)=>{if(t.review_status==='approved')return 0;if(t.review_status==='submitted'||t.review_status==='resubmitted')return 1;return 2;};
-      const aR=reviewOrder(a);const bR=reviewOrder(b);
-      if(aR!==bR)return aR-bR;
+      const aD=a.status==='done'?1:0;const bD=b.status==='done'?1:0;if(aD!==bD)return aD-bD;
+      // Review tasks float to top
+      const reviewOrder=(t)=>{if(t.review_status==='submitted'||t.review_status==='resubmitted')return 0;if(t.review_status==='needs_changes')return 1;if(t.review_status==='approved')return 2;return 3;};
+      const aR=reviewOrder(a);const bR=reviewOrder(b);if(aR!==bR)return aR-bR;
       // Sort by selected criteria
-      if(sortBy==="priority"){
-        const o={high:0,medium:1,low:2};const ap=o[a.priority]??1;const bp=o[b.priority]??1;
-        if(ap!==bp)return ap-bp;
-        const so={in_progress:0,todo:1,waiting:2};return(so[a.status]??1)-(so[b.status]??1);
-      }
+      if(sortBy==="manual"){return(a.sort_order||0)-(b.sort_order||0);}
+      if(sortBy==="priority"){const o={high:0,medium:1,low:2};const ap=o[a.priority]??1;const bp=o[b.priority]??1;if(ap!==bp)return ap-bp;const so={in_progress:0,todo:1,waiting:2};return(so[a.status]??1)-(so[b.status]??1);}
       if(sortBy==="status"){const o={in_progress:0,todo:1,waiting:2,done:3};return(o[a.status]||1)-(o[b.status]||1);}
-      if(sortBy==="deadline"){const aD=a.deadline||"zzz";const bD=b.deadline||"zzz";return aD.localeCompare(bD);}
+      if(sortBy==="deadline"){return(a.deadline||"zzz").localeCompare(b.deadline||"zzz");}
       return(a.title||"").localeCompare(b.title||"");
     });
 
-  const stats={done:tasks.filter(t=>t.status==="done").length,inProgress:tasks.filter(t=>t.status==="in_progress").length,waiting:tasks.filter(t=>t.status==="waiting").length,todo:tasks.filter(t=>t.status==="todo").length};
+  // Separate review items for pinned section
+  const reviewItems=filtered.filter(isReviewItem);
+  const nonReviewItems=filtered.filter(t=>!isReviewItem(t));
 
-  const toggleStatusFilter=(status)=>{
-    const mapped={inProgress:"in_progress",waiting:"waiting",todo:"todo",done:"done"}[status];
-    setStatusFilter(prev=>prev===mapped?"all":mapped);
-  };
+  const stats={done:tasks.filter(t=>t.status==="done").length,inProgress:tasks.filter(t=>t.status==="in_progress").length,waiting:tasks.filter(t=>t.status==="waiting").length,todo:tasks.filter(t=>t.status==="todo").length};
+  const toggleStatusFilter=(status)=>{const mapped={inProgress:"in_progress",waiting:"waiting",todo:"todo",done:"done"}[status];setStatusFilter(prev=>prev===mapped?"all":mapped);};
+
+  const renderTaskCard=(task,idx,list)=>(<TaskCard key={task.id} task={task} onUpdate={updateTask} onDelete={deleteTask} categories={categories} isStarred={starred.has(task.id)} onToggleStar={toggleStar} forceExpand={allExpanded} userEmail={user.email} addToast={addToast} onOpenReview={setReviewingTaskId} onMoveUp={(id)=>moveTask(id,-1)} onMoveDown={(id)=>moveTask(id,1)} isFirst={idx===0} isLast={idx===list.length-1} index={idx}/>);
 
   return(
     <div className="app">
       <header className="header"><div className="header-inner">
         <div style={{display:'flex',alignItems:'center',gap:12}}>
           <button className="mobile-sidebar-toggle" onClick={()=>setSidebarOpen(!sidebarOpen)}>{IC.menu}</button>
-          <div><h1>FQxI Content Manager</h1><div className="header-sub"><span className={`sync-dot ${synced?'sync-live':'sync-off'}`}/>{synced?"Live \u2014 syncing in real time":"Connecting..."}</div></div>
+          <div><h1>FQxI Content Manager</h1><div className="header-sub"><span className={`sync-dot ${synced?'sync-live':'sync-off'}`}/>{synced?"Live sync":"Connecting..."}</div></div>
         </div>
         <div className="header-right">
-          <div className="stat-badges">
-            <span className={`stat-badge stat-active ${statusFilter==='in_progress'?'filter-active':''}`} onClick={()=>toggleStatusFilter('inProgress')}>{stats.inProgress} active</span>
-            <span className={`stat-badge stat-waiting ${statusFilter==='waiting'?'filter-active':''}`} onClick={()=>toggleStatusFilter('waiting')}>{stats.waiting} waiting</span>
-            <span className={`stat-badge stat-todo ${statusFilter==='todo'?'filter-active':''}`} onClick={()=>toggleStatusFilter('todo')}>{stats.todo} to do</span>
-            <span className={`stat-badge stat-done ${statusFilter==='done'?'filter-active':''}`} onClick={()=>toggleStatusFilter('done')}>{stats.done} done</span>
-            <span className="stat-badge" style={{background:'rgba(99,102,241,0.15)',color:'#818cf8',cursor:'pointer'}} onClick={()=>setActiveCategory("In Review")}>{tasks.filter(t=>t.review_status&&t.review_status!=='none'&&t.review_status!=='approved').length} in review</span>
+          <div className="stat-pills">
+            <span className={`stat-pill s-active ${statusFilter==='in_progress'?'active':''}`} onClick={()=>toggleStatusFilter('inProgress')}>{stats.inProgress} active</span>
+            <span className={`stat-pill s-waiting ${statusFilter==='waiting'?'active':''}`} onClick={()=>toggleStatusFilter('waiting')}>{stats.waiting} waiting</span>
+            <span className={`stat-pill s-todo ${statusFilter==='todo'?'active':''}`} onClick={()=>toggleStatusFilter('todo')}>{stats.todo} to do</span>
+            <span className={`stat-pill s-done ${statusFilter==='done'?'active':''}`} onClick={()=>toggleStatusFilter('done')}>{stats.done} done</span>
+            <span className={`stat-pill s-review ${activeCategory==='In Review'?'active':''}`} onClick={()=>setActiveCategory(prev=>prev==='In Review'?'All':'In Review')}>{reviewCount} in review</span>
           </div>
           <button className="btn-primary" onClick={()=>setShowNew(true)}>{IC.plus} New Task</button>
-          <div className="user-pill"><span>{user.email||"User"}</span><button className="signout-btn" onClick={signOut}>Sign out</button></div>
+          <div className="user-pill"><span>{user.email}</span><button className="signout-btn" onClick={signOut}>Sign out</button></div>
         </div>
       </div></header>
+
       <div className="layout">
         <aside className={`sidebar ${sidebarOpen?'':'collapsed'}`}>
           <div className="sidebar-section">
             <div className="sidebar-label">Views</div>
             <button className={`sidebar-btn ${activeCategory==="All"?'active':''}`} onClick={()=>setActiveCategory("All")}><span>All Tasks</span><span className="sidebar-count">{tasks.length}</span></button>
-            <button className={`sidebar-btn ${activeCategory==="Starred"?'active':''}`} onClick={()=>setActiveCategory("Starred")}><span>{"\u2605"} Starred</span><span className="sidebar-count">{starred.size}</span></button>
-            <button className={`sidebar-btn ${activeCategory==="In Review"?'active':''}`} onClick={()=>setActiveCategory("In Review")}><span>{"\ud83d\udd0d"} In Review</span><span className="sidebar-count">{tasks.filter(t=>t.review_status&&t.review_status!=='none'&&t.review_status!=='approved').length}</span></button>
+            <button className={`sidebar-btn ${activeCategory==="Starred"?'active':''}`} onClick={()=>setActiveCategory("Starred")}><span>Starred</span><span className="sidebar-count">{starred.size}</span></button>
+            <button className={`sidebar-btn ${activeCategory==="In Review"?'active':''}`} onClick={()=>setActiveCategory("In Review")} style={reviewCount>0?{position:'relative'}:{}}><span>In Review</span><span className="sidebar-count" style={reviewCount>0?{color:'#6366f1',fontWeight:700}:{}}>{reviewCount}</span></button>
           </div>
           <div className="sidebar-section">
             <div className="sidebar-label">Categories</div>
             {categories.map(cat=>{const catTasks=tasks.filter(t=>t.category===cat);const highCount=catTasks.filter(t=>t.priority==='high'&&t.status!=='done').length;return <CategoryItem key={cat} cat={cat} isActive={activeCategory===cat} count={catTasks.length} highCount={highCount} onSelect={()=>setActiveCategory(cat)} onRename={renameCategory} onDelete={deleteCategory}/>;})}
             <div className="add-cat-row"><input className="add-cat-input" placeholder="New category..." value={newCatName} onChange={e=>setNewCatName(e.target.value)} onKeyDown={e=>{if(e.key==='Enter')addCategory();}}/><button className="add-cat-btn" disabled={!newCatName.trim()} onClick={addCategory}>Add</button></div>
           </div>
-          <div className="export-bar">
-            <button className="btn-export" onClick={seedDefaults}>Reset to default tasks</button>
-          </div>
-          <div className="shortcuts-help">
-            <span><span className="kbd">N</span> New task</span>
-            <span><span className="kbd">/</span> Search</span>
-            <span><span className="kbd">Esc</span> Close</span>
-          </div>
+          <div className="export-bar"><button className="btn-export" onClick={seedDefaults}>Reset to defaults</button></div>
+          <div className="shortcuts-help"><span><span className="kbd">N</span> New</span><span><span className="kbd">/</span> Search</span><span><span className="kbd">Esc</span> Close</span></div>
         </aside>
+
         <main className="main">
-          <div className="filters">
+          <div className="filters-bar">
             <div className="search-wrap">{IC.search}<input ref={searchRef} className="search-input" placeholder="Search tasks..." value={search} onChange={e=>setSearch(e.target.value)}/></div>
             <select className="filter-select" value={statusFilter} onChange={e=>setStatusFilter(e.target.value)}><option value="all">All Statuses</option>{STATUSES.map(s=><option key={s} value={s}>{STATUS_LABELS[s]}</option>)}</select>
             <select className="filter-select" value={priorityFilter} onChange={e=>setPriorityFilter(e.target.value)}><option value="all">All Priorities</option><option value="high">High</option><option value="medium">Medium</option><option value="low">Low</option></select>
-            <select className="filter-select" value={sortBy} onChange={e=>setSortBy(e.target.value)}><option value="priority">Sort: Priority</option><option value="status">Sort: Status</option><option value="title">Sort: Title</option><option value="deadline">Sort: Deadline</option></select>
-            <span className="results-count">{filtered.length} of {tasks.length} tasks</span>
+            <select className="filter-select" value={sortBy} onChange={e=>setSortBy(e.target.value)}><option value="manual">Sort: Manual</option><option value="priority">Sort: Priority</option><option value="status">Sort: Status</option><option value="title">Sort: Title</option><option value="deadline">Sort: Deadline</option></select>
+            <span className="results-count">{filtered.length} of {tasks.length}</span>
           </div>
           <div className="toolbar">
             <div className="toolbar-left">
-              <button className="toolbar-btn" onClick={()=>setAllExpanded(true)} title="Expand all tasks">{IC.expand} Expand all</button>
-              <button className="toolbar-btn" onClick={()=>{setAllExpanded(false);setTimeout(()=>setAllExpanded(undefined),100);}} title="Collapse all tasks">{IC.collapse} Collapse all</button>
+              <button className="toolbar-btn" onClick={()=>setAllExpanded(true)}>{IC.expand} Expand all</button>
+              <button className="toolbar-btn" onClick={()=>{setAllExpanded(false);setTimeout(()=>setAllExpanded(undefined),100);}}>{IC.collapse} Collapse</button>
             </div>
           </div>
-          {filtered.length===0&&<div className="empty-state">{search||statusFilter!=='all'||priorityFilter!=='all'?"No tasks match your filters. Try adjusting them.":"No tasks yet. Click New Task to get started!"}</div>}
-          {filtered.map(task=><TaskCard key={task.id} task={task} onUpdate={updateTask} onDelete={deleteTask} categories={categories} isStarred={starred.has(task.id)} onToggleStar={toggleStar} forceExpand={allExpanded} userEmail={user.email} addToast={addToast} onOpenReview={setReviewingTaskId}/>)}
+
+          {/* Pinned review section */}
+          {reviewItems.length>0&&activeCategory!=="In Review"&&<div className="review-section">
+            <div className="review-section-header"><span className="review-count">{reviewItems.length}</span><h3>Awaiting Review</h3></div>
+            {reviewItems.map((task,i)=>renderTaskCard(task,i,reviewItems))}
+            {nonReviewItems.length>0&&<div className="review-divider"/>}
+          </div>}
+
+          {/* Main task list (exclude review items if shown above) */}
+          {activeCategory==="In Review"?
+            (filtered.length===0?<div className="empty-state">No tasks in review.</div>:filtered.map((task,i)=>renderTaskCard(task,i,filtered)))
+            :(nonReviewItems.length===0&&reviewItems.length===0?<div className="empty-state">{search||statusFilter!=='all'||priorityFilter!=='all'?"No tasks match your filters.":"No tasks yet. Press N to add one!"}</div>:nonReviewItems.map((task,i)=>renderTaskCard(task,i,nonReviewItems)))
+          }
         </main>
       </div>
+
       {showNew&&<NewTaskModal onAdd={addTask} onClose={()=>setShowNew(false)} categories={categories}/>}
       {reviewingTaskId&&tasks.find(t=>t.id===reviewingTaskId)&&<ReviewModal task={tasks.find(t=>t.id===reviewingTaskId)} onClose={()=>setReviewingTaskId(null)} onUpdate={updateTask} userEmail={user.email} addToast={addToast}/>}
       <ToastContainer toasts={toasts}/>
