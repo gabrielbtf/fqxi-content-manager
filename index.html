@@ -359,6 +359,31 @@
   .btn-open-review { display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px; border-radius: 8px; font-size: 12px; font-weight: 600; cursor: pointer; border: 1px solid #c7d2fe; background: #eef2ff; color: #4338ca; font-family: inherit; transition: all 0.15s; margin-top: 12px; }
   .btn-open-review:hover { background: #6366f1; color: #fff; border-color: #6366f1; }
 
+  /* ─── IDEAS SCRATCHPAD ─── */
+  .ideas-section { border-top: 1px solid #e2e8f0; padding-top: 16px; margin-top: 12px; }
+  .ideas-toggle { display: flex; align-items: center; justify-content: space-between; width: 100%; background: none; border: none; cursor: pointer; padding: 0 0 8px; font-family: inherit; }
+  .ideas-toggle-left { display: flex; align-items: center; gap: 6px; }
+  .ideas-toggle-label { font-size: 10px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.08em; }
+  .ideas-toggle-count { font-size: 10px; background: #f1f5f9; color: #64748b; padding: 1px 6px; border-radius: 999px; font-weight: 600; }
+  .ideas-toggle-arrow { font-size: 12px; color: #cbd5e1; transition: transform 0.2s; }
+  .ideas-toggle-arrow.open { transform: rotate(180deg); }
+  .ideas-list { display: flex; flex-direction: column; gap: 4px; max-height: 300px; overflow-y: auto; padding-right: 4px; }
+  .idea-item { display: flex; align-items: flex-start; gap: 6px; padding: 6px 8px; background: #fafbfc; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 12px; color: #334155; transition: all 0.12s; group: true; position: relative; }
+  .idea-item:hover { border-color: #cbd5e1; background: #f1f5f9; }
+  .idea-text { flex: 1; font-size: 12px; color: #334155; line-height: 1.4; min-width: 0; word-break: break-word; background: none; border: none; outline: none; font-family: inherit; resize: none; padding: 0; }
+  .idea-actions { display: flex; gap: 2px; flex-shrink: 0; opacity: 0; transition: opacity 0.12s; }
+  .idea-item:hover .idea-actions { opacity: 1; }
+  .idea-action-btn { background: none; border: none; cursor: pointer; padding: 2px; display: flex; color: #94a3b8; transition: color 0.12s; border-radius: 4px; }
+  .idea-action-btn:hover { color: #6366f1; background: #eef2ff; }
+  .idea-action-btn.del:hover { color: #ef4444; background: #fef2f2; }
+  .idea-promote-btn { background: none; border: 1px solid #c7d2fe; color: #6366f1; font-size: 10px; font-weight: 600; padding: 2px 6px; border-radius: 4px; cursor: pointer; font-family: inherit; white-space: nowrap; transition: all 0.12s; }
+  .idea-promote-btn:hover { background: #6366f1; color: #fff; border-color: #6366f1; }
+  .ideas-add-row { display: flex; gap: 4px; margin-top: 6px; }
+  .ideas-add-input { flex: 1; border: 1px solid #e2e8f0; border-radius: 6px; padding: 6px 8px; font-size: 12px; outline: none; font-family: inherit; min-width: 0; background: #fafbfc; }
+  .ideas-add-input:focus { border-color: #6366f1; box-shadow: 0 0 0 3px rgba(99,102,241,0.1); background: #fff; }
+  .ideas-add-input::placeholder { color: #cbd5e1; }
+  .ideas-empty { font-size: 11px; color: #cbd5e1; padding: 8px 0; text-align: center; font-style: italic; }
+
   /* ─── KEYBOARD HELP ─── */
   .shortcuts-help { font-size: 10px; color: #cbd5e1; display: flex; gap: 12px; padding: 8px 0 0; flex-wrap: wrap; }
   .shortcuts-help span { display: flex; align-items: center; gap: 3px; }
@@ -727,8 +752,13 @@ function TaskCard({task,onUpdate,onDelete,categories,isStarred,onToggleStar,forc
 
   const handleHeaderClick=(e)=>{if(e.target.closest('button')||e.target.closest('select')||e.target.closest('input'))return;setExpanded(!expanded);};
 
-  // Drag handlers
-  const handleDragStart=(e)=>{e.dataTransfer.setData('text/plain',task.id);e.dataTransfer.effectAllowed='move';cardRef.current?.classList.add('dragging');};
+  // Drag handlers — only allow drag from header/handle, not from expanded content (textareas, inputs, etc.)
+  const handleDragStart=(e)=>{
+    const tag=e.target.tagName;
+    if(tag==='TEXTAREA'||tag==='INPUT'||tag==='SELECT'||e.target.isContentEditable){e.preventDefault();return;}
+    if(e.target.closest('.task-expanded')){e.preventDefault();return;}
+    e.dataTransfer.setData('text/plain',task.id);e.dataTransfer.effectAllowed='move';cardRef.current?.classList.add('dragging');
+  };
   const handleDragEnd=()=>{cardRef.current?.classList.remove('dragging');};
   const handleDragOver=(e)=>{e.preventDefault();e.dataTransfer.dropEffect='move';
     const rect=cardRef.current?.getBoundingClientRect();if(!rect)return;
@@ -801,6 +831,56 @@ function TaskCard({task,onUpdate,onDelete,categories,isStarred,onToggleStar,forc
   );
 }
 
+function IdeasPanel({ideas,onAdd,onDelete,onUpdate,onPromote}){
+  const[open,setOpen]=useState(true);
+  const[draft,setDraft]=useState("");
+  const inputRef=useRef(null);
+
+  const handleAdd=()=>{
+    const text=draft.trim();
+    if(!text)return;
+    onAdd(text);
+    setDraft("");
+    inputRef.current?.focus();
+  };
+
+  return(
+    <div className="ideas-section">
+      <button className="ideas-toggle" onClick={()=>setOpen(!open)}>
+        <div className="ideas-toggle-left">
+          <span className="ideas-toggle-label">Ideas</span>
+          {ideas.length>0&&<span className="ideas-toggle-count">{ideas.length}</span>}
+        </div>
+        <span className={`ideas-toggle-arrow ${open?'open':''}`}>{"\u25BE"}</span>
+      </button>
+      {open&&<>
+        {ideas.length===0?<div className="ideas-empty">Quick-capture ideas here</div>:
+        <div className="ideas-list">
+          {ideas.map((idea,i)=>(
+            <div key={idea.id||i} className="idea-item">
+              <textarea className="idea-text" rows={1} defaultValue={idea.text}
+                onBlur={e=>{const v=e.target.value.trim();if(v&&v!==idea.text)onUpdate(idea.id,v);}}
+                onKeyDown={e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();e.target.blur();}}}
+                onInput={e=>{e.target.style.height='auto';e.target.style.height=e.target.scrollHeight+'px';}}
+              />
+              <div className="idea-actions">
+                <button className="idea-promote-btn" onClick={()=>onPromote(idea)} title="Convert to task">Task</button>
+                <button className="idea-action-btn del" onClick={()=>onDelete(idea.id)} title="Delete">{IC.x}</button>
+              </div>
+            </div>
+          ))}
+        </div>}
+        <div className="ideas-add-row">
+          <input ref={inputRef} className="ideas-add-input" placeholder="Jot an idea..." value={draft}
+            onChange={e=>setDraft(e.target.value)}
+            onKeyDown={e=>{if(e.key==='Enter')handleAdd();}}
+          />
+        </div>
+      </>}
+    </div>
+  );
+}
+
 function CategoryItem({cat,isActive,count,highCount,onSelect,onRename,onDelete}){
   const[editing,setEditing]=useState(false);const[draft,setDraft]=useState(cat);const ref=useRef(null);
   useEffect(()=>{if(editing&&ref.current)ref.current.focus();},[editing]);
@@ -860,12 +940,13 @@ function App(){
   const[statusFilter,setStatusFilter]=useState("all");
   const[priorityFilter,setPriorityFilter]=useState("all");
   const[showNew,setShowNew]=useState(false);
-  const[sortBy,setSortBy]=useState("manual");
+  const[sortBy,setSortBy]=useState("priority");
   const[synced,setSynced]=useState(false);
   const[newCatName,setNewCatName]=useState("");
   const[allExpanded,setAllExpanded]=useState(undefined);
   const[sidebarOpen,setSidebarOpen]=useState(true);
   const[reviewingTaskId,setReviewingTaskId]=useState(null);
+  const[ideas,setIdeas]=useState([]);
   const{starred,toggle:toggleStar}=useStarred();
   const{toasts,add:addToast}=useToast();
   const searchRef=useRef(null);
@@ -887,8 +968,10 @@ function App(){
       if(payload.eventType==='DELETE')setTasks(prev=>prev.filter(t=>t.id!==payload.old.id));
     }).subscribe();
     supabase.from('meta').select('*').eq('key','categories').single().then(({data})=>{if(data?.value)setCategories(data.value);});
+    supabase.from('meta').select('*').eq('key','ideas').single().then(({data})=>{if(data?.value)setIdeas(data.value);});
     const catChannel=supabase.channel('meta-changes').on('postgres_changes',{event:'*',schema:'public',table:'meta',filter:'key=eq.categories'},(payload)=>{if(payload.new?.value)setCategories(payload.new.value);}).subscribe();
-    return()=>{supabase.removeChannel(channel);supabase.removeChannel(catChannel);};
+    const ideasChannel=supabase.channel('meta-ideas').on('postgres_changes',{event:'*',schema:'public',table:'meta',filter:'key=eq.ideas'},(payload)=>{if(payload.new?.value)setIdeas(payload.new.value);}).subscribe();
+    return()=>{supabase.removeChannel(channel);supabase.removeChannel(catChannel);supabase.removeChannel(ideasChannel);};
   },[user]);
 
   // Task ordering stored in meta table (array of task IDs)
@@ -976,6 +1059,17 @@ function App(){
   const addCategory=()=>{const n=newCatName.trim();if(!n||categories.includes(n))return;saveCategories([...categories,n]);setNewCatName("");addToast(`"${n}" added`);};
   const renameCategory=async(oldName,newName)=>{if(categories.includes(newName))return;const newCats=categories.map(c=>c===oldName?newName:c);for(const t of tasks.filter(t=>t.category===oldName))await supabase.from('tasks').update({category:newName}).eq('id',t.id);await saveCategories(newCats);if(activeCategory===oldName)setActiveCategory(newName);};
   const deleteCategory=async(cat)=>{const target=categories.find(c=>c!==cat)||"Uncategorized";if(!confirm(`Delete "${cat}"? Tasks move to "${target}".`))return;for(const t of tasks.filter(t=>t.category===cat))await supabase.from('tasks').update({category:target}).eq('id',t.id);await saveCategories(categories.filter(c=>c!==cat));if(activeCategory===cat)setActiveCategory("All");};
+  // Ideas CRUD — stored in meta table as JSON array
+  const saveIdeas=async(list)=>{setIdeas(list);await supabase.from('meta').upsert({key:'ideas',value:list});};
+  const addIdea=(text)=>{const idea={id:Date.now().toString(),text,created:new Date().toISOString()};saveIdeas([idea,...ideas]);};
+  const deleteIdea=(id)=>{saveIdeas(ideas.filter(i=>i.id!==id));};
+  const updateIdea=(id,text)=>{saveIdeas(ideas.map(i=>i.id===id?{...i,text}:i));};
+  const promoteIdea=async(idea)=>{
+    await addTask({title:idea.text,category:categories[0]||"Uncategorized",priority:"medium"});
+    saveIdeas(ideas.filter(i=>i.id!==idea.id));
+    addToast(`"${idea.text}" promoted to task`);
+  };
+
   const signOut=()=>supabase.auth.signOut();
 
   // Move up/down handlers — uses the currently displayed filtered list order
@@ -1031,7 +1125,7 @@ function App(){
       const reviewOrder=(t)=>{if(t.review_status==='submitted'||t.review_status==='resubmitted')return 0;if(t.review_status==='needs_changes')return 1;if(t.review_status==='approved')return 2;return 3;};
       const aR=reviewOrder(a);const bR=reviewOrder(b);if(aR!==bR)return aR-bR;
       // Sort by selected criteria
-      if(sortBy==="manual"){const oa=taskOrder.indexOf(a.id);const ob=taskOrder.indexOf(b.id);const ia=oa>=0?oa:9999;const ib=ob>=0?ob:9999;return ia-ib;}
+      if(sortBy==="manual"){const oa=taskOrder.indexOf(a.id);const ob=taskOrder.indexOf(b.id);if(oa>=0&&ob>=0)return oa-ob;if(oa>=0)return -1;if(ob>=0)return 1;const po={high:0,medium:1,low:2};return(po[a.priority]??1)-(po[b.priority]??1);}
       if(sortBy==="priority"){const o={high:0,medium:1,low:2};const ap=o[a.priority]??1;const bp=o[b.priority]??1;if(ap!==bp)return ap-bp;const so={in_progress:0,todo:1,waiting:2};return(so[a.status]??1)-(so[b.status]??1);}
       if(sortBy==="status"){const o={in_progress:0,todo:1,waiting:2,done:3};return(o[a.status]||1)-(o[b.status]||1);}
       if(sortBy==="deadline"){return(a.deadline||"zzz").localeCompare(b.deadline||"zzz");}
@@ -1080,6 +1174,7 @@ function App(){
             {categories.map(cat=>{const catTasks=tasks.filter(t=>t.category===cat);const highCount=catTasks.filter(t=>t.priority==='high'&&t.status!=='done').length;return <CategoryItem key={cat} cat={cat} isActive={activeCategory===cat} count={catTasks.length} highCount={highCount} onSelect={()=>setActiveCategory(cat)} onRename={renameCategory} onDelete={deleteCategory}/>;})}
             <div className="add-cat-row"><input className="add-cat-input" placeholder="New category..." value={newCatName} onChange={e=>setNewCatName(e.target.value)} onKeyDown={e=>{if(e.key==='Enter')addCategory();}}/><button className="add-cat-btn" disabled={!newCatName.trim()} onClick={addCategory}>Add</button></div>
           </div>
+          <IdeasPanel ideas={ideas} onAdd={addIdea} onDelete={deleteIdea} onUpdate={updateIdea} onPromote={promoteIdea}/>
           <div className="export-bar"><button className="btn-export" onClick={seedDefaults}>Reset to defaults</button></div>
           <div className="shortcuts-help"><span><span className="kbd">N</span> New</span><span><span className="kbd">/</span> Search</span><span><span className="kbd">Esc</span> Close</span></div>
         </aside>
